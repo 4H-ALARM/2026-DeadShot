@@ -13,6 +13,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import frc.lib.Constants.GenericConstants;
 import frc.lib.Constants.ShooterConstants;
 import frc.lib.enums.TargetEnum;
@@ -39,7 +40,7 @@ public class ShooterIOKraken implements ShooterIO {
   private TargetEnum targetEnum;
   private Pose2d robotPose;
   private Pose2d turretPose;
-  private Pose2d targetPose;
+  private Translation3d targetPose;
 
   private final LoggedTunableNumber shooterkp =
       new LoggedTunableNumber("Shooter/kp", ShooterConstants.shooterkp);
@@ -241,7 +242,7 @@ public class ShooterIOKraken implements ShooterIO {
     targetEnum = target;
     switch (this.targetEnum) {
       case HUB:
-        this.targetPose = GenericConstants.HUB_POSE2D;
+        this.targetPose = GenericConstants.HUB_POSE3D;
         break;
       case ALLIANCEZONELEFT:
         this.targetPose = GenericConstants.LEFTALLIANCE;

@@ -4,16 +4,29 @@
 
 package frc.lib.Constants;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
+
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 
 /** Add your docs here. */
 public class GenericConstants {
-  public static final Pose2d HUB_POSE2D = new Pose2d(4.6, 3.8, new Rotation2d());
-  public static final Pose2d LEFTALLIANCE = new Pose2d();
-  public static final Pose2d CENTERALLIANCE = new Pose2d();
-  public static final Pose2d RIGHTALLIANCE = new Pose2d();
+  // field constants
+  public static final double MIDY = Inches.of(317.69 / 2).in(Meters);
+  public static final double HUBX = Inches.of(182.11).in(Meters);
+  public static final double MIDX = Inches.of(325.61).in(Meters);
+
+  // field poses
+  public static final double MIDALLIANCE = HUBX / 2;
+  public static final Translation3d HUB_POSE3D =
+      new Translation3d(HUBX, MIDY, Inches.of(72).in(Meters));
+  public static final Translation3d LEFTALLIANCE = new Translation3d(MIDALLIANCE, MIDY * .5, 0);
+  public static final Translation3d CENTERALLIANCE = new Translation3d(MIDALLIANCE, MIDY, 0);
+  public static final Translation3d RIGHTALLIANCE = new Translation3d(MIDALLIANCE, MIDY * 1.5, 0);
+  public static final Translation3d LEFTNEUTRAL = new Translation3d(MIDX, MIDY * .5, 0);
+  public static final Translation3d RIGHTNEUTRAL = new Translation3d(MIDX, MIDY, 0);
+  public static final Translation3d MIDDLENEUTRAL = new Translation3d(MIDX, MIDY * 1.5, 0);
 
   public static final Translation2d turretPoseDifference = new Translation2d();
 }

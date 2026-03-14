@@ -18,7 +18,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.lib.Constants.GenericConstants;
 import frc.lib.Constants.SwerveConstants;
+import frc.robot.commands.ChooseShotTarget;
 import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
@@ -31,6 +33,7 @@ import frc.robot.subsystems.endeffector.Shooter;
 import frc.robot.subsystems.endeffector.ShooterIOKraken;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeIOKraken;
+import frc.robot.subsystems.targeting.ShootTargetIO;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -43,9 +46,11 @@ public class RobotContainer {
   private final Drive drive;
   private final Shooter shooter;
   private final Intake intake;
+  private final ShootTargetIO shootTarget = new ShootTargetIO(GenericConstants.HUB_POSE3D, true);
   private SwerveDriveKinematics swerveKinematics;
 
-  private final CommandXboxController controller = new CommandXboxController(0);
+  private final CommandXboxController PilotController = new CommandXboxController(0);
+  private final CommandXboxController OperatorController = new CommandXboxController(1);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -66,7 +71,7 @@ public class RobotContainer {
         //         new VisionIOPhotonVision(camera0Name, robotToCamera0),
         //         new VisionIOPhotonVision(camera1Name, robotToCamera1));
 
-        shooter = new Shooter(new ShooterIOKraken(), drive, new IndexerIOKraken());
+        shooter = new Shooter(new ShooterIOKraken(), drive, new IndexerIOKraken(), shootTarget);
 
         intake = new Intake(new IntakeIOKraken());
         break;
@@ -87,7 +92,7 @@ public class RobotContainer {
         //         drive::addVisionMeasurement,
         //         new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, drive::getPose),
         //         new VisionIOPhotonVisionSim(camera1Name, robotToCamera1, drive::getPose));
-        shooter = new Shooter(new ShooterIOKraken(), drive, new IndexerIOKraken());
+        shooter = new Shooter(new ShooterIOKraken(), drive, new IndexerIOKraken(), shootTarget);
 
         intake = new Intake(new IntakeIOKraken());
         break;
@@ -105,7 +110,7 @@ public class RobotContainer {
                 new ModuleIO() {});
 
         // vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
-        shooter = new Shooter(new ShooterIOKraken(), drive, new IndexerIOKraken());
+        shooter = new Shooter(new ShooterIOKraken(), drive, new IndexerIOKraken(), shootTarget);
 
         intake = new Intake(new IntakeIOKraken());
         break;
@@ -126,9 +131,9 @@ public class RobotContainer {
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
-            () -> -controller.getLeftY(),
-            () -> -controller.getLeftX(),
-            () -> -controller.getRightX()));
+            () -> -PilotController.getLeftY(),
+            () -> -PilotController.getLeftX(),
+            () -> -PilotController.getRightX()));
 
     // intake.setDefaultCommand(
     //     new InstantCommand(() -> intake.changeAngleTest(controller.getLeftY()), intake));
@@ -138,9 +143,8 @@ public class RobotContainer {
     // Switch to X pattern when X button is pressed
     // controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
     // controller.y().onTrue(new SimulateShotTrajectory(drive, shooter));
-    controller.leftBumper().onTrue(new InstantCommand(() -> shooter.spinShooter(1)));
-    controller
-        .a()
+    PilotController.leftBumper().onTrue(new InstantCommand(() -> shooter.spinShooter(1)));
+    PilotController.a()
         .whileTrue(new InstantCommand(() -> shooter.spinShooter(-.9)))
         .whileTrue(new InstantCommand(() -> shooter.setIndexerSpeed(-1)))
         .whileTrue(new InstantCommand(() -> intake.setIntakeSpeed(.8)))
@@ -149,8 +153,7 @@ public class RobotContainer {
         .whileFalse(new InstantCommand(() -> intake.setIntakeSpeed(0)));
 
     // Reset gyro to 0° when B button is pressed
-    controller
-        .b()
+    PilotController.b()
         .onTrue(
             Commands.runOnce(
                     () ->
@@ -158,6 +161,32 @@ public class RobotContainer {
                             new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
                     drive)
                 .ignoringDisable(true));
+
+    OperatorController.b().onTrue(Commands.runOnce(() -> shootTarget.resetTarget(), shootTarget));
+
+    OperatorController.leftTrigger()
+        .and(OperatorController.a().negate())
+        .onTrue(new ChooseShotTarget(shootTarget, GenericConstants.LEFTALLIANCE, false));
+
+    OperatorController.rightTrigger()
+        .and(OperatorController.a().negate())
+        .onTrue(new ChooseShotTarget(shootTarget, GenericConstants.RIGHTALLIANCE, false));
+
+    OperatorController.leftBumper()
+        .and(OperatorController.a().negate())
+        .onTrue(new ChooseShotTarget(shootTarget, GenericConstants.CENTERALLIANCE, false));
+
+    OperatorController.leftTrigger()
+        .and(OperatorController.a())
+        .onTrue(new ChooseShotTarget(shootTarget, GenericConstants.LEFTNEUTRAL, false));
+
+    OperatorController.rightTrigger()
+        .and(OperatorController.a())
+        .onTrue(new ChooseShotTarget(shootTarget, GenericConstants.RIGHTNEUTRAL, false));
+
+    OperatorController.leftBumper()
+        .and(OperatorController.a())
+        .onTrue(new ChooseShotTarget(shootTarget, GenericConstants.MIDDLENEUTRAL, false));
   }
 
   /**

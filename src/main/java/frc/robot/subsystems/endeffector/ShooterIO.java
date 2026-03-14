@@ -12,11 +12,11 @@ import org.littletonrobotics.junction.AutoLog;
 public interface ShooterIO {
   @AutoLog
   public class ShooterIOInputs {
+
     public Rotation2d hoodAngleDegrees;
     public double shooterVelocityRPM;
     public boolean shooterMotorIsConnected;
     public boolean hoodMotorIsConnected;
-    TargetEnum target;
   }
 
   public default Rotation2d getHoodAngle() {

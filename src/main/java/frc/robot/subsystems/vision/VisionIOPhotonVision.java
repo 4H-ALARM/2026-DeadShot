@@ -12,17 +12,19 @@ import static frc.robot.subsystems.vision.VisionConstants.*;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import org.photonvision.PhotonCamera;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 /** IO implementation for real PhotonVision hardware. */
 public class VisionIOPhotonVision implements VisionIO {
   protected final PhotonCamera camera;
   protected final Transform3d robotToCamera;
-
+  SendableChooser<Integer> priorityTag = new SendableChooser<>();
   /**
    * Creates a new VisionIOPhotonVision.
    *
@@ -37,6 +39,7 @@ public class VisionIOPhotonVision implements VisionIO {
   @Override
   public void updateInputs(VisionIOInputs inputs) {
     inputs.connected = camera.isConnected();
+    int priorityTagID = priorityTag.getSelected();
 
     // Read new camera observations
     Set<Short> tagIds = new HashSet<>();
@@ -53,7 +56,7 @@ public class VisionIOPhotonVision implements VisionIO {
       }
 
       // Add pose observation
-      if (result.multitagResult.isPresent()) { // Multitag result
+      if (result.multitagResult.isPresent() && priorityTagID == 0) { // Multitag result
         var multitagResult = result.multitagResult.get();
 
         // Calculate robot pose
@@ -81,7 +84,19 @@ public class VisionIOPhotonVision implements VisionIO {
                 PoseObservationType.PHOTONVISION)); // Observation type
 
       } else if (!result.targets.isEmpty()) { // Single tag result
-        var target = result.targets.get(0);
+        PhotonTrackedTarget target = null;
+
+        // allow selection of a priority april tag
+        for (var tgt : result.targets) {
+          if (priorityTagID != 0 && tgt.fiducialId != priorityTagID) {
+            continue;
+          }
+          target = tgt;
+          break;
+        }
+        if (target == null) {
+          continue;
+        }
 
         // Calculate robot pose
         var tagPose = aprilTagLayout.getTagPose(target.fiducialId);
@@ -121,5 +136,10 @@ public class VisionIOPhotonVision implements VisionIO {
     for (int id : tagIds) {
       inputs.tagIds[i++] = id;
     }
+  }
+
+  @Override
+  public void setPriorityTagChooser(SendableChooser<Integer> priorityTag) {
+    this.priorityTag = priorityTag;
   }
 }

@@ -34,7 +34,7 @@ public class Intake extends SubsystemBase {
   }
 
   public void setAngle(double angleDegrees) {
-    m_intakeIO.setAngle(angleDegrees, m_inputs);
+    m_intakeIO.setAngle(angleDegrees);
   }
 
   public void setIntakeSpeed(double speed) {

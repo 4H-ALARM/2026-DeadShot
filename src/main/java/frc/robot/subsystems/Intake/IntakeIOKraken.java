@@ -17,23 +17,27 @@ public class IntakeIOKraken implements IntakeIO {
   TalonFX m_rotationMotor;
   TalonFX m_rotationMotorFollow;
   TalonFX m_intakingMotor;
+  TalonFX m_intakingMotorFollow;
 
   Slot0Configs m_pIDConfigs;
   PositionVoltage m_requestedVoltage;
 
-  IntakeConstants m_constants;
-
   public IntakeIOKraken() {
-    m_intakingMotor = new TalonFX(m_constants.intakingMotorID, "canivore");
-    m_rotationMotor = new TalonFX(m_constants.rotationMotorID, "canivore");
-    m_rotationMotorFollow = new TalonFX(m_constants.rotationMotorFollowID, "canivore");
+    m_intakingMotor = new TalonFX(IntakeConstants.intakingMotorID, IntakeConstants.canbus);
+    m_intakingMotorFollow =
+        new TalonFX(IntakeConstants.intakingMotorFollowID, IntakeConstants.canbus);
+    m_intakingMotorFollow.setControl(
+        new Follower(IntakeConstants.intakingMotorID, MotorAlignmentValue.Opposed));
+    m_rotationMotor = new TalonFX(IntakeConstants.rotationMotorID, IntakeConstants.canbus);
+    m_rotationMotorFollow =
+        new TalonFX(IntakeConstants.rotationMotorFollowID, IntakeConstants.canbus);
     m_rotationMotorFollow.setControl(
-        new Follower(m_constants.rotationMotorID, MotorAlignmentValue.Opposed));
+        new Follower(IntakeConstants.rotationMotorID, MotorAlignmentValue.Opposed));
     m_pIDConfigs =
         new Slot0Configs()
-            .withKP(m_constants.angleMotorkp)
-            .withKI(m_constants.angleMotorki)
-            .withKD(m_constants.angleMotorkd);
+            .withKP(IntakeConstants.angleMotorkp)
+            .withKI(IntakeConstants.angleMotorki)
+            .withKD(IntakeConstants.angleMotorkd);
     m_rotationMotor.getConfigurator().apply(m_pIDConfigs);
     m_requestedVoltage = new PositionVoltage(0).withSlot(0);
   }
@@ -52,10 +56,9 @@ public class IntakeIOKraken implements IntakeIO {
     m_rotationMotor.set(speed);
   }
 
-  public void setAngle(double angleDegrees, IntakeIOInputs inputs) {
+  public void setAngle(double angleDegrees) {
     // still need to find the angle before this will work;
-    double motorRotations =
-        (angleDegrees - inputs.rotationDegrees) * m_constants.rotationGearRatio / 360;
+    double motorRotations = angleDegrees * IntakeConstants.rotationGearRatio / 360;
 
     m_rotationMotor.setControl(m_requestedVoltage.withPosition(motorRotations));
   }

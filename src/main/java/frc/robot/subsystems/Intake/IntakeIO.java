@@ -23,7 +23,7 @@ public interface IntakeIO {
 
   public void changeAngleTest(double speed);
 
-  public void setAngle(double angleDegrees, IntakeIOInputs inputs);
+  public void setAngle(double angleDegrees);
 
   public void setIntakeSpeed(double speed);
 

@@ -168,28 +168,30 @@ public class RobotContainer {
 
     OperatorController.b().onTrue(Commands.runOnce(() -> shootTarget.resetTarget(), shootTarget));
 
+    var operatorA = OperatorController.a();
+    var operatorANegative = operatorA.negate();
     OperatorController.leftTrigger()
-        .and(OperatorController.a().negate())
+        .and(operatorANegative)
         .onTrue(new ChooseShotTarget(shootTarget, GenericConstants.LEFTALLIANCE, false));
 
     OperatorController.rightTrigger()
-        .and(OperatorController.a().negate())
+        .and(operatorANegative)
         .onTrue(new ChooseShotTarget(shootTarget, GenericConstants.RIGHTALLIANCE, false));
 
     OperatorController.leftBumper()
-        .and(OperatorController.a().negate())
+        .and(operatorANegative)
         .onTrue(new ChooseShotTarget(shootTarget, GenericConstants.CENTERALLIANCE, false));
 
     OperatorController.leftTrigger()
-        .and(OperatorController.a())
+        .and(operatorA)
         .onTrue(new ChooseShotTarget(shootTarget, GenericConstants.LEFTNEUTRAL, false));
 
     OperatorController.rightTrigger()
-        .and(OperatorController.a())
+        .and(operatorA)
         .onTrue(new ChooseShotTarget(shootTarget, GenericConstants.RIGHTNEUTRAL, false));
 
     OperatorController.leftBumper()
-        .and(OperatorController.a())
+        .and(operatorA)
         .onTrue(new ChooseShotTarget(shootTarget, GenericConstants.MIDDLENEUTRAL, false));
   }
 

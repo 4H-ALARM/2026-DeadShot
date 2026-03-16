@@ -9,8 +9,6 @@ package frc.robot;
 
 import static frc.robot.subsystems.vision.VisionConstants.*;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -141,7 +139,7 @@ public class RobotContainer {
         .leftBumper()
         .whileTrue(
             Commands.runEnd(
-                () -> shooter.spinShooter(controller.getLeftY()),
+                () -> shooter.spinShooter(controller.getLeftY() * 0.25),
                 () -> shooter.spinShooter(0),
                 shooter,
                 drive));
@@ -150,7 +148,7 @@ public class RobotContainer {
         .rightBumper()
         .whileTrue(
             Commands.runEnd(
-                () -> intake.setIntakeSpeed(controller.getLeftY()),
+                () -> intake.setIntakeSpeed(controller.getLeftY() * 0.25),
                 () -> intake.setIntakeSpeed(0),
                 intake,
                 drive));
@@ -159,9 +157,8 @@ public class RobotContainer {
         .x()
         .whileTrue(
             Commands.runEnd(
-                () -> shooter.setIndexerSpeed(controller.getLeftY()),
+                () -> shooter.setIndexerSpeed(controller.getLeftY() * 0.25),
                 () -> shooter.setIndexerSpeed(0),
-                shooter,
                 drive));
 
     controller
@@ -173,16 +170,25 @@ public class RobotContainer {
                 intake,
                 drive));
 
-    // Reset gyro to 0° when B button is pressed
     controller
         .b()
-        .onTrue(
-            Commands.runOnce(
-                    () ->
-                        drive.setPose(
-                            new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
-                    drive)
-                .ignoringDisable(true));
+        .whileTrue(
+            Commands.runEnd(
+                () -> shooter.spinHood(controller.getLeftY() * 0.25),
+                () -> shooter.spinHood(0),
+                shooter,
+                drive));
+
+    // Reset gyro to 0° when B button is pressed
+    // controller
+    //     .b()
+    //     .onTrue(
+    //         Commands.runOnce(
+    //                 () ->
+    //                     drive.setPose(
+    //                         new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
+    //                 drive)
+    //             .ignoringDisable(true));
   }
 
   /**

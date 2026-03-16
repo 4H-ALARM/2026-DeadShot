@@ -30,6 +30,10 @@ public class Shooter extends SubsystemBase {
     shooter.setShooterSpeed(speed);
   }
 
+  public void spinHood(double speed) {
+    shooter.setHoodSpeed(speed);
+  }
+
   public void setIndexerSpeed(double indexerSpeed) {
     indexer.setIndexerSpeed(indexerSpeed);
   }

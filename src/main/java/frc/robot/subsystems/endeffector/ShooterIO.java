@@ -31,4 +31,6 @@ public interface ShooterIO {
   public default void updateInputs(ShooterIOInputs inputs) {}
 
   public default void setShooterSpeed(double speed) {}
+
+  public default void setHoodSpeed(double speed) {}
 }

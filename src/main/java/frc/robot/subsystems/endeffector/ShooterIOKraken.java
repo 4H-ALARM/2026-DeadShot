@@ -148,6 +148,8 @@ public class ShooterIOKraken implements ShooterIO {
 
     topShooterMotorRight.getConfigurator().apply(shooterMotorConfig);
     hoodMotor.getConfigurator().apply(hoodMotorConfig);
+    hoodMotorFollower.setControl(
+        new Follower(ShooterConstants.hoodMotorID, MotorAlignmentValue.Opposed));
   }
 
   @Override
@@ -234,6 +236,11 @@ public class ShooterIOKraken implements ShooterIO {
   @Override
   public void setShooterSpeed(double speed) {
     topShooterMotorRight.set(speed);
+  }
+
+  @Override
+  public void setHoodSpeed(double speed) {
+    hoodMotor.set(speed);
   }
 
   @Override

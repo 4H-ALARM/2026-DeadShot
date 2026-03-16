@@ -29,6 +29,7 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.endeffector.IndexerIOKraken;
+import frc.robot.subsystems.endeffector.PhaseshiftIO;
 import frc.robot.subsystems.endeffector.Shooter;
 import frc.robot.subsystems.endeffector.ShooterIOKraken;
 import frc.robot.subsystems.intake.Intake;
@@ -71,7 +72,8 @@ public class RobotContainer {
         //         new VisionIOPhotonVision(camera0Name, robotToCamera0),
         //         new VisionIOPhotonVision(camera1Name, robotToCamera1));
 
-        shooter = new Shooter(new ShooterIOKraken(), drive, new IndexerIOKraken(), shootTarget);
+        shooter =
+            new Shooter(new ShooterIOKraken(), drive, new IndexerIOKraken(), new PhaseshiftIO(), shootTarget);
 
         intake = new Intake(new IntakeIOKraken());
         break;
@@ -92,7 +94,8 @@ public class RobotContainer {
         //         drive::addVisionMeasurement,
         //         new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, drive::getPose),
         //         new VisionIOPhotonVisionSim(camera1Name, robotToCamera1, drive::getPose));
-        shooter = new Shooter(new ShooterIOKraken(), drive, new IndexerIOKraken(), shootTarget);
+        shooter =
+            new Shooter(new ShooterIOKraken(), drive, new IndexerIOKraken(), new PhaseshiftIO(), shootTarget);
 
         intake = new Intake(new IntakeIOKraken());
         break;
@@ -110,7 +113,8 @@ public class RobotContainer {
                 new ModuleIO() {});
 
         // vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
-        shooter = new Shooter(new ShooterIOKraken(), drive, new IndexerIOKraken(), shootTarget);
+        shooter =
+            new Shooter(new ShooterIOKraken(), drive, new IndexerIOKraken(), new PhaseshiftIO(), shootTarget);
 
         intake = new Intake(new IntakeIOKraken());
         break;

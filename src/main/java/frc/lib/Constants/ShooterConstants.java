@@ -19,7 +19,7 @@ public class ShooterConstants {
   public static final int hoodEncoderID = 4;
   public static final int neutralToggleButtonPort = 0;
   public static final int encoderResetButtonPort = 1;
-  public static final String shooterCanbus = "canivore";
+  public static final String shooterCanbus = "endEffector";
 
   // Turret Tuning Constants
   public static final double turretkp = 1.0;

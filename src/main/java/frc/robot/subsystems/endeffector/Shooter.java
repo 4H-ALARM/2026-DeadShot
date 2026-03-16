@@ -6,7 +6,6 @@ package frc.robot.subsystems.endeffector;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.endeffector.PhaseshiftIO.PhaseshiftIOInputs;
 import frc.robot.subsystems.targeting.ShootTargetIO;
 
 public class Shooter extends SubsystemBase {
@@ -15,7 +14,7 @@ public class Shooter extends SubsystemBase {
   private Drive drive;
   private IndexerIO indexer;
   private PhaseshiftIO phaseshift;
-  private PhaseshiftIOInputs phaseshiftInputs;
+  private PhaseshiftIOInputsAutoLogged phaseshiftInputs;
   private ShootTargetIO shootTarget;
 
   /** FIX DO NOT WANT TO IMPORT A WHOLE DRIVE */
@@ -30,6 +29,7 @@ public class Shooter extends SubsystemBase {
     this.indexer = indexer;
     this.phaseshift = phaseshift;
     this.shootTarget = shootTarget;
+    this.phaseshiftInputs = new PhaseshiftIOInputsAutoLogged();
   }
 
   @Override

@@ -48,6 +48,13 @@ public class ShooterConstants {
   public static final double shooterJerk = 50.0;
   public static final double hoodToMotorRatio = 1.0;
 
+  public static final double indexerkp = 1.0;
+  public static final double indexerki = 0.0;
+  public static final double indexerkd = 0.0;
+  public static final double indexerks = 0.0;
+  public static final double indexerkv = 0.0;
+  public static final double indexerka = 0.0;
+
   public static final double hoodkp = 1.0;
   public static final double hoodki = 0.0;
   public static final double hoodkd = 0.0;

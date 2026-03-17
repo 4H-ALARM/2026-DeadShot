@@ -44,7 +44,7 @@ public class Shooter extends SubsystemBase {
     shooter.setHoodAngle(hoodAngle);
   }
 
-  public void setIndexerSpeed(double indexerSpeed) {
-    indexer.setIndexerSpeed(indexerSpeed);
+  public void setIndexerSpeed(double indexerSpeedInRPS) {
+    indexer.setIndexerSpeed(indexerSpeedInRPS);
   }
 }

@@ -32,5 +32,9 @@ public interface ShooterIO {
 
   public default void setShooterSpeed(double speed) {}
 
+  public default double getVelocity() {
+    return 0;
+  }
+
   public default void setHoodAngle(double angleDegrees) {}
 }

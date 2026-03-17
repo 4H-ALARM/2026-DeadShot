@@ -47,6 +47,7 @@ public class ShooterConstants {
   public static final double shooterMaxSpeed = 50.0;
   public static final double shooterJerk = 50.0;
   public static final double hoodToMotorRatio = 1.0;
+  public static final double shooterRevTolerance = 100;
 
   public static final double hoodkp = 1.0;
   public static final double hoodki = 0.0;

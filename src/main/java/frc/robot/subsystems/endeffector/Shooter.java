@@ -19,12 +19,18 @@ public class Shooter extends SubsystemBase {
   private ShootTargetIO shootTarget;
 
   /** FIX DO NOT WANT TO IMPORT A WHOLE DRIVE */
-  public Shooter(ShooterIO shooter, Drive drive, IndexerIO indexer, PhaseshiftIO phaseshift, ShootTargetIO shootTarget) {
+  public Shooter(
+      ShooterIO shooter,
+      Drive drive,
+      IndexerIO indexer,
+      PhaseshiftIO phaseshift,
+      ShootTargetIO shootTarget) {
     this.shooter = shooter;
     this.drive = drive;
     this.indexer = indexer;
     this.phaseshift = phaseshift;
     this.shootTarget = shootTarget;
+    this.phaseshiftInputs = new PhaseshiftIOInputs();
   }
 
   @Override
@@ -46,5 +52,9 @@ public class Shooter extends SubsystemBase {
 
   public void setIndexerSpeed(double indexerSpeed) {
     indexer.setIndexerSpeed(indexerSpeed);
+  }
+
+  public double getShooterVelocity() {
+    return shooter.getVelocity();
   }
 }

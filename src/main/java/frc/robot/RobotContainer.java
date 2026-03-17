@@ -16,12 +16,12 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.Constants.GenericConstants;
 import frc.lib.Constants.SwerveConstants;
-import frc.robot.commands.ChooseShotTarget;
 import frc.robot.commands.DriveCommands;
+import frc.robot.subsystems.Intake.Intake;
+import frc.robot.subsystems.Intake.IntakeIOKraken;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -32,8 +32,6 @@ import frc.robot.subsystems.endeffector.IndexerIOKraken;
 import frc.robot.subsystems.endeffector.PhaseshiftIO;
 import frc.robot.subsystems.endeffector.Shooter;
 import frc.robot.subsystems.endeffector.ShooterIOKraken;
-import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.intake.IntakeIOKraken;
 import frc.robot.subsystems.targeting.ShootTargetIO;
 
 /**
@@ -73,7 +71,12 @@ public class RobotContainer {
         //         new VisionIOPhotonVision(camera1Name, robotToCamera1));
 
         shooter =
-            new Shooter(new ShooterIOKraken(), drive, new IndexerIOKraken(), new PhaseshiftIO(), shootTarget);
+            new Shooter(
+                new ShooterIOKraken(),
+                drive,
+                new IndexerIOKraken(),
+                new PhaseshiftIO(),
+                shootTarget);
 
         intake = new Intake(new IntakeIOKraken());
         break;
@@ -95,7 +98,12 @@ public class RobotContainer {
         //         new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, drive::getPose),
         //         new VisionIOPhotonVisionSim(camera1Name, robotToCamera1, drive::getPose));
         shooter =
-            new Shooter(new ShooterIOKraken(), drive, new IndexerIOKraken(), new PhaseshiftIO(), shootTarget);
+            new Shooter(
+                new ShooterIOKraken(),
+                drive,
+                new IndexerIOKraken(),
+                new PhaseshiftIO(),
+                shootTarget);
 
         intake = new Intake(new IntakeIOKraken());
         break;
@@ -114,7 +122,12 @@ public class RobotContainer {
 
         // vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
         shooter =
-            new Shooter(new ShooterIOKraken(), drive, new IndexerIOKraken(), new PhaseshiftIO(), shootTarget);
+            new Shooter(
+                new ShooterIOKraken(),
+                drive,
+                new IndexerIOKraken(),
+                new PhaseshiftIO(),
+                shootTarget);
 
         intake = new Intake(new IntakeIOKraken());
         break;
@@ -147,14 +160,21 @@ public class RobotContainer {
     // Switch to X pattern when X button is pressed
     // controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
     // controller.y().onTrue(new SimulateShotTrajectory(drive, shooter));
-    PilotController.leftBumper().onTrue(new InstantCommand(() -> shooter.spinShooter(1)));
-    PilotController.a()
-        .whileTrue(new InstantCommand(() -> shooter.spinShooter(-.9)))
-        .whileTrue(new InstantCommand(() -> shooter.setIndexerSpeed(-1)))
-        .whileTrue(new InstantCommand(() -> intake.setIntakeSpeed(.8)))
-        .whileFalse(new InstantCommand(() -> shooter.setIndexerSpeed(0)))
-        .whileFalse(new InstantCommand(() -> shooter.spinShooter(0)))
-        .whileFalse(new InstantCommand(() -> intake.setIntakeSpeed(0)));
+    // PilotController.leftBumper().onTrue(new InstantCommand(() -> shooter.spinShooter(1)));
+    // PilotController.a()
+    //     .whileTrue(new InstantCommand(() -> shooter.spinShooter(-.9)))
+    //     .whileTrue(new InstantCommand(() -> shooter.setIndexerSpeed(-1)))
+    //     .whileTrue(new InstantCommand(() -> intake.setIntakeSpeed(.8)))
+    //     .whileFalse(new InstantCommand(() -> shooter.setIndexerSpeed(0)))
+    //     .whileFalse(new InstantCommand(() -> shooter.spinShooter(0)))
+    //     .whileFalse(new InstantCommand(() -> intake.setIntakeSpeed(0)));
+    PilotController.leftTrigger()
+        .whileTrue(
+            Commands.runEnd(() -> shooter.spinShooter(3000 / 60), () -> shooter.spinShooter(0)));
+    PilotController.rightTrigger()
+        .whileTrue(
+            Commands.runEnd(
+                () -> shooter.setIndexerSpeed(-1), () -> shooter.setIndexerSpeed(0), drive));
 
     // Reset gyro to 0° when B button is pressed
     PilotController.b()
@@ -166,31 +186,32 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
 
-    OperatorController.b().onTrue(Commands.runOnce(() -> shootTarget.resetTarget(), shootTarget));
+    //     OperatorController.b().onTrue(Commands.runOnce(() -> shootTarget.resetTarget(),
+    // shootTarget));
 
-    OperatorController.leftTrigger()
-        .and(OperatorController.a().negate())
-        .onTrue(new ChooseShotTarget(shootTarget, GenericConstants.LEFTALLIANCE, false));
+    //     OperatorController.leftTrigger()
+    //         .and(OperatorController.a().negate())
+    //         .onTrue(new ChooseShotTarget(shootTarget, GenericConstants.LEFTALLIANCE, false));
 
-    OperatorController.rightTrigger()
-        .and(OperatorController.a().negate())
-        .onTrue(new ChooseShotTarget(shootTarget, GenericConstants.RIGHTALLIANCE, false));
+    //     OperatorController.rightTrigger()
+    //         .and(OperatorController.a().negate())
+    //         .onTrue(new ChooseShotTarget(shootTarget, GenericConstants.RIGHTALLIANCE, false));
 
-    OperatorController.leftBumper()
-        .and(OperatorController.a().negate())
-        .onTrue(new ChooseShotTarget(shootTarget, GenericConstants.CENTERALLIANCE, false));
+    //     OperatorController.leftBumper()
+    //         .and(OperatorController.a().negate())
+    //         .onTrue(new ChooseShotTarget(shootTarget, GenericConstants.CENTERALLIANCE, false));
 
-    OperatorController.leftTrigger()
-        .and(OperatorController.a())
-        .onTrue(new ChooseShotTarget(shootTarget, GenericConstants.LEFTNEUTRAL, false));
+    //     OperatorController.leftTrigger()
+    //         .and(OperatorController.a())
+    //         .onTrue(new ChooseShotTarget(shootTarget, GenericConstants.LEFTNEUTRAL, false));
 
-    OperatorController.rightTrigger()
-        .and(OperatorController.a())
-        .onTrue(new ChooseShotTarget(shootTarget, GenericConstants.RIGHTNEUTRAL, false));
+    //     OperatorController.rightTrigger()
+    //         .and(OperatorController.a())
+    //         .onTrue(new ChooseShotTarget(shootTarget, GenericConstants.RIGHTNEUTRAL, false));
 
-    OperatorController.leftBumper()
-        .and(OperatorController.a())
-        .onTrue(new ChooseShotTarget(shootTarget, GenericConstants.MIDDLENEUTRAL, false));
+    //     OperatorController.leftBumper()
+    //         .and(OperatorController.a())
+    //         .onTrue(new ChooseShotTarget(shootTarget, GenericConstants.MIDDLENEUTRAL, false));
   }
 
   /**

@@ -10,6 +10,7 @@ import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.Constants.ShooterConstants;
 
 /** Add your docs here. */
@@ -52,7 +53,7 @@ public class IndexerIOKraken implements IndexerIO {
   }
 
   public void updateInputs(IndexerIOInputs inputs) {
-
+    SmartDashboard.putNumber("IndexerSpeed", m_indexerMotor.getVelocity().getValueAsDouble() * 60);
     // need to figure out how many encoder units equals one full rotation
   }
 }

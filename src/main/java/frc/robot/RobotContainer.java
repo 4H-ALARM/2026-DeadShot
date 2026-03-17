@@ -171,7 +171,7 @@ public class RobotContainer {
     PilotController.leftTrigger()
         .whileTrue(
             Commands.runEnd(
-                () -> shooter.spinShooter(2000 / 60), () -> shooter.spinShooter(0), shooter));
+                () -> shooter.spinShooter(3600 / 60), () -> shooter.spinShooter(0), shooter));
     PilotController.rightTrigger()
         .whileTrue(
             Commands.runEnd(

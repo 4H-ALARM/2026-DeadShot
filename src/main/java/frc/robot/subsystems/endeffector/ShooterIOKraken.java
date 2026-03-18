@@ -242,7 +242,7 @@ public class ShooterIOKraken implements ShooterIO {
   @Override
   public void setShooterSpeed(double speed) {
     // topShooterMotorRight.set(speed);
-    topShooterMotorRight.setControl(shooterVelocityVoltage.withVelocity(speed));
+    topShooterMotorRight.setControl(shooterVelocityVoltage.withVelocity(speed).withFeedForward(0.2));
   }
 
   @Override

@@ -73,7 +73,12 @@ public class RobotContainer {
         //         new VisionIOPhotonVision(camera1Name, robotToCamera1));
 
         shooter =
-            new Shooter(new ShooterIOKraken(), drive, new IndexerIOKraken(), new PhaseshiftIO(), shootTarget);
+            new Shooter(
+                new ShooterIOKraken(),
+                drive,
+                new IndexerIOKraken(),
+                new PhaseshiftIO(),
+                shootTarget);
 
         intake = new Intake(new IntakeIOKraken());
         break;
@@ -95,7 +100,12 @@ public class RobotContainer {
         //         new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, drive::getPose),
         //         new VisionIOPhotonVisionSim(camera1Name, robotToCamera1, drive::getPose));
         shooter =
-            new Shooter(new ShooterIOKraken(), drive, new IndexerIOKraken(), new PhaseshiftIO(), shootTarget);
+            new Shooter(
+                new ShooterIOKraken(),
+                drive,
+                new IndexerIOKraken(),
+                new PhaseshiftIO(),
+                shootTarget);
 
         intake = new Intake(new IntakeIOKraken());
         break;
@@ -114,7 +124,12 @@ public class RobotContainer {
 
         // vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
         shooter =
-            new Shooter(new ShooterIOKraken(), drive, new IndexerIOKraken(), new PhaseshiftIO(), shootTarget);
+            new Shooter(
+                new ShooterIOKraken(),
+                drive,
+                new IndexerIOKraken(),
+                new PhaseshiftIO(),
+                shootTarget);
 
         intake = new Intake(new IntakeIOKraken());
         break;
@@ -165,6 +180,9 @@ public class RobotContainer {
                             new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
                     drive)
                 .ignoringDisable(true));
+
+    PilotController.povUp().onTrue(Commands.runOnce(() -> shooter.changeHoodAngle(5)));
+    PilotController.povDown().onTrue(Commands.runOnce(() -> shooter.changeHoodAngle(-5)));
 
     OperatorController.b().onTrue(Commands.runOnce(() -> shootTarget.resetTarget(), shootTarget));
 

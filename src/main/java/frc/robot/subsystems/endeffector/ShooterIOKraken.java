@@ -267,4 +267,19 @@ public class ShooterIOKraken implements ShooterIO {
 
     hoodMotor.setControl(hoodPositionVoltage.withPosition(motorRotations));
   }
+
+  public void changeHoodAngle(double angleDegrees) {
+
+    double currentHoodRotations =
+        hoodMotor.getPosition().getValueAsDouble() * ShooterConstants.hoodGearRatio / 360;
+    double motorRotations = (angleDegrees) * ShooterConstants.hoodGearRatio / 360;
+
+    if (currentHoodRotations + motorRotations > ShooterConstants.maxHoodRotations) {
+      motorRotations = ShooterConstants.maxHoodRotations - currentHoodRotations;
+    } else if (currentHoodRotations + motorRotations < ShooterConstants.minHoodRotations) {
+      motorRotations = ShooterConstants.minHoodRotations + currentHoodRotations;
+    }
+
+    hoodMotor.setControl(hoodPositionVoltage.withPosition(motorRotations));
+  }
 }

@@ -13,21 +13,22 @@ public class ChooseShotTarget extends Command {
 
   final Translation3d target;
   final ShootTargetIO m_shootTarget;
-  final boolean targetAvailable;
+  final boolean followPhaseShift;
 
   /** Creates a new ChooseShotTarget. */
   public ChooseShotTarget(
-      ShootTargetIO shootTarget, Translation3d target, boolean targetAvailable) {
+      ShootTargetIO shootTarget, Translation3d target, boolean followPhaseShift) {
     this.m_shootTarget = shootTarget;
     this.target = target;
-    this.targetAvailable = targetAvailable;
+
+    this.followPhaseShift = followPhaseShift;
 
     addRequirements(shootTarget);
   }
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_shootTarget.setTarget(target, targetAvailable);
+    m_shootTarget.setTarget(target, followPhaseShift);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

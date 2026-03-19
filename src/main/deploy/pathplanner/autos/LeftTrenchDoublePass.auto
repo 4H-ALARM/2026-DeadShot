@@ -11,7 +11,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "TopTrenchToMid"
+                  "pathName": "TrenchToMidLeft"
                 }
               },
               {
@@ -30,7 +30,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "HalfTopSweep"
+                  "pathName": "HalfSweepLeft"
                 }
               },
               {
@@ -45,7 +45,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "CrossTopBump"
+            "pathName": "CrossBumpLeft"
           }
         },
         {
@@ -57,7 +57,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "AllianceBumpToTrench"
+            "pathName": "AllianceBumpToTrenchLeft"
           }
         },
         {
@@ -67,7 +67,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "TopScrape"
+                  "pathName": "ScrapeLeft"
                 }
               },
               {
@@ -82,7 +82,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "CrossTopBump"
+            "pathName": "CrossBumpLeft"
           }
         },
         {

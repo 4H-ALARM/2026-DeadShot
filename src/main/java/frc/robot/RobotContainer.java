@@ -174,7 +174,7 @@ public class RobotContainer {
     PilotController.rightTrigger()
         .whileTrue(
             Commands.runEnd(
-                () -> shooter.setIndexerSpeed(-8000/60), () -> shooter.setIndexerSpeed(0), drive));
+                () -> shooter.setIndexerSpeed(-7500/60), () -> shooter.setIndexerSpeed(0), drive));
 
     // Reset gyro to 0° when B button is pressed
     PilotController.b()

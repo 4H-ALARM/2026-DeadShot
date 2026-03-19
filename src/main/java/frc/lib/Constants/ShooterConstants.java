@@ -33,11 +33,11 @@ public class ShooterConstants {
   public static final double hoodToMotorRatio = 1.0;
   public static final double shooterFF = 1.25;
 
-  public static final double indexerkp = 2.0;
+  public static final double indexerkp = 1.5;
   public static final double indexerki = 0.0;
   public static final double indexerkd = 0.0;
-  public static final double indexerks = 0.01;
-  public static final double indexerkv = 0.0;
+  public static final double indexerks = 0.05;
+  public static final double indexerkv = 0.39;
   public static final double indexerka = 0.0;
 
   public static final double hoodkp = 1.0;

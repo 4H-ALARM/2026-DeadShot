@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems.Intake;
+package frc.robot.subsystems.intake;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -80,6 +80,10 @@ public class IntakeIOKraken implements IntakeIO {
         m_requestedPosition.withPosition(-angleDegrees / 360).withEnableFOC(true));
   }
 
+  public double getAngle() {
+    return m_rotationMotor.getPosition().getValueAsDouble() / IntakeConstants.rotationGearRatio * 360;
+  }
+
   public void setIntakeSpeed(double speed) {
     if (speed > 1) {
       speed = 1;
@@ -93,6 +97,10 @@ public class IntakeIOKraken implements IntakeIO {
   public void stopIntake() {
 
     m_intakingMotor.set(0);
+  }
+
+  public boolean isIntakeUp() {
+    return getAngle() < IntakeConstants.rotationDownDegrees / 4;
   }
 
   @Override

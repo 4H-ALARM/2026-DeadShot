@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems.Intake;
+package frc.robot.subsystems.intake;
 
 import org.littletonrobotics.junction.AutoLog;
 
@@ -26,9 +26,17 @@ public interface IntakeIO {
 
   public void setAngle(double angleDegrees);
 
+  public default double getAngle() {
+    return 0;
+  }
+
   public void setIntakeSpeed(double speed);
 
   public void stopIntake();
+
+  public default boolean isIntakeUp() {
+    return true;
+  };
 
   public default void updateTuningValues() {}
 

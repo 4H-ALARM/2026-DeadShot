@@ -4,9 +4,13 @@
 
 package frc.robot.subsystems.endeffector;
 
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.Constants.ShooterConstants;
 
 /** Add your docs here. */
@@ -14,6 +18,9 @@ public class IndexerIOKraken implements IndexerIO {
 
   TalonFX m_indexerMotor;
   TalonFX m_indexerMotorFollower;
+  TalonFXConfiguration m_configurator;
+  Slot0Configs m_Configs;
+  VelocityTorqueCurrentFOC m_targetVelocity;
 
   public IndexerIOKraken() {
     m_indexerMotor = new TalonFX(ShooterConstants.indexerMotorID, ShooterConstants.shooterCanbus);
@@ -21,10 +28,23 @@ public class IndexerIOKraken implements IndexerIO {
         new TalonFX(ShooterConstants.indexerMotorFollowerID, ShooterConstants.shooterCanbus);
     m_indexerMotorFollower.setControl(
         new Follower(ShooterConstants.indexerMotorID, MotorAlignmentValue.Opposed));
-  }
+    m_Configs = new Slot0Configs()
+    .withKP(ShooterConstants.indexerkp)
+    .withKI(ShooterConstants.indexerki)
+    .withKD(ShooterConstants.indexerkd)
+    .withKS(ShooterConstants.indexerks)
+    .withKV(ShooterConstants.indexerkv)
+    .withKA(ShooterConstants.indexerka);
+    m_configurator = new TalonFXConfiguration();
+    m_configurator.Slot0 = m_Configs;
+    m_indexerMotor.getConfigurator().apply(m_configurator);
+    m_targetVelocity = new VelocityTorqueCurrentFOC(0);
 
+  }
+  ///
   public void setIndexerSpeed(double speed) {
-    m_indexerMotor.set(speed);
+    //m_indexerMotor.set(speed);
+    m_indexerMotor.setControl(m_targetVelocity.withVelocity(speed).withFeedForward(1));
   }
 
   public void stopIndexer() {
@@ -33,7 +53,7 @@ public class IndexerIOKraken implements IndexerIO {
   }
 
   public void updateInputs(IndexerIOInputs inputs) {
-
+    SmartDashboard.putNumber("IndexerSpeed", m_indexerMotor.getVelocity().getValueAsDouble() * 60);
     // need to figure out how many encoder units equals one full rotation
   }
 }

@@ -16,4 +16,6 @@ public interface IndexerIO {
   public default void setIndexerSpeed(double indexerSpeed) {}
 
   public default void stopIndexer() {}
+
+  public default void updateInputs(IndexerIOInputs inputs) {}
 }

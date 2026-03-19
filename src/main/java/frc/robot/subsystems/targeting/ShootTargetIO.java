@@ -42,6 +42,14 @@ public class ShootTargetIO extends SubsystemBase {
     this.m_targetAvailable = targetAvailable;
   }
 
+  public Translation3d getTarget() {
+    return m_target;
+  }
+
+  public boolean isTargetAvailable() {
+    return m_targetAvailable;
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run

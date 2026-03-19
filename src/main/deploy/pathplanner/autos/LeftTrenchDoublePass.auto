@@ -5,15 +5,41 @@
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "TopTrenchToMid"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "TopTrenchToMid"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Deploy intake"
+                }
+              }
+            ]
           }
         },
         {
-          "type": "path",
+          "type": "deadline",
           "data": {
-            "pathName": "HalfTopSweep"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "HalfTopSweep"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Intake"
+                }
+              }
+            ]
           }
         },
         {
@@ -23,9 +49,9 @@
           }
         },
         {
-          "type": "wait",
+          "type": "named",
           "data": {
-            "waitTime": 5.0
+            "name": "Shoot"
           }
         },
         {
@@ -35,15 +61,34 @@
           }
         },
         {
-          "type": "path",
+          "type": "deadline",
           "data": {
-            "pathName": "TopScrape"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "TopScrape"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Intake"
+                }
+              }
+            ]
           }
         },
         {
           "type": "path",
           "data": {
             "pathName": "CrossTopBump"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
           }
         }
       ]

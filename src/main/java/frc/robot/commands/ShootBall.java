@@ -12,12 +12,12 @@ import frc.robot.subsystems.endeffector.Shooter;
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class ShootBall extends SequentialCommandGroup {
   /** Creates a new ShootBall. */
-  public ShootBall(Shooter shooter, double shooterSpeed, double indexerSpeed) {
+  public ShootBall(Shooter shooter, double indexerSpeed) {
 
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-        new RevShooter(shooter, shooterSpeed),
-        new RunEndEffector(shooter, shooterSpeed, indexerSpeed));
+        new RevShooter(shooter),
+        new RunEndEffector(shooter, indexerSpeed));
   }
 }

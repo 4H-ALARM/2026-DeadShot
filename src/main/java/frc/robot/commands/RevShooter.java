@@ -15,8 +15,8 @@ public class RevShooter extends Command {
 
   private Shooter m_shooter;
 
-  public RevShooter(Shooter shooter, double speed) {
-    this.m_speed = speed;
+  public RevShooter(Shooter shooter) {
+
     this.m_shooter = shooter;
     addRequirements(shooter);
     // Use addRequirements() here to declare subsystem dependencies.
@@ -25,12 +25,14 @@ public class RevShooter extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_shooter.spinShooter(m_speed);
+    m_shooter.spinShooterFromLookup();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+
+  }
 
   // Called once the command ends or is interrupted.
   @Override
@@ -41,7 +43,8 @@ public class RevShooter extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return m_shooter.getShooterVelocity() > m_speed - ShooterConstants.shooterRevTolerance
-        && m_shooter.getShooterVelocity() < m_speed + ShooterConstants.shooterRevTolerance;
+    this.m_speed = m_shooter.getLookupRpm();
+    return (m_shooter.getShooterVelocity() > m_speed - ShooterConstants.shooterRevTolerance
+        && m_shooter.getShooterVelocity() < m_speed + ShooterConstants.shooterRevTolerance);
   }
 }

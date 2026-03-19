@@ -42,6 +42,13 @@ import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import java.util.function.DoubleSupplier;
 
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+
+import choreo.auto.AutoChooser;
+
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -61,11 +68,17 @@ public class RobotContainer {
   private final CommandXboxController OperatorController = new CommandXboxController(1);
 
   private final DeployIntake deployIntake;
+   private final DeployIntake deployIntakeAuto;
   private final Command driveDefaultCommand;
   private final Command indexerReverseCommand;
   private final Command autoShootCommand;
   private final Command intakeCommand;
+   private final Command intakeCommandAuto;
   private final Command resetGyroCommand;
+
+  private final Command ShootCommand;
+
+  private final LoggedDashboardChooser<Command> autoChooser;
 
   private final DoubleSupplier pilotForwardInput = () -> -PilotController.getLeftY();
   private final DoubleSupplier pilotStrafeInput = () -> -PilotController.getLeftX();
@@ -164,19 +177,28 @@ public class RobotContainer {
     }
 
     deployIntake = new DeployIntake(intake);
+    deployIntakeAuto = new DeployIntake(intake);
     driveDefaultCommand =
         DriveCommands.joystickDrive(
             drive, pilotForwardInput, pilotStrafeInput, pilotRotateInput);
     indexerReverseCommand =
         Commands.runEnd(() -> shooter.setIndexerSpeed(-5900 / 60), () -> shooter.setIndexerSpeed(0));
-    autoShootCommand = AutoShoot.autoShoot(shooter, drive, pilotForwardInput, pilotStrafeInput);
+    autoShootCommand = AutoShoot.autoShoot(shooter, drive, pilotForwardInput, pilotStrafeInput).withTimeout(5);
+    ShootCommand = AutoShoot.autoShoot(shooter, drive, pilotForwardInput, pilotStrafeInput);
     intakeCommand =
+        Commands.runEnd(() -> intake.setIntakeSpeed(-5900 / 60), () -> intake.setIntakeSpeed(0), intake);
+    intakeCommandAuto =
         Commands.runEnd(() -> intake.setIntakeSpeed(-5900 / 60), () -> intake.setIntakeSpeed(0), intake);
     resetGyroCommand =
         Commands.runOnce(
                 () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
                 drive)
             .ignoringDisable(true);
+    NamedCommands.registerCommand("Shoot", autoShootCommand);
+    NamedCommands.registerCommand("Deploy intake", deployIntakeAuto);
+    NamedCommands.registerCommand("Intake", intakeCommandAuto);
+
+    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // Configure the button bindings
     configureButtonBindings();
@@ -223,7 +245,7 @@ public class RobotContainer {
                 () -> -PilotController.getLeftY(),
                 () -> -PilotController.getLeftX()));
     PilotController.leftTrigger()
-        .whileTrue(
+        .toggleOnTrue(
             Commands.runEnd(() -> intake.setIntakeSpeed(-4000/60), () -> intake.setIntakeSpeed(0), intake));
     PilotController.leftBumper()
         .onTrue(deployIntake);
@@ -272,6 +294,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return Commands.none();
+    return autoChooser.get();
   }
 }

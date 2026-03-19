@@ -13,9 +13,9 @@ public class RunEndEffector extends Command {
   double m_indexerSpeed;
   Shooter m_shooter;
   /** Creates a new RunEndEffector. */
-  public RunEndEffector(Shooter shooter, double shooterSpeed, double indexerSpeed) {
+  public RunEndEffector(Shooter shooter, double indexerSpeed) {
     this.m_shooter = shooter;
-    this.m_shooterSpeed = shooterSpeed;
+    this.m_shooterSpeed = shooter.getLookupRpm();
     this.m_indexerSpeed = indexerSpeed;
     addRequirements(shooter);
     // Use addRequirements() here to declare subsystem dependencies.
@@ -24,7 +24,7 @@ public class RunEndEffector extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    m_shooter.spinShooter(m_shooterSpeed);
+    m_shooter.spinShooterFromLookup();
     m_shooter.setIndexerSpeed(m_indexerSpeed);
   }
 

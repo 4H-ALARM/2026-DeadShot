@@ -20,8 +20,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.Constants.GenericConstants;
 import frc.lib.Constants.SwerveConstants;
 import frc.robot.commands.DriveCommands;
-import frc.robot.subsystems.Intake.Intake;
-import frc.robot.subsystems.Intake.IntakeIOKraken;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeIOKraken;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -170,7 +170,7 @@ public class RobotContainer {
     //     .whileFalse(new InstantCommand(() -> intake.setIntakeSpeed(0)));
     PilotController.leftTrigger()
         .whileTrue(
-            Commands.runEnd(() -> shooter.spinShooter(3000 / 60), () -> shooter.spinShooter(0)));
+            Commands.runEnd(() -> shooter.spinShooterAtSpeed(3000 / 60), () -> shooter.spinShooterAtSpeed(0)));
     PilotController.rightTrigger()
         .whileTrue(
             Commands.runEnd(

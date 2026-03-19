@@ -268,6 +268,7 @@ public class ShooterIOKraken implements ShooterIO {
 
   public double getVelocity() {
     return topShooterMotorRight.getVelocity().getValueAsDouble() * 60;
+  }
   @Override
   public void stopShooter() {
     topShooterMotorRight.stopMotor();

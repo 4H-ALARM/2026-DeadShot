@@ -34,6 +34,10 @@ public interface IntakeIO {
 
   public void stopIntake();
 
+  public default boolean isIntakeUp() {
+    return true;
+  };
+
   public default void updateTuningValues() {}
 
   public default void updateInputs(IntakeIOInputs inputs) {}

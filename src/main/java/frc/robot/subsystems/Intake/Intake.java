@@ -63,6 +63,10 @@ public class Intake extends SubsystemBase {
     m_intakeIO.stopIntake();
   }
 
+  public boolean isIntakeUp() {
+    return m_intakeIO.isIntakeUp();
+  }
+
   public double getRotationDegrees() {
     return m_inputs.rotationDegrees;
   }

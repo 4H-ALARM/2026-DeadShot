@@ -4,19 +4,15 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.lib.Constants.IntakeConstants;
 import frc.robot.subsystems.intake.Intake;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class DeployIntake extends Command {
   Intake m_intake;
-  boolean m_isIntakeUp;
   /** Creates a new DeployIntake. */
   public DeployIntake(Intake intake) {
     this.m_intake = intake;
-    this.m_isIntakeUp = intake.getAngle() < IntakeConstants.rotationDownDegrees/4;
     addRequirements(intake);
     // Use addRequirements() here to declare subsystem dependencies.
   }
@@ -24,7 +20,8 @@ public class DeployIntake extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    if (m_isIntakeUp) {
+
+    if (m_intake.isIntakeUp()) {
       m_intake.setRotationDown();
     }
     else {

@@ -99,6 +99,10 @@ public class IntakeIOKraken implements IntakeIO {
     m_intakingMotor.set(0);
   }
 
+  public boolean isIntakeUp() {
+    return getAngle() < IntakeConstants.rotationDownDegrees / 4;
+  }
+
   @Override
   public void updateTuningValues() {
     if (BuildConstants.TUNING) {

@@ -23,6 +23,7 @@ import frc.lib.Constants.SwerveConstants;
 import frc.robot.commands.DeployIntake;
 import frc.robot.commands.AutoShoot;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.SelectTarget;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeIOKraken;
 import frc.robot.subsystems.drive.Drive;
@@ -68,15 +69,15 @@ public class RobotContainer {
   private final CommandXboxController OperatorController = new CommandXboxController(1);
 
   private final DeployIntake deployIntake;
-   private final DeployIntake deployIntakeAuto;
+  private final DeployIntake deployIntakeAuto;
   private final Command driveDefaultCommand;
   private final Command indexerReverseCommand;
   private final Command autoShootCommand;
   private final Command intakeCommand;
-   private final Command intakeCommandAuto;
+  private final Command intakeCommandAuto;
   private final Command resetGyroCommand;
-
   private final Command ShootCommand;
+
 
   private final LoggedDashboardChooser<Command> autoChooser;
 
@@ -239,16 +240,18 @@ public class RobotContainer {
             Commands.runEnd(() -> shooter.setIndexerSpeed(-5900 / 60), () -> shooter.setIndexerSpeed(0)));
     PilotController.rightTrigger()
         .whileTrue(
-            AutoShoot.autoShoot(
-                shooter,
-                drive,
-                () -> -PilotController.getLeftY(),
-                () -> -PilotController.getLeftX()));
+            ShootCommand);
     PilotController.leftTrigger()
         .toggleOnTrue(
             Commands.runEnd(() -> intake.setIntakeSpeed(-4000/60), () -> intake.setIntakeSpeed(0), intake));
     PilotController.leftBumper()
         .onTrue(deployIntake);
+
+    OperatorController.rightBumper()
+        .whileTrue(
+            Commands.runEnd(
+                () -> shooter.spinShooter(2500/60), () -> shooter.stopShooter(), null)
+        );
 
     // Reset gyro to 0° when B button is pressed
     PilotController.b()

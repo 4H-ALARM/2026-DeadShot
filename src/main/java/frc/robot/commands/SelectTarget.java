@@ -4,47 +4,38 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.lib.Constants.ShooterConstants;
 import frc.robot.subsystems.endeffector.Shooter;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class RevShooter extends Command {
-  /** Creates a new ShootBall. */
-  private double m_speed;
-
-  private Shooter m_shooter;
-
-  public RevShooter(Shooter shooter) {
-
+public class SelectTarget extends Command {
+  Shooter m_shooter;
+  Translation3d m_target;
+  /** Creates a new SelectTarget. */
+  public SelectTarget(Shooter shooter, Translation3d targetPosition) {
     this.m_shooter = shooter;
-    addRequirements(shooter);
+    this.m_target = targetPosition;
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-  
+    m_shooter.setTarget(m_target);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {
-    m_shooter.spinShooterFromLookup();
-  }
+  public void execute() {}
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    m_shooter.stopShooter();
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    this.m_speed = m_shooter.getLookupRpm();
-    return (m_shooter.getShooterVelocity() > m_speed - ShooterConstants.shooterRevTolerance
-        && m_shooter.getShooterVelocity() < m_speed + ShooterConstants.shooterRevTolerance);
+    return true;
   }
 }

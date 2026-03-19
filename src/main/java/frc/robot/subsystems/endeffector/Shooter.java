@@ -6,6 +6,7 @@ package frc.robot.subsystems.endeffector;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.Constants.GenericConstants;
 import frc.robot.subsystems.drive.Drive;
@@ -126,5 +127,9 @@ public class Shooter extends SubsystemBase {
   }
   public double getShooterVelocity() {
     return shooter.getVelocity();
+  }
+
+  public void setTarget(Translation3d target) {
+    shootTarget.setTarget(target, true);
   }
 }

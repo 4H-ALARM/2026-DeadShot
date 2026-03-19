@@ -54,4 +54,8 @@ public class Shooter extends SubsystemBase {
   public void setIndexerSpeed(double indexerSpeedInRPS) {
     indexer.setIndexerSpeed(indexerSpeedInRPS);
   }
+
+  public double getShooterVelocity() {
+    return shooter.getVelocity();
+  }
 }

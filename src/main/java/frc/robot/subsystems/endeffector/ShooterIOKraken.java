@@ -266,6 +266,9 @@ public class ShooterIOKraken implements ShooterIO {
     hoodMotor.setControl(hoodPositionVoltage.withPosition(motorRotations));
   }
 
+  public double getVelocity() {
+    return topShooterMotorRight.getVelocity().getValueAsDouble() * 60;
+  }
   @Override
   public void stopShooter() {
     topShooterMotorRight.stopMotor();

@@ -44,7 +44,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public void stopShooter() {
-    shooter.setShooterSpeed(0);
+    shooter.stopShooter();
   }
 
   public void setHoodAngle(double hoodAngle) {

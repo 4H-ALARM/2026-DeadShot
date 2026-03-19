@@ -26,10 +26,10 @@ public class IntakeConstants {
   public static final double angleMotorkg = 0.72;
   public static final double angleMotorka = 0.18;
 
-  public static final double intakingMotorkp = 0.0;
+  public static final double intakingMotorkp = 1.5;
   public static final double intakingMotorki = 0.0;
   public static final double intakingMotorkd = 0.0;
-  public static final double intakingMotorks = 0;
+  public static final double intakingMotorks = 0.01;
   public static final double intakingMotorkv = 0.0;
   public static final double intakingMotorka = 0.0;
 }

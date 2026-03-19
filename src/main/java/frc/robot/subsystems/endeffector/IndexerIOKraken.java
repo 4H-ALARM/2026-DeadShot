@@ -44,7 +44,7 @@ public class IndexerIOKraken implements IndexerIO {
   ///
   public void setIndexerSpeed(double speed) {
     //m_indexerMotor.set(speed);
-    m_indexerMotor.setControl(m_targetVelocity.withVelocity(speed));
+    m_indexerMotor.setControl(m_targetVelocity.withVelocity(speed).withFeedForward(1));
   }
 
   public void stopIndexer() {

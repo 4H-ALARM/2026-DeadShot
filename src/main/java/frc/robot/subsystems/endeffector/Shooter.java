@@ -123,6 +123,7 @@ public class Shooter extends SubsystemBase {
 
   public ShootTargetIO getShootTarget() {
     return shootTarget;
+  }
   public double getShooterVelocity() {
     return shooter.getVelocity();
   }

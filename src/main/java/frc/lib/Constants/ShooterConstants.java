@@ -21,7 +21,7 @@ public class ShooterConstants {
   public static final int encoderResetButtonPort = 1;
   public static final String shooterCanbus = "endEffector";
 
-  public static final double shooterkp = 15;
+  public static final double shooterkp = 12.5;
   public static final double shooterki = 0;
   public static final double shooterkd = 0;
   public static final double shooterks = 0.625;

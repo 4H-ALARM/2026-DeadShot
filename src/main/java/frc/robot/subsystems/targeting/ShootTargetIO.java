@@ -4,8 +4,13 @@
 
 package frc.robot.subsystems.targeting;
 
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.util.AllianceFlipUtil;
+
 import org.littletonrobotics.junction.AutoLog;
 
 public class ShootTargetIO extends SubsystemBase {
@@ -40,6 +45,21 @@ public class ShootTargetIO extends SubsystemBase {
   public void setTarget(Translation3d target, boolean targetAvailable) {
     this.m_target = target;
     this.m_targetAvailable = targetAvailable;
+  }
+
+  public Translation3d getTarget() {
+    if (DriverStation.getAlliance().get() == Alliance.Red) {
+      Translation2d flippedtranslation = AllianceFlipUtil.apply(new Translation2d(this.m_target.getX(), this.m_target.getY()));
+
+      return new Translation3d(flippedtranslation.getX(), flippedtranslation.getY(), this.m_target.getZ());
+    }
+
+    return this.m_target;
+
+  }
+
+  public boolean isTargetAvailable() {
+    return m_targetAvailable;
   }
 
   @Override

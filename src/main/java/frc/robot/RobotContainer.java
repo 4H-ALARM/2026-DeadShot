@@ -17,9 +17,11 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.Constants.GenericConstants;
 import frc.lib.Constants.SwerveConstants;
 import frc.robot.commands.DeployIntake;
+import frc.robot.commands.AutoShoot;
 import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeIOKraken;
@@ -34,6 +36,11 @@ import frc.robot.subsystems.endeffector.PhaseshiftIO;
 import frc.robot.subsystems.endeffector.Shooter;
 import frc.robot.subsystems.endeffector.ShooterIOKraken;
 import frc.robot.subsystems.targeting.ShootTargetIO;
+import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionIO;
+import frc.robot.subsystems.vision.VisionIOPhotonVision;
+import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
+import java.util.function.DoubleSupplier;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -46,6 +53,7 @@ public class RobotContainer {
   private final Drive drive;
   private final Shooter shooter;
   private final Intake intake;
+  private final Vision vision;
   private final ShootTargetIO shootTarget = new ShootTargetIO(GenericConstants.HUB_POSE3D, true);
   private SwerveDriveKinematics swerveKinematics;
 
@@ -53,6 +61,21 @@ public class RobotContainer {
   private final CommandXboxController OperatorController = new CommandXboxController(1);
 
   private final DeployIntake deployIntake;
+  private final Command driveDefaultCommand;
+  private final Command indexerReverseCommand;
+  private final Command autoShootCommand;
+  private final Command intakeCommand;
+  private final Command resetGyroCommand;
+
+  private final DoubleSupplier pilotForwardInput = () -> -PilotController.getLeftY();
+  private final DoubleSupplier pilotStrafeInput = () -> -PilotController.getLeftX();
+  private final DoubleSupplier pilotRotateInput = () -> -PilotController.getRightX();
+
+  private final Trigger pilotRightBumper = PilotController.rightBumper();
+  private final Trigger pilotRightTrigger = PilotController.rightTrigger();
+  private final Trigger pilotLeftTrigger = PilotController.leftTrigger();
+  private final Trigger pilotLeftBumper = PilotController.leftBumper();
+  private final Trigger pilotB = PilotController.b();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -67,11 +90,11 @@ public class RobotContainer {
                 new ModuleIOTalonFX(SwerveConstants.BackLeft),
                 new ModuleIOTalonFX(SwerveConstants.BackRight));
 
-        // vision =
-        //     new Vision(
-        //         drive::addVisionMeasurement,
-        //         new VisionIOPhotonVision(camera0Name, robotToCamera0),
-        //         new VisionIOPhotonVision(camera1Name, robotToCamera1));
+        vision =
+            new Vision(
+                drive::addVisionMeasurement,
+                new VisionIOPhotonVision(camera0Name, robotToCameraL),
+                new VisionIOPhotonVision(camera1Name, robotToCameraR));
 
         shooter =
             new Shooter(
@@ -95,11 +118,11 @@ public class RobotContainer {
                 new ModuleIOSim(SwerveConstants.BackLeft),
                 new ModuleIOSim(SwerveConstants.BackRight));
 
-        // vision =
-        //     new Vision(
-        //         drive::addVisionMeasurement,
-        //         new VisionIOPhotonVisionSim(camera0Name, robotToCamera0, drive::getPose),
-        //         new VisionIOPhotonVisionSim(camera1Name, robotToCamera1, drive::getPose));
+        vision =
+            new Vision(
+                drive::addVisionMeasurement,
+                new VisionIOPhotonVisionSim(camera0Name, robotToCameraL, drive::getPose),
+                new VisionIOPhotonVisionSim(camera1Name, robotToCameraR, drive::getPose));
         shooter =
             new Shooter(
                 new ShooterIOKraken(),
@@ -133,10 +156,27 @@ public class RobotContainer {
                 shootTarget);
 
         intake = new Intake(new IntakeIOKraken());
+
+        vision = new Vision(drive::addVisionMeasurement,
+            new VisionIO() {},
+            new VisionIO() {});
         break;
     }
 
     deployIntake = new DeployIntake(intake);
+    driveDefaultCommand =
+        DriveCommands.joystickDrive(
+            drive, pilotForwardInput, pilotStrafeInput, pilotRotateInput);
+    indexerReverseCommand =
+        Commands.runEnd(() -> shooter.setIndexerSpeed(-5900 / 60), () -> shooter.setIndexerSpeed(0));
+    autoShootCommand = AutoShoot.autoShoot(shooter, drive, pilotForwardInput, pilotStrafeInput);
+    intakeCommand =
+        Commands.runEnd(() -> intake.setIntakeSpeed(-5900 / 60), () -> intake.setIntakeSpeed(0), intake);
+    resetGyroCommand =
+        Commands.runOnce(
+                () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
+                drive)
+            .ignoringDisable(true);
 
     // Configure the button bindings
     configureButtonBindings();
@@ -150,12 +190,7 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // Default command, normal field-relative drive
-    drive.setDefaultCommand(
-        DriveCommands.joystickDrive(
-            drive,
-            () -> -PilotController.getLeftY(),
-            () -> -PilotController.getLeftX(),
-            () -> -PilotController.getRightX()));
+    drive.setDefaultCommand(driveDefaultCommand);
 
     // intake.setDefaultCommand(
     //     new InstantCommand(() -> intake.changeAngleTest(controller.getLeftY()), intake));
@@ -173,18 +208,25 @@ public class RobotContainer {
     //     .whileFalse(new InstantCommand(() -> shooter.setIndexerSpeed(0)))
     //     .whileFalse(new InstantCommand(() -> shooter.spinShooter(0)))
     //     .whileFalse(new InstantCommand(() -> intake.setIntakeSpeed(0)));
-    PilotController.leftTrigger()
+    // PilotController.leftTrigger()
+    //     .whileTrue(
+    //         Commands.runEnd(() -> shooter.spinShooter(1750 / 60), () -> shooter.stopShooter()));
+
+    PilotController.rightBumper()
         .whileTrue(
-            Commands.runEnd(() -> shooter.spinShooter(1750 / 60), () -> shooter.stopShooter()));
+            Commands.runEnd(() -> shooter.setIndexerSpeed(-5900 / 60), () -> shooter.setIndexerSpeed(0)));
     PilotController.rightTrigger()
         .whileTrue(
-            Commands.runEnd(
-                () -> shooter.setIndexerSpeed(-7500/60), () -> shooter.setIndexerSpeed(0), drive));
-    PilotController.leftBumper()
+            AutoShoot.autoShoot(
+                shooter,
+                drive,
+                () -> -PilotController.getLeftY(),
+                () -> -PilotController.getLeftX()));
+    PilotController.leftTrigger()
         .whileTrue(
-            Commands.runEnd(() -> intake.setIntakeSpeed(-5900/60), () -> intake.setIntakeSpeed(0), intake));
-    // PilotController.rightBumper()
-    //     .onTrue(deployIntake);
+            Commands.runEnd(() -> intake.setIntakeSpeed(-4000/60), () -> intake.setIntakeSpeed(0), intake));
+    PilotController.leftBumper()
+        .onTrue(deployIntake);
 
     // Reset gyro to 0° when B button is pressed
     PilotController.b()

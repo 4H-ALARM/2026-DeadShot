@@ -9,7 +9,7 @@ public class IntakeConstants {
 
   public static final double rotationGearRatio = 3 * 5;
   public static final double rotationUpDegrees = 2;
-  public static final double rotationDownDegrees = 98;
+  public static final double rotationDownDegrees = 96;
 
   // Motor IDs
   public static final int rotationMotorID = 30;

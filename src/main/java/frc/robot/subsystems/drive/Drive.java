@@ -49,8 +49,10 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Drive extends SubsystemBase {
+  private static final int MAX_ODOMETRY_SAMPLES_PER_LOOP = 5;
+
   // TunerConstants doesn't include these constants, so they are declared locally
-  static final double ODOMETRY_FREQUENCY = SwerveConstants.kCANBus.isNetworkFD() ? 250.0 : 100.0;
+  static final double ODOMETRY_FREQUENCY = SwerveConstants.kCANBus.isNetworkFD() ? 100.0 : 100.0;
   public static final double DRIVE_BASE_RADIUS =
       Math.max(
           Math.max(
@@ -90,6 +92,7 @@ public class Drive extends SubsystemBase {
 
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
   private Rotation2d rawGyroRotation = Rotation2d.kZero;
+  private boolean wasDisabled = false;
   private SwerveModulePosition[] lastModulePositions = // For delta tracking
       new SwerveModulePosition[] {
         new SwerveModulePosition(),
@@ -162,23 +165,25 @@ public class Drive extends SubsystemBase {
     odometryLock.unlock();
 
     // Stop moving when disabled
-    if (DriverStation.isDisabled()) {
+    if (DriverStation.isDisabled() && !wasDisabled) {
       for (var module : modules) {
         module.stop();
       }
-    }
-
-    // Log empty setpoint states when disabled
-    if (DriverStation.isDisabled()) {
       Logger.recordOutput("SwerveStates/Setpoints", new SwerveModuleState[] {});
       Logger.recordOutput("SwerveStates/SetpointsOptimized", new SwerveModuleState[] {});
     }
+    wasDisabled = DriverStation.isDisabled();
 
     // Update odometry
     double[] sampleTimestamps =
         modules[0].getOdometryTimestamps(); // All signals are sampled together
     int sampleCount = sampleTimestamps.length;
-    for (int i = 0; i < sampleCount; i++) {
+    int startIndex = Math.max(0, sampleCount - MAX_ODOMETRY_SAMPLES_PER_LOOP);
+    int yawSampleCount = gyroInputs.odometryYawPositions.length;
+    Logger.recordOutput("Drive/OdometrySampleCount", sampleCount);
+    Logger.recordOutput("Drive/OdometrySamplesProcessed", sampleCount - startIndex);
+    Logger.recordOutput("Drive/OdometrySamplesSkipped", startIndex);
+    for (int i = startIndex; i < sampleCount; i++) {
       // Read wheel positions and deltas from each module
       SwerveModulePosition[] modulePositions = new SwerveModulePosition[4];
       SwerveModulePosition[] moduleDeltas = new SwerveModulePosition[4];
@@ -193,7 +198,7 @@ public class Drive extends SubsystemBase {
       }
 
       // Update gyro angle
-      if (gyroInputs.connected) {
+      if (gyroInputs.connected && i < yawSampleCount) {
         // Use the real gyro angle
         rawGyroRotation = gyroInputs.odometryYawPositions[i];
       } else {

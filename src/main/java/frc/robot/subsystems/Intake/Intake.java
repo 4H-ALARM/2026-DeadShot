@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.intake;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.Constants.IntakeConstants;
 import frc.lib.util.LoggedTunableNumber;
@@ -18,6 +19,7 @@ public class Intake extends SubsystemBase {
       new LoggedTunableNumber("Intake/upRotationDegrees", IntakeConstants.rotationUpDegrees);
   private final LoggedTunableNumber m_downRotationDegrees =
       new LoggedTunableNumber("Intake/downRotationDegrees", IntakeConstants.rotationDownDegrees);
+  private int disabledSampleCounter = 0;
 
   public Intake(IntakeIO intake) {
     this.m_intakeIO = intake;
@@ -25,7 +27,12 @@ public class Intake extends SubsystemBase {
 
   @Override
   public void periodic() {
-    m_intakeIO.updateTuningValues();
+    // m_intakeIO.updateTuningValues();
+
+    // Disabled mode does not need full-rate intake telemetry every loop.
+    if (DriverStation.isDisabled() && (disabledSampleCounter++ % 3 != 0)) {
+      return;
+    }
     m_intakeIO.updateInputs(m_inputs);
     Logger.processInputs("Intake", m_inputs);
   }

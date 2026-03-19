@@ -4,11 +4,17 @@
 
 package frc.robot.subsystems.intake;
 
+import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
+import com.ctre.phoenix6.hardware.ParentDevice;
 import com.ctre.phoenix6.hardware.TalonFX;
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import frc.lib.Constants.BuildConstants;
 import frc.lib.Constants.IntakeConstants;
 import frc.lib.util.LoggedTunableNumber;
@@ -27,6 +33,16 @@ public class IntakeIOKraken implements IntakeIO {
   private final VelocityTorqueCurrentFOC m_requestedVelocity;
   private final PositionVoltage m_requestedPosition;
   private double m_requestedAngleDegrees = 0.0;
+  private final StatusSignal<Angle> m_rotationPosition;
+  private final StatusSignal<AngularVelocity> m_rotationVelocity;
+  private final StatusSignal<Angle> m_rotationFollowerPosition;
+  private final StatusSignal<AngularVelocity> m_intakingVelocity;
+  private final Debouncer m_rotationMotorConnectedDebounce =
+      new Debouncer(0.5, Debouncer.DebounceType.kFalling);
+  private final Debouncer m_rotationFollowerConnectedDebounce =
+      new Debouncer(0.5, Debouncer.DebounceType.kFalling);
+  private final Debouncer m_intakingMotorConnectedDebounce =
+      new Debouncer(0.5, Debouncer.DebounceType.kFalling);
 
   private final LoggedTunableNumber rotationkp =
       new LoggedTunableNumber("Intake/Rotation/kp", IntakeConstants.angleMotorkp);
@@ -72,6 +88,18 @@ public class IntakeIOKraken implements IntakeIO {
     m_intakingMotor.getConfigurator().apply(m_intakingMotorConfig);
     m_requestedPosition = new PositionVoltage(0).withSlot(0);
     m_requestedVelocity = new VelocityTorqueCurrentFOC(0).withSlot(0);
+
+    m_rotationPosition = m_rotationMotor.getPosition();
+    m_rotationVelocity = m_rotationMotor.getVelocity();
+    m_rotationFollowerPosition = m_rotationMotorFollow.getPosition();
+    m_intakingVelocity = m_intakingMotor.getVelocity();
+
+    BaseStatusSignal.setUpdateFrequencyForAll(
+        50.0, m_rotationPosition, m_rotationVelocity, m_rotationFollowerPosition, m_intakingVelocity);
+    ParentDevice.optimizeBusUtilizationForAll(
+        m_rotationMotor, m_rotationMotorFollow, m_intakingMotor);
+
+    resetEncoder();
   }
 
   public void resetEncoder() {
@@ -91,6 +119,7 @@ public class IntakeIOKraken implements IntakeIO {
   }
 
   public void setAngle(double angleDegrees) {
+    m_requestedAngleDegrees = angleDegrees;
     m_rotationMotor.setControl(
         m_requestedPosition.withPosition(angleDegrees / 360).withEnableFOC(true));
     m_rotationMotorFollow.setControl(
@@ -98,7 +127,7 @@ public class IntakeIOKraken implements IntakeIO {
   }
 
   public double getAngle() {
-    return m_rotationMotor.getPosition().getValueAsDouble() / IntakeConstants.rotationGearRatio * 360;
+    return m_rotationPosition.getValueAsDouble() * 360.0;
   }
 
   public void setIntakeSpeed(double speedInRPS) {
@@ -143,12 +172,16 @@ public class IntakeIOKraken implements IntakeIO {
   }
 
   public void updateInputs(IntakeIOInputs inputs) {
+    var status =
+        BaseStatusSignal.refreshAll(
+            m_rotationPosition, m_rotationVelocity, m_rotationFollowerPosition, m_intakingVelocity);
 
-    inputs.rotationMotorConnected = m_rotationMotor.isConnected();
-    inputs.intakingMotorConnected = m_intakingMotor.isConnected();
-    inputs.rotationMotorFollowerConnected = m_rotationMotorFollow.isConnected();
-    inputs.rotationDegrees = m_rotationMotor.getPosition().getValueAsDouble();
-    inputs.rotationSpeedDegreesPerSecond = m_rotationMotor.getVelocity().getValueAsDouble();
+    inputs.rotationMotorConnected = m_rotationMotorConnectedDebounce.calculate(status.isOK());
+    inputs.intakingMotorConnected = m_intakingMotorConnectedDebounce.calculate(status.isOK());
+    inputs.rotationMotorFollowerConnected =
+        m_rotationFollowerConnectedDebounce.calculate(status.isOK());
+    inputs.rotationDegrees = m_rotationPosition.getValueAsDouble() * 360.0;
+    inputs.rotationSpeedDegreesPerSecond = m_rotationVelocity.getValueAsDouble() * 360.0;
     inputs.rotationSetpointDegrees = m_requestedAngleDegrees;
   }
 }

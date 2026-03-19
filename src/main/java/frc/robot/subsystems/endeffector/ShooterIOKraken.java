@@ -16,11 +16,11 @@ import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.Constants.GenericConstants;
 import frc.lib.Constants.ShooterConstants;
 import frc.lib.enums.TargetEnum;
 import frc.lib.util.LoggedTunableNumber;
+import org.littletonrobotics.junction.Logger;
 
 /** Add your docs here. */
 public class ShooterIOKraken implements ShooterIO {
@@ -275,6 +275,6 @@ public class ShooterIOKraken implements ShooterIO {
   }
 
   public void updateInputs(ShooterIOInputs inputs) {
-    SmartDashboard.putNumber("Speed", topShooterMotorRight.getVelocity().getValueAsDouble() * 60);
+    Logger.recordOutput("Shooter/SpeedRpm", topShooterMotorRight.getVelocity().getValueAsDouble() * 60);
   }
 }

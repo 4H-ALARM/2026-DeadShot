@@ -12,14 +12,17 @@ import static frc.robot.subsystems.vision.VisionConstants.*;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.wpilibj.DriverStation;
+import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import org.photonvision.PhotonCamera;
 
 /** IO implementation for real PhotonVision hardware. */
 public class VisionIOPhotonVision implements VisionIO {
+  private static final int MAX_RESULTS_PER_LOOP = 1;
+
   protected final PhotonCamera camera;
   protected final Transform3d robotToCamera;
 
@@ -39,9 +42,36 @@ public class VisionIOPhotonVision implements VisionIO {
     inputs.connected = camera.isConnected();
 
     // Read new camera observations
+    var unreadResults = camera.getAllUnreadResults();
+    inputs.unreadResultCount = unreadResults.size();
+    if (DriverStation.isDisabled()) {
+      if (unreadResults.isEmpty()) {
+        inputs.latestTargetObservation = new TargetObservation(Rotation2d.kZero, Rotation2d.kZero);
+      } else {
+        var latestResult = unreadResults.get(unreadResults.size() - 1);
+        if (latestResult.hasTargets()) {
+          inputs.latestTargetObservation =
+              new TargetObservation(
+                  Rotation2d.fromDegrees(latestResult.getBestTarget().getYaw()),
+                  Rotation2d.fromDegrees(latestResult.getBestTarget().getPitch()));
+        } else {
+          inputs.latestTargetObservation = new TargetObservation(Rotation2d.kZero, Rotation2d.kZero);
+        }
+      }
+      inputs.poseObservations = new PoseObservation[0];
+      inputs.tagIds = new int[0];
+      return;
+    }
+
     Set<Short> tagIds = new HashSet<>();
-    List<PoseObservation> poseObservations = new LinkedList<>();
-    for (var result : camera.getAllUnreadResults()) {
+    int resultsToProcess = Math.min(unreadResults.size(), MAX_RESULTS_PER_LOOP);
+    int startIndex = unreadResults.size() - resultsToProcess;
+    List<PoseObservation> poseObservations = new ArrayList<>(resultsToProcess);
+    if (unreadResults.isEmpty()) {
+      inputs.latestTargetObservation = new TargetObservation(Rotation2d.kZero, Rotation2d.kZero);
+    }
+    for (int resultIndex = startIndex; resultIndex < unreadResults.size(); resultIndex++) {
+      var result = unreadResults.get(resultIndex);
       // Update latest target observation
       if (result.hasTargets()) {
         inputs.latestTargetObservation =
@@ -110,10 +140,7 @@ public class VisionIOPhotonVision implements VisionIO {
     }
 
     // Save pose observations to inputs object
-    inputs.poseObservations = new PoseObservation[poseObservations.size()];
-    for (int i = 0; i < poseObservations.size(); i++) {
-      inputs.poseObservations[i] = poseObservations.get(i);
-    }
+    inputs.poseObservations = poseObservations.toArray(new PoseObservation[0]);
 
     // Save tag IDs to inputs objects
     inputs.tagIds = new int[tagIds.size()];

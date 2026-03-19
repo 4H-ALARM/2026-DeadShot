@@ -17,6 +17,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import frc.lib.Constants.SwerveConstants;
+import java.util.Arrays;
 import java.util.Queue;
 
 /** IO implementation for Pigeon 2. */
@@ -49,13 +50,33 @@ public class GyroIOPigeon2 implements GyroIO {
     inputs.yawPosition = Rotation2d.fromDegrees(yaw.getValueAsDouble());
     inputs.yawVelocityRadPerSec = Units.degreesToRadians(yawVelocity.getValueAsDouble());
 
-    inputs.odometryYawTimestamps =
-        yawTimestampQueue.stream().mapToDouble((Double value) -> value).toArray();
-    inputs.odometryYawPositions =
-        yawPositionQueue.stream()
-            .map((Double value) -> Rotation2d.fromDegrees(value))
-            .toArray(Rotation2d[]::new);
-    yawTimestampQueue.clear();
-    yawPositionQueue.clear();
+    inputs.odometryYawTimestamps = drainTimestampQueue(yawTimestampQueue);
+    inputs.odometryYawPositions = drainYawPositionQueue(yawPositionQueue);
+  }
+
+  private static double[] drainTimestampQueue(Queue<Double> queue) {
+    int size = queue.size();
+    double[] values = new double[size];
+    for (int i = 0; i < size; i++) {
+      Double value = queue.poll();
+      if (value == null) {
+        return Arrays.copyOf(values, i);
+      }
+      values[i] = value;
+    }
+    return values;
+  }
+
+  private static Rotation2d[] drainYawPositionQueue(Queue<Double> queue) {
+    int size = queue.size();
+    Rotation2d[] values = new Rotation2d[size];
+    for (int i = 0; i < size; i++) {
+      Double value = queue.poll();
+      if (value == null) {
+        return Arrays.copyOf(values, i);
+      }
+      values[i] = Rotation2d.fromDegrees(value);
+    }
+    return values;
   }
 }

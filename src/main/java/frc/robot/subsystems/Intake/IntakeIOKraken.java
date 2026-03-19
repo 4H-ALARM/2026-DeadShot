@@ -102,7 +102,8 @@ public class IntakeIOKraken implements IntakeIO {
   }
 
   public void setIntakeSpeed(double speedInRPS) {
-    m_intakingMotor.setControl(m_requestedVelocity.withAcceleration(speedInRPS));
+    m_intakingMotor.setControl(m_requestedVelocity.withVelocity(speedInRPS));
+    //m_intakingMotor.set(speedInRPS);
   }
 
   public void stopIntake() {

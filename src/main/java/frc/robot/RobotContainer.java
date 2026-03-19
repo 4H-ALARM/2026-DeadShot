@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.Constants.GenericConstants;
 import frc.lib.Constants.SwerveConstants;
+import frc.robot.commands.DeployIntake;
 import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeIOKraken;
@@ -50,6 +51,8 @@ public class RobotContainer {
 
   private final CommandXboxController PilotController = new CommandXboxController(0);
   private final CommandXboxController OperatorController = new CommandXboxController(1);
+
+  private final DeployIntake deployIntake;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -133,6 +136,8 @@ public class RobotContainer {
         break;
     }
 
+    deployIntake = new DeployIntake(intake);
+
     // Configure the button bindings
     configureButtonBindings();
   }
@@ -175,6 +180,11 @@ public class RobotContainer {
         .whileTrue(
             Commands.runEnd(
                 () -> shooter.setIndexerSpeed(-7500/60), () -> shooter.setIndexerSpeed(0), drive));
+    PilotController.leftBumper()
+        .whileTrue(
+            Commands.runEnd(() -> intake.setIntakeSpeed(-5900/60), () -> intake.setIntakeSpeed(0), intake));
+    // PilotController.rightBumper()
+    //     .onTrue(deployIntake);
 
     // Reset gyro to 0° when B button is pressed
     PilotController.b()

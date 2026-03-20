@@ -48,7 +48,7 @@ public class ShootTargetIO extends SubsystemBase {
   }
 
   public Translation3d getTarget() {
-    if (DriverStation.getAlliance().get() == Alliance.Red) {
+    if (DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().get() == Alliance.Red) {
       Translation2d flippedtranslation = AllianceFlipUtil.apply(new Translation2d(this.m_target.getX(), this.m_target.getY()));
 
       return new Translation3d(flippedtranslation.getX(), flippedtranslation.getY(), this.m_target.getZ());

@@ -37,7 +37,10 @@ public class RevShooter extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_shooter.stopShooter();
+    // Note: RevShooter should only be used to rev up the shooter for shooting, so only stop the shooter if the command was interrupted.
+    if(interrupted) {
+      m_shooter.stopShooter();
+    }
   }
 
   // Returns true when the command should end.

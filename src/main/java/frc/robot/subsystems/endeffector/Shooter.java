@@ -138,4 +138,8 @@ public class Shooter extends SubsystemBase {
   public void setTarget(Translation3d target) {
     shootTarget.setTarget(target, true);
   }
+
+  public double getPhaseTime() {
+    return phaseshift.getPhaseTime();
+  }
 }

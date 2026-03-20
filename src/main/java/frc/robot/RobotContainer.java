@@ -247,10 +247,11 @@ public class RobotContainer {
     PilotController.leftBumper()
         .onTrue(deployIntake);
 
+    // TODO: this requires the shooter, but would not allow indexer to run from the pilot command.
     OperatorController.rightBumper()
         .whileTrue(
             Commands.runEnd(
-                () -> shooter.spinShooter(2500/60), () -> shooter.stopShooter(), null)
+                () -> shooter.spinShooter(2500/60), () -> shooter.stopShooter())
         );
 
     // Reset gyro to 0° when B button is pressed

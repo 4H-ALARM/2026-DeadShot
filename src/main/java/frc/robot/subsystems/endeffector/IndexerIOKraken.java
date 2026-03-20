@@ -53,7 +53,9 @@ public class IndexerIOKraken implements IndexerIO {
   }
 
   public void updateInputs(IndexerIOInputs inputs) {
-    Logger.recordOutput("Indexer/SpeedRpm", m_indexerMotor.getVelocity().getValueAsDouble() * 60);
+    inputs.indexerVelocityRPM = m_indexerMotor.getVelocity().getValueAsDouble() * 60;
+    inputs.isIndexerMotorConnected = m_indexerMotor.isConnected();
+    inputs.isFollowerMotorConnected = m_indexerMotorFollower.isConnected();
     // need to figure out how many encoder units equals one full rotation
   }
 }

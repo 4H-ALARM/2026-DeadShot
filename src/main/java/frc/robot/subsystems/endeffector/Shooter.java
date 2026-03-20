@@ -22,8 +22,10 @@ public class Shooter extends SubsystemBase {
   };
 
   private ShooterIO shooter;
+  private ShooterIOInputsAutoLogged shooterInputs;
   private Drive drive;
   private IndexerIO indexer;
+  private IndexerIOInputsAutoLogged indexerInputs;
   private PhaseshiftIO phaseshift;
   private PhaseshiftIOInputsAutoLogged phaseshiftInputs;
   private ShootTargetIO shootTarget;
@@ -41,6 +43,8 @@ public class Shooter extends SubsystemBase {
     this.phaseshift = phaseshift;
     this.shootTarget = shootTarget;
     this.phaseshiftInputs = new PhaseshiftIOInputsAutoLogged();
+    this.shooterInputs = new ShooterIOInputsAutoLogged();
+    this.indexerInputs = new IndexerIOInputsAutoLogged();
 
     // Distance (meters) -> RPM calibration points for quadratic interpolation
     // TODO: tune these values with real testing
@@ -49,10 +53,12 @@ public class Shooter extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // phaseshift.updateInputs(phaseshiftInputs);
-    // shooter.updateInputs(null);
-    // indexer.updateInputs(null);
-
+     phaseshift.updateInputs(phaseshiftInputs);
+     shooter.updateInputs(shooterInputs);
+     indexer.updateInputs(indexerInputs);
+    Logger.processInputs("PhaseShift", phaseshiftInputs);
+    Logger.processInputs("Shooter", shooterInputs);
+    Logger.processInputs("Indexer", indexerInputs);
     Logger.recordOutput("Shooter/DistanceToTargetMeters", getDistanceToTarget());
   }
 

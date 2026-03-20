@@ -18,13 +18,16 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import org.littletonrobotics.junction.Logger;
 
 public class Vision extends SubsystemBase {
+  private static final Pose3d[] EMPTY_POSE_ARRAY = new Pose3d[0];
+
   private final VisionConsumer consumer;
   private final VisionIO[] io;
   private final VisionIOInputsAutoLogged[] inputs;
@@ -65,11 +68,28 @@ public class Vision extends SubsystemBase {
       Logger.processInputs("Vision/Camera" + Integer.toString(i), inputs[i]);
     }
 
+    if (DriverStation.isDisabled()) {
+      int totalUnreadResults = 0;
+      for (int cameraIndex = 0; cameraIndex < io.length; cameraIndex++) {
+        disconnectedAlerts[cameraIndex].set(!inputs[cameraIndex].connected);
+
+        String cameraKey = "Vision/Camera" + Integer.toString(cameraIndex);
+        totalUnreadResults += inputs[cameraIndex].unreadResultCount;
+        Logger.recordOutput(cameraKey + "/UnreadResultCount", inputs[cameraIndex].unreadResultCount);
+        Logger.recordOutput(cameraKey + "/ObservationCount", 0);
+        Logger.recordOutput(cameraKey + "/TagCount", 0);
+      }
+      Logger.recordOutput("Vision/Summary/ObservationCount", 0);
+      Logger.recordOutput("Vision/Summary/UnreadResultCount", totalUnreadResults);
+      return;
+    }
+
     // Initialize logging values
-    List<Pose3d> allTagPoses = new LinkedList<>();
-    List<Pose3d> allRobotPoses = new LinkedList<>();
-    List<Pose3d> allRobotPosesAccepted = new LinkedList<>();
-    List<Pose3d> allRobotPosesRejected = new LinkedList<>();
+    List<Pose3d> allTagPoses = new ArrayList<>();
+    List<Pose3d> allRobotPoses = new ArrayList<>();
+    List<Pose3d> allRobotPosesAccepted = new ArrayList<>();
+    List<Pose3d> allRobotPosesRejected = new ArrayList<>();
+    int totalObservations = 0;
 
     // Loop over cameras
     for (int cameraIndex = 0; cameraIndex < io.length; cameraIndex++) {
@@ -77,10 +97,10 @@ public class Vision extends SubsystemBase {
       disconnectedAlerts[cameraIndex].set(!inputs[cameraIndex].connected);
 
       // Initialize logging values
-      List<Pose3d> tagPoses = new LinkedList<>();
-      List<Pose3d> robotPoses = new LinkedList<>();
-      List<Pose3d> robotPosesAccepted = new LinkedList<>();
-      List<Pose3d> robotPosesRejected = new LinkedList<>();
+      List<Pose3d> tagPoses = new ArrayList<>(inputs[cameraIndex].tagIds.length);
+      List<Pose3d> robotPoses = new ArrayList<>(inputs[cameraIndex].poseObservations.length);
+      List<Pose3d> robotPosesAccepted = new ArrayList<>(inputs[cameraIndex].poseObservations.length);
+      List<Pose3d> robotPosesRejected = new ArrayList<>(inputs[cameraIndex].poseObservations.length);
 
       // Add tag poses
       for (int tagId : inputs[cameraIndex].tagIds) {
@@ -91,6 +111,7 @@ public class Vision extends SubsystemBase {
       }
 
       // Loop over pose observations
+      totalObservations += inputs[cameraIndex].poseObservations.length;
       for (var observation : inputs[cameraIndex].poseObservations) {
         // Check whether to reject pose
         boolean rejectPose =
@@ -140,19 +161,16 @@ public class Vision extends SubsystemBase {
             VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev));
       }
 
+      String cameraKey = "Vision/Camera" + Integer.toString(cameraIndex);
+      Logger.recordOutput(cameraKey + "/UnreadResultCount", inputs[cameraIndex].unreadResultCount);
+      Logger.recordOutput(cameraKey + "/ObservationCount", inputs[cameraIndex].poseObservations.length);
+      Logger.recordOutput(cameraKey + "/TagCount", inputs[cameraIndex].tagIds.length);
+
       // Log camera metadata
-      Logger.recordOutput(
-          "Vision/Camera" + Integer.toString(cameraIndex) + "/TagPoses",
-          tagPoses.toArray(new Pose3d[0]));
-      Logger.recordOutput(
-          "Vision/Camera" + Integer.toString(cameraIndex) + "/RobotPoses",
-          robotPoses.toArray(new Pose3d[0]));
-      Logger.recordOutput(
-          "Vision/Camera" + Integer.toString(cameraIndex) + "/RobotPosesAccepted",
-          robotPosesAccepted.toArray(new Pose3d[0]));
-      Logger.recordOutput(
-          "Vision/Camera" + Integer.toString(cameraIndex) + "/RobotPosesRejected",
-          robotPosesRejected.toArray(new Pose3d[0]));
+      Logger.recordOutput(cameraKey + "/TagPoses", toPoseArray(tagPoses));
+      Logger.recordOutput(cameraKey + "/RobotPoses", toPoseArray(robotPoses));
+      Logger.recordOutput(cameraKey + "/RobotPosesAccepted", toPoseArray(robotPosesAccepted));
+      Logger.recordOutput(cameraKey + "/RobotPosesRejected", toPoseArray(robotPosesRejected));
       allTagPoses.addAll(tagPoses);
       allRobotPoses.addAll(robotPoses);
       allRobotPosesAccepted.addAll(robotPosesAccepted);
@@ -160,12 +178,15 @@ public class Vision extends SubsystemBase {
     }
 
     // Log summary data
-    Logger.recordOutput("Vision/Summary/TagPoses", allTagPoses.toArray(new Pose3d[0]));
-    Logger.recordOutput("Vision/Summary/RobotPoses", allRobotPoses.toArray(new Pose3d[0]));
-    Logger.recordOutput(
-        "Vision/Summary/RobotPosesAccepted", allRobotPosesAccepted.toArray(new Pose3d[0]));
-    Logger.recordOutput(
-        "Vision/Summary/RobotPosesRejected", allRobotPosesRejected.toArray(new Pose3d[0]));
+    Logger.recordOutput("Vision/Summary/ObservationCount", totalObservations);
+    Logger.recordOutput("Vision/Summary/TagPoses", toPoseArray(allTagPoses));
+    Logger.recordOutput("Vision/Summary/RobotPoses", toPoseArray(allRobotPoses));
+    Logger.recordOutput("Vision/Summary/RobotPosesAccepted", toPoseArray(allRobotPosesAccepted));
+    Logger.recordOutput("Vision/Summary/RobotPosesRejected", toPoseArray(allRobotPosesRejected));
+  }
+
+  private static Pose3d[] toPoseArray(List<Pose3d> poses) {
+    return poses.isEmpty() ? EMPTY_POSE_ARRAY : poses.toArray(new Pose3d[0]);
   }
 
   @FunctionalInterface

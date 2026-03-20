@@ -4,14 +4,22 @@
 
 package frc.robot.subsystems.intake;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.intake.IntakeIO.IntakeIOInputs;
+import frc.lib.Constants.IntakeConstants;
+import frc.lib.util.LoggedTunableNumber;
+import org.littletonrobotics.junction.Logger;
 
 public class Intake extends SubsystemBase {
   /** Creates a new Intake. */
   private final IntakeIO m_intakeIO;
 
-  private IntakeIOInputs m_inputs;
+  private final IntakeIOInputsAutoLogged m_inputs = new IntakeIOInputsAutoLogged();
+  private final LoggedTunableNumber m_upRotationDegrees =
+      new LoggedTunableNumber("Intake/upRotationDegrees", IntakeConstants.rotationUpDegrees);
+  private final LoggedTunableNumber m_downRotationDegrees =
+      new LoggedTunableNumber("Intake/downRotationDegrees", IntakeConstants.rotationDownDegrees);
+  private int disabledSampleCounter = 0;
 
   public Intake(IntakeIO intake) {
     this.m_intakeIO = intake;
@@ -19,8 +27,14 @@ public class Intake extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+    // m_intakeIO.updateTuningValues();
 
+    // Disabled mode does not need full-rate intake telemetry every loop.
+    if (DriverStation.isDisabled() && (disabledSampleCounter++ % 3 != 0)) {
+      return;
+    }
+    m_intakeIO.updateInputs(m_inputs);
+    Logger.processInputs("Intake", m_inputs);
   }
 
   public void resetEncoder() {
@@ -37,6 +51,17 @@ public class Intake extends SubsystemBase {
     m_intakeIO.setAngle(angleDegrees);
   }
 
+  public void setRotationUp() {
+    setAngle(m_upRotationDegrees.get());
+  }
+
+  public void setRotationDown() {
+    setAngle(m_downRotationDegrees.get());
+  }
+  public double getAngle() {
+    return m_intakeIO.getAngle();
+  }
+
   public void setIntakeSpeed(double speed) {
     m_intakeIO.setIntakeSpeed(speed);
   }
@@ -45,7 +70,11 @@ public class Intake extends SubsystemBase {
     m_intakeIO.stopIntake();
   }
 
-  public void updateInputs() {
-    m_intakeIO.updateInputs(m_inputs);
+  public boolean isIntakeUp() {
+    return m_intakeIO.isIntakeUp();
+  }
+
+  public double getRotationDegrees() {
+    return m_inputs.rotationDegrees;
   }
 }

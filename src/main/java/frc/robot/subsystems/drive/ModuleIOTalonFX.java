@@ -35,6 +35,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import frc.lib.Constants.SwerveConstants;
+import java.util.Arrays;
 import java.util.Queue;
 
 /**
@@ -209,19 +210,9 @@ public class ModuleIOTalonFX implements ModuleIO {
     inputs.turnCurrentAmps = turnCurrent.getValueAsDouble();
 
     // Update odometry inputs
-    inputs.odometryTimestamps =
-        timestampQueue.stream().mapToDouble((Double value) -> value).toArray();
-    inputs.odometryDrivePositionsRad =
-        drivePositionQueue.stream()
-            .mapToDouble((Double value) -> Units.rotationsToRadians(value))
-            .toArray();
-    inputs.odometryTurnPositions =
-        turnPositionQueue.stream()
-            .map((Double value) -> Rotation2d.fromRotations(value))
-            .toArray(Rotation2d[]::new);
-    timestampQueue.clear();
-    drivePositionQueue.clear();
-    turnPositionQueue.clear();
+    inputs.odometryTimestamps = drainTimestampQueue(timestampQueue);
+    inputs.odometryDrivePositionsRad = drainDrivePositionQueue(drivePositionQueue);
+    inputs.odometryTurnPositions = drainTurnPositionQueue(turnPositionQueue);
   }
 
   @Override
@@ -260,5 +251,44 @@ public class ModuleIOTalonFX implements ModuleIO {
           case TorqueCurrentFOC -> positionTorqueCurrentRequest.withPosition(
               rotation.getRotations());
         });
+  }
+
+  private static double[] drainTimestampQueue(Queue<Double> queue) {
+    int size = queue.size();
+    double[] values = new double[size];
+    for (int i = 0; i < size; i++) {
+      Double value = queue.poll();
+      if (value == null) {
+        return Arrays.copyOf(values, i);
+      }
+      values[i] = value;
+    }
+    return values;
+  }
+
+  private static double[] drainDrivePositionQueue(Queue<Double> queue) {
+    int size = queue.size();
+    double[] values = new double[size];
+    for (int i = 0; i < size; i++) {
+      Double value = queue.poll();
+      if (value == null) {
+        return Arrays.copyOf(values, i);
+      }
+      values[i] = Units.rotationsToRadians(value);
+    }
+    return values;
+  }
+
+  private static Rotation2d[] drainTurnPositionQueue(Queue<Double> queue) {
+    int size = queue.size();
+    Rotation2d[] values = new Rotation2d[size];
+    for (int i = 0; i < size; i++) {
+      Double value = queue.poll();
+      if (value == null) {
+        return Arrays.copyOf(values, i);
+      }
+      values[i] = Rotation2d.fromRotations(value);
+    }
+    return values;
   }
 }

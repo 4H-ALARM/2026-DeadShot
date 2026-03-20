@@ -9,6 +9,7 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
@@ -19,6 +20,7 @@ import frc.lib.Constants.GenericConstants;
 import frc.lib.Constants.ShooterConstants;
 import frc.lib.enums.TargetEnum;
 import frc.lib.util.LoggedTunableNumber;
+import org.littletonrobotics.junction.Logger;
 
 /** Add your docs here. */
 public class ShooterIOKraken implements ShooterIO {
@@ -44,6 +46,7 @@ public class ShooterIOKraken implements ShooterIO {
   private Translation3d targetPose;
 
   private PositionVoltage hoodPositionVoltage;
+  private VelocityTorqueCurrentFOC shooterVelocityVoltage;
 
   private final LoggedTunableNumber shooterkp =
       new LoggedTunableNumber("Shooter/kp", ShooterConstants.shooterkp);
@@ -63,8 +66,8 @@ public class ShooterIOKraken implements ShooterIO {
       new LoggedTunableNumber("Shooter/maxSpeed", ShooterConstants.shooterMaxSpeed);
   private final LoggedTunableNumber shooterJerk =
       new LoggedTunableNumber("Shooter/jerk", ShooterConstants.shooterJerk);
-  private final LoggedTunableNumber hoodToMotorRatio =
-      new LoggedTunableNumber("Hood/hoodToMotorRatio", ShooterConstants.hoodToMotorRatio);
+  private final LoggedTunableNumber shooterFF =
+      new LoggedTunableNumber("Shooter/shooterFF", ShooterConstants.shooterFF);
 
   private final LoggedTunableNumber hoodkp =
       new LoggedTunableNumber("Hood/kp", ShooterConstants.hoodkp);
@@ -86,6 +89,7 @@ public class ShooterIOKraken implements ShooterIO {
       new LoggedTunableNumber("Hood/maxSpeed", ShooterConstants.hoodMaxSpeed);
   private final LoggedTunableNumber hoodJerk =
       new LoggedTunableNumber("Hood/jerk", ShooterConstants.hoodJerk);
+
 
   public ShooterIOKraken() {
 
@@ -139,16 +143,17 @@ public class ShooterIOKraken implements ShooterIO {
             .withMotionMagicCruiseVelocity(hoodMaxSpeed.get())
             .withMotionMagicJerk(hoodJerk.get());
 
+    shooterVelocityVoltage = new VelocityTorqueCurrentFOC(0).withSlot(0);
     shooterMotorConfig = new TalonFXConfiguration();
     shooterMotorConfig.Slot0 = shooterConfig;
-    shooterMotorConfig.MotionMagic = shooterMotionMagicConfig;
+    // shooterMotorConfig.MotionMagic = shooterMotionMagicConfig;
 
     hoodMotorConfig = new TalonFXConfiguration();
     hoodMotorConfig.Slot0 = hoodConfig;
     hoodMotorConfig.MotionMagic = hoodMotionMagicConfig;
     hoodMotorConfig.Feedback.FeedbackRemoteSensorID = ShooterConstants.hoodEncoderID;
     hoodMotorConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
-    hoodMotorConfig.Feedback.SensorToMechanismRatio = hoodToMotorRatio.get();
+    hoodMotorConfig.Feedback.SensorToMechanismRatio = ShooterConstants.hoodToMotorRatio;
 
     topShooterMotorRight.getConfigurator().apply(shooterMotorConfig);
     hoodMotor.getConfigurator().apply(hoodMotorConfig);
@@ -225,19 +230,12 @@ public class ShooterIOKraken implements ShooterIO {
         hoodMaxAccel,
         hoodMaxSpeed,
         hoodJerk);
-
-    LoggedTunableNumber.ifChanged(
-        hashCode(),
-        () -> {
-          hoodMotorConfig.Feedback.SensorToMechanismRatio = hoodToMotorRatio.get();
-          hoodMotor.getConfigurator().apply(hoodMotorConfig);
-        },
-        hoodToMotorRatio);
   }
 
   @Override
   public void setShooterSpeed(double speed) {
-    topShooterMotorRight.set(speed);
+    // topShooterMotorRight.set(speed);
+    topShooterMotorRight.setControl(shooterVelocityVoltage.withVelocity(speed).withFeedForward(ShooterConstants.shooterFF));
   }
 
   @Override
@@ -266,5 +264,17 @@ public class ShooterIOKraken implements ShooterIO {
     double motorRotations = (angleDegrees) * ShooterConstants.hoodGearRatio / 360;
 
     hoodMotor.setControl(hoodPositionVoltage.withPosition(motorRotations));
+  }
+
+  public double getVelocity() {
+    return topShooterMotorRight.getVelocity().getValueAsDouble() * 60;
+  }
+  @Override
+  public void stopShooter() {
+    topShooterMotorRight.stopMotor();
+  }
+
+  public void updateInputs(ShooterIOInputs inputs) {
+    Logger.recordOutput("Shooter/SpeedRpm", topShooterMotorRight.getVelocity().getValueAsDouble() * 60);
   }
 }

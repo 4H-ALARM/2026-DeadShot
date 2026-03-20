@@ -7,8 +7,8 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 
 public class AllianceFlipUtil {
-  public static double fieldWidth = Units.feetToMeters(26.0) + Units.inchesToMeters(5.0);
-  public static double fieldLength = Units.feetToMeters(57.0) + Units.inchesToMeters(6.875);
+  public static double fieldWidth = Units.feetToMeters(26.0) + Units.inchesToMeters(3.0);
+  public static double fieldLength = Units.feetToMeters(54) + Units.inchesToMeters(3);
 
   public static double applyX(double x) {
     return shouldFlip() ? fieldLength - x : x;

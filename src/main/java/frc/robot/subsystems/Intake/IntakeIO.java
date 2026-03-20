@@ -11,12 +11,13 @@ public interface IntakeIO {
 
   @AutoLog
   public static class IntakeIOInputs {
-    boolean rotationMotorConnected;
-    boolean rotationMotorFollowerConnected;
-    boolean intakingMotorConnected;
+    public boolean rotationMotorConnected;
+    public boolean rotationMotorFollowerConnected;
+    public boolean intakingMotorConnected;
 
-    double rotationDegrees;
-    double rotationSpeed;
+    public double rotationDegrees;
+    public double rotationSpeedDegreesPerSecond;
+    public double rotationSetpointDegrees;
   }
 
   public void resetEncoder();
@@ -25,9 +26,19 @@ public interface IntakeIO {
 
   public void setAngle(double angleDegrees);
 
+  public default double getAngle() {
+    return 0;
+  }
+
   public void setIntakeSpeed(double speed);
 
   public void stopIntake();
+
+  public default boolean isIntakeUp() {
+    return true;
+  };
+
+  public default void updateTuningValues() {}
 
   public default void updateInputs(IntakeIOInputs inputs) {}
 }

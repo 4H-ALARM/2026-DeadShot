@@ -243,7 +243,7 @@ public class RobotContainer {
             ShootCommand);
     PilotController.leftTrigger()
         .toggleOnTrue(
-            Commands.runEnd(() -> intake.setIntakeSpeed(-4000/60), () -> intake.setIntakeSpeed(0), intake));
+            Commands.runEnd(() -> intake.setIntakeSpeed(-5900/60), () -> intake.setIntakeSpeed(0), intake));
     PilotController.leftBumper()
         .onTrue(deployIntake);
 

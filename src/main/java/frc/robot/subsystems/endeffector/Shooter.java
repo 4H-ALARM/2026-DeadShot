@@ -38,6 +38,7 @@ public class Shooter extends SubsystemBase {
   private double lastPhaseTime = 0;
   private Command rumble10Seconds;
   private Command rumble3Seconds;
+  private Command rumbleEndShift;
 
   /** FIX DO NOT WANT TO IMPORT A WHOLE DRIVE */
   public Shooter(
@@ -56,8 +57,9 @@ public class Shooter extends SubsystemBase {
     this.phaseshiftInputs = new PhaseshiftIOInputsAutoLogged();
     this.shooterInputs = new ShooterIOInputsAutoLogged();
     this.indexerInputs = new IndexerIOInputsAutoLogged();
-    this.rumble3Seconds = new RumbleController(controller, 3, 0.75);
-    this.rumble10Seconds = new RumbleController(controller, 0.5, 0.75);
+    this.rumble3Seconds = new RumbleController(controller, 3, 0.2);
+    this.rumble10Seconds = new RumbleController(controller, 0.5, 0.2);
+    this.rumbleEndShift = new RumbleController(controller, 1, 1);
 
     // Distance (meters) -> RPM calibration points for quadratic interpolation
     // TODO: tune these values with real testing
@@ -74,6 +76,9 @@ public class Shooter extends SubsystemBase {
      }
      if(phaseshiftInputs.phaseTimeRemaining <= 3 && lastPhaseTime > 3 && phaseshiftInputs.myHubActive == false){
         CommandScheduler.getInstance().schedule(rumble3Seconds);
+     }
+      if(phaseshiftInputs.phaseTimeRemaining <= 3 && lastPhaseTime > 3 && phaseshiftInputs.myHubActive == true){
+        CommandScheduler.getInstance().schedule(rumbleEndShift);
      }
      lastPhaseTime = phaseshiftInputs.phaseTimeRemaining;
      shooter.updateInputs(shooterInputs);

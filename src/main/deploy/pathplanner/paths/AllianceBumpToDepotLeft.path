@@ -8,20 +8,20 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.930057061340941,
-        "y": 6.1375320970042795
+        "x": 1.5418972895863048,
+        "y": 5.71055634807418
       },
       "isLocked": false,
       "linkedName": "AllianceTopBump"
     },
     {
       "anchor": {
-        "x": 0.7397004279600568,
-        "y": 5.956390870185448
+        "x": 0.8690870185449355,
+        "y": 5.814065620542083
       },
       "prevControl": {
-        "x": 1.1803752762880237,
-        "y": 5.956390870185448
+        "x": 1.3097618668729025,
+        "y": 5.814065620542083
       },
       "nextControl": null,
       "isLocked": false,
@@ -31,7 +31,7 @@
   "rotationTargets": [
     {
       "waypointRelativePos": 0.5202558635394499,
-      "rotationDegrees": 180.0
+      "rotationDegrees": 170.0
     }
   ],
   "constraintZones": [
@@ -40,7 +40,7 @@
       "minWaypointRelativePos": 0.0,
       "maxWaypointRelativePos": 1.0,
       "constraints": {
-        "maxVelocity": 1.0,
+        "maxVelocity": 0.75,
         "maxAcceleration": 3.0,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0,
@@ -61,7 +61,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": 170.0
   },
   "reversed": false,
   "folder": null,

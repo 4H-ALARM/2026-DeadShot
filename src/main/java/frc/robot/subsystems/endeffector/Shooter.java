@@ -57,8 +57,8 @@ public class Shooter extends SubsystemBase {
     this.phaseshiftInputs = new PhaseshiftIOInputsAutoLogged();
     this.shooterInputs = new ShooterIOInputsAutoLogged();
     this.indexerInputs = new IndexerIOInputsAutoLogged();
-    this.rumble3Seconds = new RumbleController(controller, 3, 0.2);
-    this.rumble10Seconds = new RumbleController(controller, 0.5, 0.2);
+    this.rumble3Seconds = new RumbleController(controller, 3, 0.1);
+    this.rumble10Seconds = new RumbleController(controller, 0.5, 0.1);
     this.rumbleEndShift = new RumbleController(controller, 1, 1);
 
     // Distance (meters) -> RPM calibration points for quadratic interpolation

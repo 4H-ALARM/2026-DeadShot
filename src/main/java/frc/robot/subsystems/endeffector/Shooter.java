@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -34,8 +35,9 @@ public class Shooter extends SubsystemBase {
   private PhaseshiftIO phaseshift;
   private PhaseshiftIOInputsAutoLogged phaseshiftInputs;
   private ShootTargetIO shootTarget;
-  private CommandXboxController controller;
-  private double lastPhaseTime;
+  private double lastPhaseTime = 0;
+  private Command rumble10Seconds;
+  private Command rumble5Seconds;
 
   /** FIX DO NOT WANT TO IMPORT A WHOLE DRIVE */
   public Shooter(
@@ -54,7 +56,8 @@ public class Shooter extends SubsystemBase {
     this.phaseshiftInputs = new PhaseshiftIOInputsAutoLogged();
     this.shooterInputs = new ShooterIOInputsAutoLogged();
     this.indexerInputs = new IndexerIOInputsAutoLogged();
-    this.controller = controller;
+    this.rumble5Seconds = new RumbleController(controller, 5, 1);
+    this.rumble10Seconds = new RumbleController(controller, 0.5, 1);
 
     // Distance (meters) -> RPM calibration points for quadratic interpolation
     // TODO: tune these values with real testing
@@ -65,16 +68,14 @@ public class Shooter extends SubsystemBase {
   public void periodic() {
      phaseshift.updateInputs(phaseshiftInputs);
 
-     var newPhaseTime = getPhaseTime();
-     if(newPhaseTime <= 10 && lastPhaseTime > 10 && phaseshiftInputs.myHubActive == false){
-      // new RumbleController(controller, .5, 1);
-      CommandScheduler.getInstance().schedule(new RumbleController(controller, .5, 1));
+     if(phaseshiftInputs.phaseTimeRemaining <= 10 && lastPhaseTime > 10 && phaseshiftInputs.myHubActive == false){
+      CommandScheduler.getInstance().schedule(rumble10Seconds);
 
      }
-     if(newPhaseTime <= 5 && lastPhaseTime > 5 && phaseshiftInputs.myHubActive == false){
-        CommandScheduler.getInstance().schedule(new RumbleController(controller, 5, 1));
+     if(phaseshiftInputs.phaseTimeRemaining <= 5 && lastPhaseTime > 5 && phaseshiftInputs.myHubActive == false){
+        CommandScheduler.getInstance().schedule(rumble5Seconds);
      }
-     lastPhaseTime = newPhaseTime;
+     lastPhaseTime = phaseshiftInputs.phaseTimeRemaining;
      shooter.updateInputs(shooterInputs);
      indexer.updateInputs(indexerInputs);
     Logger.processInputs("PhaseShift", phaseshiftInputs);
@@ -157,9 +158,5 @@ public class Shooter extends SubsystemBase {
 
   public void setTarget(Translation3d target) {
     shootTarget.setTarget(target, true);
-  }
-
-  public double getPhaseTime() {
-    return phaseshift.getPhaseTime();
   }
 }

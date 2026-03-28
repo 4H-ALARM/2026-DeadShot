@@ -275,6 +275,10 @@ public class ShooterIOKraken implements ShooterIO {
   }
 
   public void updateInputs(ShooterIOInputs inputs) {
-    Logger.recordOutput("Shooter/SpeedRpm", topShooterMotorRight.getVelocity().getValueAsDouble() * 60);
+    inputs.shooterVelocityRPM = topShooterMotorRight.getVelocity().getValueAsDouble() * 60;
+    inputs.topRightMotorIsConnected = topShooterMotorRight.isConnected();
+    inputs.topLeftMotorIsConnected = topShooterMotorLeft.isConnected();
+    inputs.bottomRightMotorIsConnected = bottomShooterMotorRight.isConnected();
+    inputs.bottomLeftMotorIsConnected = bottomShooterMotorLeft.isConnected();
   }
 }

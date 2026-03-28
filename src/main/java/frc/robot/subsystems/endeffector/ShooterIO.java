@@ -15,7 +15,10 @@ public interface ShooterIO {
 
     public Rotation2d hoodAngleDegrees;
     public double shooterVelocityRPM;
-    public boolean shooterMotorIsConnected;
+    public boolean topLeftMotorIsConnected;
+    public boolean topRightMotorIsConnected;
+    public boolean bottomLeftMotorIsConnected;
+    public boolean bottomRightMotorIsConnected;
     public boolean hoodMotorIsConnected;
   }
 

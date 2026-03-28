@@ -20,12 +20,12 @@
         "y": 4.996638554216868
       },
       "prevControl": {
-        "x": 8.036687903646193,
-        "y": 5.2459878879892035
+        "x": 7.946181980189124,
+        "y": 5.235901072001081
       },
       "nextControl": {
-        "x": 7.9530963855421675,
-        "y": 4.089638554216867
+        "x": 8.25706134094151,
+        "y": 4.209671897289586
       },
       "isLocked": false,
       "linkedName": "MidOfMid"
@@ -36,8 +36,8 @@
         "y": 4.947175463623396
       },
       "prevControl": {
-        "x": 6.437870288572262,
-        "y": 3.8544043792860476
+        "x": 6.80793152639087,
+        "y": 4.144978601997147
       },
       "nextControl": null,
       "isLocked": false,
@@ -51,7 +51,7 @@
       "minWaypointRelativePos": 0,
       "maxWaypointRelativePos": 2.0,
       "constraints": {
-        "maxVelocity": 1.0,
+        "maxVelocity": 0.75,
         "maxAcceleration": 3.0,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0,
@@ -78,7 +78,7 @@
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -105.00000000000001
+    "rotation": -95.0
   },
   "useDefaultConstraints": true
 }

@@ -6,8 +6,14 @@ package frc.robot.subsystems.endeffector;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.Constants.GenericConstants;
+import frc.robot.commands.RumbleController;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.targeting.ShootTargetIO;
 import org.littletonrobotics.junction.Logger;
@@ -22,11 +28,17 @@ public class Shooter extends SubsystemBase {
   };
 
   private ShooterIO shooter;
+  private ShooterIOInputsAutoLogged shooterInputs;
   private Drive drive;
   private IndexerIO indexer;
+  private IndexerIOInputsAutoLogged indexerInputs;
   private PhaseshiftIO phaseshift;
   private PhaseshiftIOInputsAutoLogged phaseshiftInputs;
   private ShootTargetIO shootTarget;
+  private double lastPhaseTime = 0;
+  private Command rumble10Seconds;
+  private Command rumble3Seconds;
+  private Command rumbleEndShift;
 
   /** FIX DO NOT WANT TO IMPORT A WHOLE DRIVE */
   public Shooter(
@@ -34,25 +46,46 @@ public class Shooter extends SubsystemBase {
       Drive drive,
       IndexerIO indexer,
       PhaseshiftIO phaseshift,
-      ShootTargetIO shootTarget) {
+      ShootTargetIO shootTarget,
+      CommandXboxController controller
+      ) {
     this.shooter = shooter;
     this.drive = drive;
     this.indexer = indexer;
     this.phaseshift = phaseshift;
     this.shootTarget = shootTarget;
     this.phaseshiftInputs = new PhaseshiftIOInputsAutoLogged();
+    this.shooterInputs = new ShooterIOInputsAutoLogged();
+    this.indexerInputs = new IndexerIOInputsAutoLogged();
+    this.rumble3Seconds = new RumbleController(controller, 3, 0.1);
+    this.rumble10Seconds = new RumbleController(controller, 0.5, 0.1);
+    this.rumbleEndShift = new RumbleController(controller, 1, 1);
 
     // Distance (meters) -> RPM calibration points for quadratic interpolation
     // TODO: tune these values with real testing
-    shootTarget.setTarget(GenericConstants.HUB_POSE3D, true);
+    // shootTarget.setTarget(GenericConstants.HUB_POSE3D, true);
   }
 
   @Override
   public void periodic() {
-    // phaseshift.updateInputs(phaseshiftInputs);
-    // shooter.updateInputs(null);
-    // indexer.updateInputs(null);
+     phaseshift.updateInputs(phaseshiftInputs);
 
+     if(phaseshiftInputs.phaseTimeRemaining <= 10 && lastPhaseTime > 10 && phaseshiftInputs.myHubActive == false){
+      CommandScheduler.getInstance().schedule(rumble10Seconds);
+
+     }
+     if(phaseshiftInputs.phaseTimeRemaining <= 3 && lastPhaseTime > 3 && phaseshiftInputs.myHubActive == false){
+        CommandScheduler.getInstance().schedule(rumble3Seconds);
+     }
+      if(phaseshiftInputs.phaseTimeRemaining <= 3 && lastPhaseTime > 3 && phaseshiftInputs.myHubActive == true){
+        CommandScheduler.getInstance().schedule(rumbleEndShift);
+     }
+     lastPhaseTime = phaseshiftInputs.phaseTimeRemaining;
+     shooter.updateInputs(shooterInputs);
+     indexer.updateInputs(indexerInputs);
+    Logger.processInputs("PhaseShift", phaseshiftInputs);
+    Logger.processInputs("Shooter", shooterInputs);
+    Logger.processInputs("Indexer", indexerInputs);
     Logger.recordOutput("Shooter/DistanceToTargetMeters", getDistanceToTarget());
   }
 
@@ -126,5 +159,9 @@ public class Shooter extends SubsystemBase {
   }
   public double getShooterVelocity() {
     return shooter.getVelocity();
+  }
+
+  public void setTarget(Translation3d target) {
+    shootTarget.setTarget(target, true);
   }
 }

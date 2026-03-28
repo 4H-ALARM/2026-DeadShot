@@ -10,7 +10,9 @@ import org.littletonrobotics.junction.AutoLog;
 public interface IndexerIO {
   @AutoLog
   public class IndexerIOInputs {
-    double indexerSpeed;
+    double indexerVelocityRPM;
+    boolean isIndexerMotorConnected;
+    boolean isFollowerMotorConnected;
   }
 
   public default void setIndexerSpeed(double indexerSpeed) {}

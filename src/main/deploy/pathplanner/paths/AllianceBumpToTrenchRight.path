@@ -12,7 +12,7 @@
         "y": 1.7529167282539575
       },
       "isLocked": false,
-      "linkedName": "AllianceTopBump"
+      "linkedName": "AllianceTopBumpRight"
     },
     {
       "anchor": {
@@ -41,7 +41,7 @@
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "NeutralZoneTopTrench"
+      "linkedName": "NeutralZoneTopTrenchRight"
     }
   ],
   "rotationTargets": [

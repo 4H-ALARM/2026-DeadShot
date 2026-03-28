@@ -4,50 +4,52 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.lib.Constants.ShooterConstants;
-import frc.robot.subsystems.endeffector.Shooter;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class RevShooter extends Command {
-  /** Creates a new ShootBall. */
-  private double m_speed;
+public class RumbleController extends Command {
+  private CommandXboxController m_controller;
+  private double m_rumbleTime;
+  private double m_rumbleIntensity;
+  private Timer m_timer;
 
-  private Shooter m_shooter;
-
-  public RevShooter(Shooter shooter) {
-
-    this.m_shooter = shooter;
-    addRequirements(shooter);
+  /** Creates a new rumbleController. */
+  public RumbleController(CommandXboxController controller, double rumbleTime, double rumbleIntensity) {
+    this.m_controller = controller;
+    this.m_rumbleTime = rumbleTime;
+    this.m_rumbleIntensity = rumbleIntensity;
+    m_timer = new Timer();
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-
+    m_timer.reset();
+    m_timer.start();
+    m_controller.setRumble(RumbleType.kBothRumble, m_rumbleIntensity);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_shooter.spinShooterFromLookup();
+
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    // Note: RevShooter should only be used to rev up the shooter for shooting, so only stop the shooter if the command was interrupted.
-    if(interrupted) {
-      m_shooter.stopShooter();
-    }
+    m_controller.setRumble(RumbleType.kBothRumble, 0);
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    this.m_speed = m_shooter.getLookupRpm();
-    return (m_shooter.getShooterVelocity() > m_speed - ShooterConstants.shooterRevTolerance
-        && m_shooter.getShooterVelocity() < m_speed + ShooterConstants.shooterRevTolerance);
+      return m_timer.hasElapsed(m_rumbleTime);
   }
 }

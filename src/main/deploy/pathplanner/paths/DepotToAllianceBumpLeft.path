@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 0.8690870185449355,
+        "y": 5.814065620542083
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.4642653352353778,
+        "y": 5.852881597717548
+      },
+      "isLocked": false,
+      "linkedName": "Depot"
+    },
+    {
+      "anchor": {
+        "x": 2.162952924393723,
+        "y": 5.4647218259629105
+      },
+      "prevControl": {
+        "x": 1.7359771754636228,
+        "y": 5.969329529243937
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "AllianceTopBump"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 135.0
+  },
+  "reversed": false,
+  "folder": null,
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 170.0
+  },
+  "useDefaultConstraints": true
+}

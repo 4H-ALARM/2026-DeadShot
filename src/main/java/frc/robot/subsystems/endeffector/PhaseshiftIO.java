@@ -1,7 +1,11 @@
 package frc.robot.subsystems.endeffector;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.subsystems.endeffector.PhaseshiftIO.PhaseshiftIOInputs.AutoWinner;
 import java.util.Optional;
 import org.littletonrobotics.junction.AutoLog;
@@ -11,7 +15,6 @@ public class PhaseshiftIO {
   public static final double graceStartPeriod = 0;
   // time after current phase where the hub will register scoring fuel.
   public static final double graceEndPeriod = 3;
-
   @AutoLog
   public static class PhaseshiftIOInputs {
     public enum AutoWinner {
@@ -26,7 +29,6 @@ public class PhaseshiftIO {
   }
 
   public void updateInputs(PhaseshiftIOInputs inputs) {
-
     Optional<Alliance> alliance = DriverStation.getAlliance();
     // If we have no alliance, we cannot be enabled, therefore no hub.
     if (alliance.isEmpty()) {
@@ -79,7 +81,8 @@ public class PhaseshiftIO {
     if (matchTime > 130) {
       // Transition shift, hub is active.
       inputs.myHubActive = true;
-      inputs.phaseTimeRemaining = matchTime - 130;
+      // if shift1 is active, then our active shift lasts until the end of shift 1.
+      inputs.phaseTimeRemaining = matchTime - (shift1Active ? 105 : 130);
     } else if (matchTime > 105) {
       // Shift 1
       inputs.myHubActive = shift1Active;
@@ -96,11 +99,13 @@ public class PhaseshiftIO {
     } else if (matchTime > 30) {
       // Shift 4
       inputs.myHubActive = !shift1Active;
-      inputs.phaseTimeRemaining = matchTime - 30;
+      // if we are active for shift 4, the active shift lasts the rest of the game.
+      inputs.phaseTimeRemaining = matchTime - (shift1Active ? 30 : 0);
     } else {
       // End game, hub always active.
       inputs.myHubActive = true;
       inputs.phaseTimeRemaining = matchTime;
     }
   }
+
 }

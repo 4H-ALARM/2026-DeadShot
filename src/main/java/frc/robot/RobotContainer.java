@@ -203,7 +203,7 @@ public class RobotContainer {
                 drive)
             .ignoringDisable(true);
     ShootFromTowerCommand =
-        Commands.runEnd(() -> shooter.spinShooter(1825), () -> shooter.stopShooter(), shooter);
+        Commands.runEnd(() -> shooter.spinShooter(1825 / 60), () -> shooter.stopShooter(), shooter);
     NamedCommands.registerCommand("Shoot", autoShootCommand);
     NamedCommands.registerCommand("Deploy intake", deployIntakeAuto);
     NamedCommands.registerCommand("Intake", intakeCommandAuto);

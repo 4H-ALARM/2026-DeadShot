@@ -9,18 +9,34 @@
       "prevControl": null,
       "nextControl": {
         "x": 5.641484794275492,
-        "y": 7.515348837209302
+        "y": 7.304418604651163
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.529606440071557,
-        "y": 7.239516994633274
+        "x": 7.474955277280859,
+        "y": 7.392582025677603
       },
       "prevControl": {
-        "x": 7.296475849731663,
+        "x": 6.004453166707744,
+        "y": 7.6278623633692995
+      },
+      "nextControl": {
+        "x": 7.880590339892666,
+        "y": 7.327680415659715
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.545831842576028,
+        "y": 6.85010733452594
+      },
+      "prevControl": {
+        "x": 8.464704830053668,
         "y": 7.304418604651163
       },
       "nextControl": null,
@@ -28,7 +44,12 @@
       "linkedName": "AgitatePositionLeft"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.45989304812834264,
+      "rotationDegrees": 180.0
+    }
+  ],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
@@ -48,7 +69,7 @@
   "folder": null,
   "idealStartingState": {
     "velocity": 3.0,
-    "rotation": -90.0
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }

@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.41432915921288,
-        "y": 5.3573703041144904
+        "x": 4.303240963855422,
+        "y": 7.392582025677603
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.9864937388193207,
-        "y": 6.119964221824687
+        "x": 5.303240963855422,
+        "y": 7.392582025677603
       },
       "isLocked": false,
-      "linkedName": "AgitatePositionEndLeft"
+      "linkedName": "TopTrench"
     },
     {
       "anchor": {
-        "x": 3.0094,
-        "y": 6.665299999999999
+        "x": 6.355402504472272,
+        "y": 7.392582025677603
       },
       "prevControl": {
-        "x": 3.113057142857143,
-        "y": 5.5769
+        "x": 5.355402504472272,
+        "y": 7.392582025677603
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "EndAgitateAndShootLeft"
+      "linkedName": null
     }
   ],
   "rotationTargets": [],
@@ -41,14 +41,14 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0.0,
-    "rotation": 105.75117366345296
+    "velocity": 0,
+    "rotation": 0.0
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
-    "velocity": 3.0,
-    "rotation": 164.05460409907727
+    "velocity": 0,
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }

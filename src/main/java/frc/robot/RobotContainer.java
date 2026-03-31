@@ -24,8 +24,8 @@ import frc.robot.commands.DeployIntake;
 import frc.robot.commands.AutoShoot;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.SelectTarget;
-import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.intake.IntakeIOKraken;
+import frc.robot.subsystems.Intake.Intake;
+import frc.robot.subsystems.Intake.IntakeIOKraken;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -109,8 +109,10 @@ public class RobotContainer {
         vision =
             new Vision(
                 drive::addVisionMeasurement,
-                new VisionIOPhotonVision(camera0Name, robotToCameraL),
-                new VisionIOPhotonVision(camera1Name, robotToCameraR));
+                new VisionIOPhotonVision(camera0Name, backLeft),
+                new VisionIOPhotonVision(camera1Name, backRight),
+                new VisionIOPhotonVision(camera2Name, sideLeft),
+                new VisionIOPhotonVision(camera3Name, sideRight));
 
         shooter =
             new Shooter(
@@ -138,8 +140,10 @@ public class RobotContainer {
         vision =
             new Vision(
                 drive::addVisionMeasurement,
-                new VisionIOPhotonVisionSim(camera0Name, robotToCameraL, drive::getPose),
-                new VisionIOPhotonVisionSim(camera1Name, robotToCameraR, drive::getPose));
+                new VisionIOPhotonVisionSim(camera0Name, backLeft, drive::getPose),
+                new VisionIOPhotonVisionSim(camera1Name, backRight, drive::getPose),
+                new VisionIOPhotonVisionSim(camera2Name, sideLeft, drive::getPose),
+                new VisionIOPhotonVisionSim(camera3Name, sideRight, drive::getPose));
         shooter =
             new Shooter(
                 new ShooterIOKraken(),
@@ -188,13 +192,13 @@ public class RobotContainer {
         DriveCommands.joystickDrive(
             drive, pilotForwardInput, pilotStrafeInput, pilotRotateInput);
     indexerReverseCommand =
-        Commands.runEnd(() -> shooter.setIndexerSpeed(-5900 / 60), () -> shooter.setIndexerSpeed(0));
+        Commands.runEnd(() -> shooter.setIndexerSpeed(-6300 / 60), () -> shooter.setIndexerSpeed(0));
     autoShootCommand = AutoShoot.autoShoot(shooter, drive, pilotForwardInput, pilotStrafeInput).withTimeout(4);
     ShootCommand = AutoShoot.autoShoot(shooter, drive, pilotForwardInput, pilotStrafeInput);
     intakeCommand =
         Commands.runEnd(() -> intake.setIntakeSpeed(-5900 / 60), () -> intake.setIntakeSpeed(0), intake);
     ejectCommand =
-        Commands.runEnd(() -> intake.setIntakeSpeed(3000 / 60), () -> intake.setIntakeSpeed(0), intake);
+        Commands.runEnd(() -> intake.setIntakeSpeed(5900 / 60), () -> intake.setIntakeSpeed(0), intake);
     intakeCommandAuto =
         Commands.runEnd(() -> intake.setIntakeSpeed(-5900 / 60), () -> intake.setIntakeSpeed(0), intake);
     resetGyroCommand =
@@ -244,16 +248,16 @@ public class RobotContainer {
     //     .whileTrue(
     //         Commands.runEnd(() -> shooter.spinShooter(1750 / 60), () -> shooter.stopShooter()));
 
-    PilotController.rightBumper()
+    pilotRightBumper
         .whileTrue(
             Commands.runEnd(() -> shooter.setIndexerSpeed(-5900 / 60), () -> shooter.setIndexerSpeed(0)));
-    PilotController.rightTrigger()
+    pilotRightTrigger
         .whileTrue(
             ShootCommand);
-    PilotController.leftTrigger()
+    pilotLeftTrigger
         .toggleOnTrue(
             intakeCommand);
-    PilotController.leftBumper()
+    pilotLeftBumper
         .onTrue(deployIntake);
 
     // TODO: this requires the shooter, but would not allow indexer to run from the pilot command.
@@ -272,7 +276,7 @@ public class RobotContainer {
         );
 
     // Reset gyro to 0° when B button is pressed
-    PilotController.b()
+    pilotB
         .onTrue(
             Commands.runOnce(
                     () ->

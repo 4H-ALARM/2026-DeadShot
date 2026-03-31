@@ -3,53 +3,48 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.303240963855422,
-        "y": 0.6774179743223971
+        "x": 8.172647584973166,
+        "y": 3.978211091234347
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.303240963855423,
-        "y": 0.6774179743223971
+        "x": 7.583271428571429,
+        "y": 3.5944571428571432
       },
       "isLocked": false,
-      "linkedName": "TopTrenchRight"
+      "linkedName": "AgitatePositionEndRight"
     },
     {
       "anchor": {
-        "x": 5.59169757489301,
-        "y": 0.6774179743223971
+        "x": 5.328728571428571,
+        "y": 2.8040714285714285
       },
       "prevControl": {
-        "x": 5.070123553658574,
-        "y": 0.6774179743223971
+        "x": 6.080242857142857,
+        "y": 2.933642857142858
       },
       "nextControl": {
-        "x": 6.08788028203584,
-        "y": 0.6774179743223971
+        "x": 4.434825045762022,
+        "y": 2.6499501310427123
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.01866265060241,
-        "y": 1.1719397590361451
+        "x": 3.0094,
+        "y": 1.404700000000001
       },
       "prevControl": {
-        "x": 7.501116288262895,
-        "y": 0.4732521698778003
+        "x": 3.113057142857143,
+        "y": 2.4931
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "TopOfMidRight"
+      "linkedName": "EndAgitateAndShootRight"
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 1,
-      "rotationDegrees": 180
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
@@ -62,14 +57,14 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 1.5,
-    "rotation": 95
+    "velocity": 0.0,
+    "rotation": -105.75117366345296
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
-    "velocity": 0,
-    "rotation": 180
+    "velocity": 3.0,
+    "rotation": -114.44395478041672
   },
   "useDefaultConstraints": true
 }

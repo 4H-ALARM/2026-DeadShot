@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.933542039355992,
-        "y": 6.665299999999999
+        "x": 6.160697674418604,
+        "y": 6.606726296958855
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.063317695185318,
-        "y": 5.978440712247323
+        "x": 6.29047333024793,
+        "y": 5.919867009206179
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "endScrapeLeftPT1"
     },
     {
       "anchor": {
@@ -48,16 +48,16 @@
     },
     {
       "anchor": {
-        "x": 3.0094,
-        "y": 6.665299999999999
+        "x": 2.162952924393723,
+        "y": 5.4647218259629105
       },
       "prevControl": {
-        "x": 3.045420393559928,
-        "y": 5.665652951699462
+        "x": 2.1989733179536515,
+        "y": 4.465074777662373
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "EndAgitateAndShootLeft"
+      "linkedName": "AllianceTopBump"
     }
   ],
   "rotationTargets": [
@@ -101,13 +101,13 @@
   },
   "goalEndState": {
     "velocity": 3.0,
-    "rotation": 105.75117366345296
+    "rotation": 135.0
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 1.5,
-    "rotation": 105.75117366345296
+    "rotation": -90.0
   },
   "useDefaultConstraints": true
 }

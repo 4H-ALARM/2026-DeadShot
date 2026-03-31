@@ -3,59 +3,51 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.0094,
-        "y": 6.665299999999999
+        "x": 2.162952924393723,
+        "y": 5.4647218259629105
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.256350626118068,
-        "y": 7.255742397137746
+        "x": 2.5099821109123432,
+        "y": 7.434221824686941
       },
       "isLocked": false,
-      "linkedName": "EndAgitateAndShootLeft"
+      "linkedName": "AllianceTopBump"
     },
     {
       "anchor": {
-        "x": 4.765313059033989,
-        "y": 7.628926654740608
+        "x": 4.619284436493739,
+        "y": 7.434221824686941
       },
       "prevControl": {
-        "x": 4.1905640318184325,
-        "y": 7.576676743175556
+        "x": 4.045029432641538,
+        "y": 7.4916473250721625
       },
       "nextControl": {
-        "x": 5.014286360650915,
-        "y": 7.651560591251239
+        "x": 4.9437924865831855,
+        "y": 7.401771019677995
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 5.933542039355992,
-        "y": 6.665299999999999
+        "x": 6.160697674418604,
+        "y": 6.606726296958855
       },
       "prevControl": {
-        "x": 5.690161001788908,
-        "y": 7.9534347048300535
+        "x": 5.965992844364938,
+        "y": 7.5054513416815745
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "endScrapeLeftPT1"
     }
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 2,
-      "rotationDegrees": -90.0
-    },
-    {
-      "waypointRelativePos": 2,
-      "rotationDegrees": -90.0
-    },
-    {
-      "waypointRelativePos": 2.5,
-      "rotationDegrees": 90.0
+      "waypointRelativePos": 0.8663101604278088,
+      "rotationDegrees": 0.0
     }
   ],
   "constraintZones": [],
@@ -71,13 +63,13 @@
   },
   "goalEndState": {
     "velocity": 1.5,
-    "rotation": 135.0
+    "rotation": -90.0
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 3.0,
-    "rotation": 105.75117366345296
+    "rotation": 135.0
   },
   "useDefaultConstraints": true
 }

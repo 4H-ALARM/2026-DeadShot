@@ -8,24 +8,24 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.9864937388193207,
-        "y": 6.119964221824687
+        "x": 3.954042933810376,
+        "y": 5.373595706618962
       },
       "isLocked": false,
       "linkedName": "AgitatePositionEndLeft"
     },
     {
       "anchor": {
-        "x": 3.0094,
-        "y": 6.665299999999999
+        "x": 2.162952924393723,
+        "y": 5.4647218259629105
       },
       "prevControl": {
-        "x": 3.113057142857143,
-        "y": 5.5769
+        "x": 2.2666100672508662,
+        "y": 4.376321825962911
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "EndAgitateAndShootLeft"
+      "linkedName": "AllianceTopBump"
     }
   ],
   "rotationTargets": [],
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0.0,
-    "rotation": 105.75117366345296
+    "rotation": 135.0
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 3.0,
-    "rotation": 164.05460409907727
+    "rotation": 135.0
   },
   "useDefaultConstraints": true
 }

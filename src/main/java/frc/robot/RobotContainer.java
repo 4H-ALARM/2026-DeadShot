@@ -123,20 +123,6 @@ public class RobotContainer {
         shooter =
             new Shooter(
                 new ShooterIOKraken(),
-                new RotationalMechanism(RotationalMechanism.Config.builder()
-                                                    .name("hood")
-                                                    .canBus("endEffector")
-                                                    .currentLimit(30)
-                                                    .motor(ShooterConstants.hoodMotorID)
-                                                    .follower(ShooterConstants.hoodMotorFollowerID, true)
-                                                    .motorType(MotorType.KRAKEN_X60_FOC)
-                                                    .gearRatio(213.3333)
-                                                    .pid(1000,0,8)
-                                                    .feedforward(0, 20.85)
-                                                    .range(-30, 0)
-                                                    .statorCurrentLimit(30)
-                                                    .startingAngle(0)
-                                                    .motionMagic(999, 9999, 0).build()),
                 drive,
                 new IndexerIOKraken(),
                 new PhaseshiftIO(),
@@ -167,14 +153,6 @@ public class RobotContainer {
         shooter =
             new Shooter(
                 new ShooterIOKraken(),
-                new RotationalMechanism(RotationalMechanism.Config.builder()
-                                                    .name("hood")
-                                                    .canBus("endEffector")
-                                                    .currentLimit(30)
-                                                    .motor(ShooterConstants.hoodMotorID)
-                                                    .follower(ShooterConstants.hoodMotorFollowerID, true)
-                                                    .motorType(MotorType.KRAKEN_X60_FOC)
-                                                    .pid(1,0,0).build()),
                 drive,
                 new IndexerIOKraken(),
                 new PhaseshiftIO(),
@@ -200,16 +178,6 @@ public class RobotContainer {
         shooter =
             new Shooter(
                 new ShooterIOKraken(),
-                new RotationalMechanism(RotationalMechanism.Config.builder()
-                                                    .name("hood")
-                                                    .canBus("endEffector")
-                                                    .currentLimit(30)
-                                                    .motor(ShooterConstants.hoodMotorID)
-                                                    .follower(ShooterConstants.hoodMotorFollowerID, true)
-                                                    .motorType(MotorType.KRAKEN_X60_FOC)
-                                                    .pid(0.5,0,0)
-                                                    .motionMagic(99, 99, 0)
-                                                    .build()),
                 drive,
                 new IndexerIOKraken(),
                 new PhaseshiftIO(),
@@ -232,8 +200,8 @@ public class RobotContainer {
             drive, pilotForwardInput, pilotStrafeInput, pilotRotateInput);
     indexerReverseCommand =
         Commands.runEnd(() -> shooter.setIndexerSpeed(-6300 / 60), () -> shooter.setIndexerSpeed(0));
-    autoShootCommand = AutoShoot.autoShoot(shooter, drive, pilotForwardInput, pilotStrafeInput).withTimeout(4);
-    ShootCommand = AutoShoot.autoShoot(shooter, drive, pilotForwardInput, pilotStrafeInput);
+    autoShootCommand = AutoShoot.autoShoot(shooter, drive, intake, pilotForwardInput, pilotStrafeInput).withTimeout(4);
+    ShootCommand = AutoShoot.autoShoot(shooter, drive, intake, pilotForwardInput, pilotStrafeInput);
     intakeCommand =
         Commands.runEnd(() -> intake.setIntakeSpeed(-5900 / 60), () -> intake.setIntakeSpeed(0), intake);
     ejectCommand =
@@ -292,12 +260,12 @@ public class RobotContainer {
     //     .whileTrue(
     //         Commands.runEnd(() -> shooter.spinShooter(1750 / 60), () -> shooter.stopShooter()));
 
-    // pilotRightBumper
-    //     .whileTrue(
-    //         Commands.runEnd(() -> shooter.setIndexerSpeed(-5900 / 60), () -> shooter.setIndexerSpeed(0)));
+    pilotRightBumper
+        .whileTrue(
+            Commands.runEnd(() -> shooter.setIndexerSpeed(-5900 / 60), () -> shooter.setIndexerSpeed(0)));
     pilotRightTrigger
         .whileTrue(
-            ShootCommand);
+            ShootCommand).onFalse(new InstantCommand(() -> shooter.stopShooter()) );
     pilotLeftTrigger
         .toggleOnTrue(
             intakeCommand);
@@ -305,11 +273,11 @@ public class RobotContainer {
         .onTrue(deployIntake);
 
     // TODO: this requires the shooter, but would not allow indexer to run from the pilot command.
-    // OperatorController.rightBumper()
-    //     .whileTrue(
-    //         Commands.runEnd(
-    //             () -> shooter.spinShooter(2500/60), () -> shooter.stopShooter())
-    //     );
+    OperatorController.rightBumper()
+        .whileTrue(
+            Commands.runEnd(
+                () -> shooter.spinShooter(2500/60), () -> shooter.stopShooter())
+        );
     // OperatorController.rightTrigger()
     //     .whileTrue(
     //         ShootFromTowerCommand

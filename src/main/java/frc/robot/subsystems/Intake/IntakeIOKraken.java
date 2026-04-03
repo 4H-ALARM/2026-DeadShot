@@ -147,7 +147,7 @@ public class IntakeIOKraken implements IntakeIO {
 
   public void stopIntake() {
 
-    m_intakingMotor.set(0);
+    m_intakingMotor.stopMotor();
   }
 
   public boolean isIntakeUp() {

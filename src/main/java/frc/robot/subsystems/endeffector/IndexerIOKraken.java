@@ -64,7 +64,7 @@ public class IndexerIOKraken implements IndexerIO {
   }
 
   public void stopIndexer() {
-    m_indexerMotor.set(0);
+    m_indexerMotor.stopMotor();
   }
 
   @Override

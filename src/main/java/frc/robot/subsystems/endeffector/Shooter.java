@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.endeffector;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -13,19 +14,30 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.Constants.GenericConstants;
+import frc.lib.Constants.ShooterConstants;
+import frc.lib.catalyst.hardware.MotorType;
 import frc.lib.catalyst.mechanisms.RotationalMechanism;
+import frc.lib.util.LoggedTunableNumber;
 import frc.robot.commands.RumbleController;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.targeting.ShootTargetIO;
+import java.util.Arrays;
+import java.util.Comparator;
 import org.littletonrobotics.junction.Logger;
+
+import com.ctre.phoenix6.hardware.CANcoder;
 
 public class Shooter extends SubsystemBase {
 
   private static final double MAX_RPM = 3600.0;
-  private static final double[][] DISTANCE_TO_RPM_POINTS = {
-    {3.11, 1825.0},
-    {3.84, 2030.0},
-    {2.35, 1800.0}
+  private static final double HOOD_COMMAND_EPSILON_DEGREES = 0.1;
+  private static final double HOOD_MIN_ANGLE_DEGREES = -30.0;
+  private static final double HOOD_MAX_ANGLE_DEGREES = 0.0;
+  private static final int QUADRATIC_POINT_COUNT = 3;
+  private static final LookupPoint[] LOOKUP_POINTS = {
+    new LookupPoint(2.35, 1825.0, 00),
+    new LookupPoint(3.11, 1875.0, 0),
+    new LookupPoint(3.84, 2075.0, 0)
   };
 
   private ShooterIO shooter;
@@ -40,13 +52,19 @@ public class Shooter extends SubsystemBase {
   private Command rumble10Seconds;
   private Command rumble3Seconds;
   private Command rumbleEndShift;
-
+  private double lastCommandedHoodAngleDegrees = Double.NaN;
+  private final CANcoder hoodEncoder = new CANcoder(ShooterConstants.hoodEncoderID);
+  private final LoggedTunableNumber useDashboardShotTuning =
+      new LoggedTunableNumber("Shooter/ShotTuning/UseDashboardSetpoints", 0.0);
+  private final LoggedTunableNumber dashboardShooterRpm =
+      new LoggedTunableNumber("Shooter/ShotTuning/ShooterRPM", 1825.0);
+  private final LoggedTunableNumber dashboardHoodPercent =
+      new LoggedTunableNumber("Shooter/ShotTuning/HoodPercent", 50.0);
   private RotationalMechanism hood;
 
   /** FIX DO NOT WANT TO IMPORT A WHOLE DRIVE */
   public Shooter(
       ShooterIO shooter,
-      RotationalMechanism hood,
       Drive drive,
       IndexerIO indexer,
       PhaseshiftIO phaseshift,
@@ -64,7 +82,20 @@ public class Shooter extends SubsystemBase {
     this.rumble3Seconds = new RumbleController(controller, 3, 0.1);
     this.rumble10Seconds = new RumbleController(controller, 0.5, 0.1);
     this.rumbleEndShift = new RumbleController(controller, 1, 1);
-    this.hood = hood;
+    this.hood = new RotationalMechanism(RotationalMechanism.Config.builder()
+                                                    .name("hood")
+                                                    .canBus("endEffector")
+                                                    .currentLimit(30)
+                                                    .motor(ShooterConstants.hoodMotorID)
+                                                    .follower(ShooterConstants.hoodMotorFollowerID, true)
+                                                    .motorType(MotorType.KRAKEN_X60_FOC)
+                                                    .gearRatio(213.3333)
+                                                    .pid(900,0,8)
+                                                    .feedforward(0, 20.85)
+                                                    .range(HOOD_MIN_ANGLE_DEGREES, HOOD_MAX_ANGLE_DEGREES)
+                                                    .statorCurrentLimit(30)
+                                                    .startingAngle(hoodEncoder.getAbsolutePosition().getValueAsDouble())
+                                                    .motionMagic(999, 9999, 0).build());
 
 
 
@@ -95,6 +126,11 @@ public class Shooter extends SubsystemBase {
     Logger.processInputs("Indexer", indexerInputs);
     Logger.recordOutput("Shooter/DistanceToTargetMeters", getDistanceToTarget());
     Logger.recordOutput("Shooter/HoodAngle", hood.getAngle());
+    Logger.recordOutput(
+        "Shooter/ShotTuning/UseDashboardSetpoints", shouldUseDashboardShotTuning());
+    Logger.recordOutput("Shooter/ShotTuning/HoodPercent", dashboardHoodPercent.get());
+    Logger.recordOutput("Shooter/ShotTuning/TargetRPM", getActiveTargetRpm());
+    Logger.recordOutput("Shooter/ShotTuning/TargetHoodAngle", getActiveTargetHoodAngle());
   }
 
   /** Returns the distance in meters from the robot to the current shoot target. */
@@ -109,37 +145,79 @@ public class Shooter extends SubsystemBase {
   /** Returns the quadratically interpolated RPM for the current distance to target, capped at MAX_RPM. */
   public double getLookupRpm() {
     double distance = getDistanceToTarget();
-    double rpm = interpolateQuadratic(distance);
+    double rpm = interpolateQuadratic(distance, LookupPoint::rpm);
     return Math.min(rpm, MAX_RPM);
   }
 
-  private double interpolateQuadratic(double distance) {
-    double rpm = 0.0;
+  /** Returns the quadratically interpolated hood angle for the current distance to target. */
+  public double getLookupHoodAngle() {
+    return interpolateQuadratic(getDistanceToTarget(), LookupPoint::hoodAngleDegrees);
+  }
 
-    for (int i = 0; i < DISTANCE_TO_RPM_POINTS.length; i++) {
-      double xi = DISTANCE_TO_RPM_POINTS[i][0];
-      double yi = DISTANCE_TO_RPM_POINTS[i][1];
+  public boolean shouldUseDashboardShotTuning() {
+    return useDashboardShotTuning.get() > 0.5;
+  }
+
+  public double getDashboardShooterRpm() {
+    return dashboardShooterRpm.get();
+  }
+
+  public double getDashboardHoodAngle() {
+    double normalizedValue = MathUtil.clamp(dashboardHoodPercent.get() / 100.0, 0.0, 1.0);
+    return HOOD_MAX_ANGLE_DEGREES
+        - normalizedValue * (HOOD_MAX_ANGLE_DEGREES - HOOD_MIN_ANGLE_DEGREES);
+  }
+
+  public double getActiveTargetRpm() {
+    return shouldUseDashboardShotTuning() ? getDashboardShooterRpm() : getLookupRpm();
+  }
+
+  public double getActiveTargetHoodAngle() {
+    return shouldUseDashboardShotTuning() ? getDashboardHoodAngle() : getLookupHoodAngle();
+  }
+
+  private double interpolateQuadratic(double distance, LookupValueExtractor valueExtractor) {
+    LookupPoint[] interpolationPoints = getClosestLookupPoints(distance);
+    double interpolatedValue = 0.0;
+
+    for (int i = 0; i < interpolationPoints.length; i++) {
+      double xi = interpolationPoints[i].distanceMeters();
+      double yi = valueExtractor.extract(interpolationPoints[i]);
       double basis = 1.0;
 
-      for (int j = 0; j < DISTANCE_TO_RPM_POINTS.length; j++) {
+      for (int j = 0; j < interpolationPoints.length; j++) {
         if (i == j) {
           continue;
         }
 
-        double xj = DISTANCE_TO_RPM_POINTS[j][0];
+        double xj = interpolationPoints[j].distanceMeters();
         basis *= (distance - xj) / (xi - xj);
       }
 
-      rpm += yi * basis;
+      interpolatedValue += yi * basis;
     }
 
-    return rpm;
+    return interpolatedValue;
+  }
+
+  private LookupPoint[] getClosestLookupPoints(double distance) {
+    return Arrays.stream(LOOKUP_POINTS)
+        .sorted(Comparator.comparingDouble(point -> Math.abs(point.distanceMeters() - distance)))
+        .limit(Math.min(QUADRATIC_POINT_COUNT, LOOKUP_POINTS.length))
+        .sorted(Comparator.comparingDouble(LookupPoint::distanceMeters))
+        .toArray(LookupPoint[]::new);
+  }
+
+  /** Applies the lookup-table setpoints based on distance to the current target. */
+  public void applyLookupSetpoints() {
+    double rpm = getActiveTargetRpm();
+    setHoodAngle(getActiveTargetHoodAngle());
+    shooter.setShooterSpeed(rpm / 60.0); // convert RPM to RPS
   }
 
   /** Spins the shooter at the lookup-table RPM based on distance to the current target. */
   public void spinShooterFromLookup() {
-    double rpm = getLookupRpm();
-    shooter.setShooterSpeed(rpm / 60.0); // convert RPM to RPS
+    applyLookupSetpoints();
   }
 
   public void spinShooter(double speed) {
@@ -151,7 +229,11 @@ public class Shooter extends SubsystemBase {
   }
 
   public void setHoodAngle(double hoodAngle) {
-   this.hood.jogCCW(hoodAngle);
+    if (Double.isNaN(lastCommandedHoodAngleDegrees)
+        || Math.abs(lastCommandedHoodAngleDegrees - hoodAngle) > HOOD_COMMAND_EPSILON_DEGREES) {
+      CommandScheduler.getInstance().schedule(hood.goTo(hoodAngle));
+      lastCommandedHoodAngleDegrees = hoodAngle;
+    }
   }
 
   public RotationalMechanism getHood() {
@@ -160,6 +242,10 @@ public class Shooter extends SubsystemBase {
 
   public void setIndexerSpeed(double indexerSpeedInRPS) {
     indexer.setIndexerSpeed(indexerSpeedInRPS);
+  }
+
+  public void stopIndexer() {
+    indexer.stopIndexer();
   }
 
   public Drive getDrive() {
@@ -175,5 +261,12 @@ public class Shooter extends SubsystemBase {
 
   public void setTarget(Translation3d target) {
     shootTarget.setTarget(target, true);
+  }
+
+  private static record LookupPoint(double distanceMeters, double rpm, double hoodAngleDegrees) {}
+
+  @FunctionalInterface
+  private static interface LookupValueExtractor {
+    double extract(LookupPoint point);
   }
 }

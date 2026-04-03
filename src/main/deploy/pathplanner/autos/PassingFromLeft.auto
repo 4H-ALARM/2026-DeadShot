@@ -5,7 +5,7 @@
     "data": {
       "commands": [
         {
-          "type": "parallel",
+          "type": "deadline",
           "data": {
             "commands": [
               {
@@ -17,7 +17,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Deploy intake"
+                  "name": "Intake"
                 }
               }
             ]
@@ -30,7 +30,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "HalfSweepLeft"
+                  "pathName": "PassFromLeftPt1"
                 }
               },
               {
@@ -43,9 +43,9 @@
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "CrossBumpLeft"
+            "name": "TargetRight"
           }
         },
         {
@@ -61,7 +61,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "AllianceBumpToDepotLeft"
+                  "pathName": "PassingFromLeftPt2"
                 }
               },
               {
@@ -74,27 +74,40 @@
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "DepotToAllianceBumpLeft"
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "Shoot"
           }
         },
         {
-          "type": "path",
+          "type": "deadline",
           "data": {
-            "pathName": "AllianceBumpToTrenchLeft"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "PassingFromLeftPt3"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Intake"
+                }
+              }
+            ]
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "ScrapeLeft"
+            "name": "ResetTarget"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
           }
         }
       ]

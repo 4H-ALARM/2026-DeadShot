@@ -84,6 +84,9 @@ public class RobotContainer {
   private final Command resetGyroCommand;
   private final Command ShootCommand;
   private final Command ShootFromTowerCommand;
+  private final Command targetLeftPassing;
+  private final Command targetRightPassing;
+  private final Command resetTarget;
 
 
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -208,6 +211,12 @@ public class RobotContainer {
         Commands.runEnd(() -> intake.setIntakeSpeed(5900 / 60), () -> intake.setIntakeSpeed(0), intake);
     intakeCommandAuto =
         Commands.runEnd(() -> intake.setIntakeSpeed(-5900 / 60), () -> intake.setIntakeSpeed(0), intake);
+    targetLeftPassing =
+        Commands.runOnce(() -> shooter.setTarget(GenericConstants.LEFTPASSING), null);
+    targetRightPassing =
+        Commands.runOnce(() -> shooter.setTarget(GenericConstants.RIGHTPASSING), null);
+    resetTarget =
+        Commands.runOnce(() -> shooter.resetTarget(), null);
     resetGyroCommand =
         Commands.runOnce(
                 () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
@@ -218,6 +227,9 @@ public class RobotContainer {
     NamedCommands.registerCommand("Shoot", autoShootCommand);
     NamedCommands.registerCommand("Deploy intake", new DeployIntake(intake));
     NamedCommands.registerCommand("Intake", intakeCommandAuto);
+    NamedCommands.registerCommand("TargetLeft", targetLeftPassing);
+    NamedCommands.registerCommand("TargetRight", targetRightPassing);
+    NamedCommands.registerCommand("ResetTarget", resetTarget);
 
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 

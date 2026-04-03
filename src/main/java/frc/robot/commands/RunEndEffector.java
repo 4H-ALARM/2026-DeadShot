@@ -6,15 +6,18 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.endeffector.Shooter;
+import frc.robot.subsystems.intake.Intake;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class RunEndEffector extends Command {
   double m_shooterSpeed;
   double m_indexerSpeed;
   Shooter m_shooter;
+  Intake m_intake;
   /** Creates a new RunEndEffector. */
-  public RunEndEffector(Shooter shooter, double indexerSpeed) {
+  public RunEndEffector(Shooter shooter, Intake intake, double indexerSpeed) {
     this.m_shooter = shooter;
+    this.m_intake = intake;
     this.m_shooterSpeed = shooter.getLookupRpm();
     this.m_indexerSpeed = indexerSpeed;
     addRequirements(shooter);
@@ -26,6 +29,7 @@ public class RunEndEffector extends Command {
   public void initialize() {
     m_shooter.spinShooterFromLookup();
     m_shooter.setIndexerSpeed(m_indexerSpeed);
+    m_intake.setIntakeSpeed(-5900 / 60);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -36,7 +40,8 @@ public class RunEndEffector extends Command {
   @Override
   public void end(boolean interrupted) {
     m_shooter.stopShooter();
-    m_shooter.setIndexerSpeed(0);
+    m_shooter.stopIndexer();
+    m_intake.stopIntake();
   }
 
   // Returns true when the command should end.

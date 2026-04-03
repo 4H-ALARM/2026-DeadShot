@@ -16,22 +16,22 @@ public class ShooterConstants {
   public static final int hoodMotorFollowerID = 36;
   public static final int indexerMotorID = 27;
   public static final int indexerMotorFollowerID = 37;
-  public static final int hoodEncoderID = 4;
+  public static final int hoodEncoderID = 9;
   public static final int neutralToggleButtonPort = 0;
   public static final int encoderResetButtonPort = 1;
   public static final String shooterCanbus = "endEffector";
 
-  public static final double shooterkp = 12.5;
+  public static final double shooterkp = 10;
   public static final double shooterki = 0;
   public static final double shooterkd = 0;
   public static final double shooterks = 0.625;
   public static final double shooterkv = 0.39;
-  public static final double shooterka = 0.31;
-  public static final double shooterMaxAccel = 3600/60*2;
+  public static final double shooterka = 0.5;
+  public static final double shooterMaxAccel = 3600/60*12;
   public static final double shooterMaxSpeed = 3600/60;
   public static final double shooterJerk = 0.0;
   public static final double hoodToMotorRatio = 1.0;
-  public static final double shooterRevTolerance = 50;
+  public static final double shooterRevTolerance = 10;
   public static final double shooterFF = 1.25;
 
   public static final double indexerkp = 6;

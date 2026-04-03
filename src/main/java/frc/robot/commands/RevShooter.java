@@ -46,7 +46,7 @@ public class RevShooter extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    this.m_speed = m_shooter.getLookupRpm();
+    this.m_speed = m_shooter.getActiveTargetRpm();
     return (m_shooter.getShooterVelocity() > m_speed - ShooterConstants.shooterRevTolerance
         && m_shooter.getShooterVelocity() < m_speed + ShooterConstants.shooterRevTolerance);
   }

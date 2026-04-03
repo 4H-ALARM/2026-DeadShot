@@ -190,6 +190,11 @@ public class Shooter extends SubsystemBase {
     return shouldUseDashboardShotTuning() ? getDashboardShooterRpm() : getLookupRpm();
   }
 
+  public boolean isShooterAtTargetVelocity() {
+    double targetRpm = getActiveTargetRpm();
+    return Math.abs(getShooterVelocity() - targetRpm) <= ShooterConstants.shooterRevTolerance;
+  }
+
   public double getActiveTargetHoodAngle() {
     return shouldUseDashboardShotTuning() ? getDashboardHoodAngle() : getLookupHoodAngle();
   }

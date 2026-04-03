@@ -10,7 +10,6 @@ import frc.robot.subsystems.intake.Intake;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class RunEndEffector extends Command {
-  double m_shooterSpeed;
   double m_indexerSpeed;
   Shooter m_shooter;
   Intake m_intake;
@@ -18,7 +17,6 @@ public class RunEndEffector extends Command {
   public RunEndEffector(Shooter shooter, Intake intake, double indexerSpeed) {
     this.m_shooter = shooter;
     this.m_intake = intake;
-    this.m_shooterSpeed = shooter.getLookupRpm();
     this.m_indexerSpeed = indexerSpeed;
     addRequirements(shooter);
     // Use addRequirements() here to declare subsystem dependencies.
@@ -28,13 +26,21 @@ public class RunEndEffector extends Command {
   @Override
   public void initialize() {
     m_shooter.spinShooterFromLookup();
-    m_shooter.setIndexerSpeed(m_indexerSpeed);
+    m_shooter.stopIndexer();
     m_intake.setIntakeSpeed(-5900 / 60);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    m_shooter.spinShooterFromLookup();
+
+    if (m_shooter.isShooterAtTargetVelocity()) {
+      m_shooter.setIndexerSpeed(m_indexerSpeed);
+    } else {
+      m_shooter.stopIndexer();
+    }
+  }
 
   // Called once the command ends or is interrupted.
   @Override

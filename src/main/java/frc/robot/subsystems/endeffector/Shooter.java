@@ -306,6 +306,10 @@ public class Shooter extends SubsystemBase {
     shootTarget.setTarget(target, true);
   }
 
+  public void resetTarget() {
+    shootTarget.resetTarget();
+  }
+
   private static record LookupPoint(double distanceMeters, double rpm, double hoodPercent) {}
 
   @FunctionalInterface

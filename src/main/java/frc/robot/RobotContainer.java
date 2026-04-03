@@ -278,6 +278,13 @@ public class RobotContainer {
             Commands.runEnd(
                 () -> shooter.spinShooter(2500/60), () -> shooter.stopShooter())
         );
+    OperatorController.b()
+        .onTrue( new InstantCommand(() -> shooter.setTarget(GenericConstants.RIGHTPASSING)))
+        .onFalse(new InstantCommand(() -> shooter.resetTarget()));
+
+    OperatorController.x()
+        .onTrue(new InstantCommand( () -> shooter.setTarget(GenericConstants.LEFTPASSING)))
+        .onFalse(new InstantCommand(() -> shooter.resetTarget()));
     // OperatorController.rightTrigger()
     //     .whileTrue(
     //         ShootFromTowerCommand

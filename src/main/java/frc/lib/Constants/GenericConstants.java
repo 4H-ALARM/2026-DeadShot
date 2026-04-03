@@ -27,6 +27,8 @@ public class GenericConstants {
   public static final Translation3d LEFTNEUTRAL = new Translation3d(MIDX, MIDY * .5, 0);
   public static final Translation3d RIGHTNEUTRAL = new Translation3d(MIDX, MIDY, 0);
   public static final Translation3d MIDDLENEUTRAL = new Translation3d(MIDX, MIDY * 1.5, 0);
+  public static final Translation3d LEFTPASSING = new Translation3d(3.825,6.659, 0);
+  public static final Translation3d RIGHTPASSING = new Translation3d(3.825, 1.954, 0);
 
   public static final Translation2d turretPoseDifference = new Translation2d();
 }

@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.Constants.GenericConstants;
+import frc.lib.catalyst.mechanisms.RotationalMechanism;
 import frc.robot.commands.RumbleController;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.targeting.ShootTargetIO;
@@ -40,9 +41,12 @@ public class Shooter extends SubsystemBase {
   private Command rumble3Seconds;
   private Command rumbleEndShift;
 
+  private RotationalMechanism hood;
+
   /** FIX DO NOT WANT TO IMPORT A WHOLE DRIVE */
   public Shooter(
       ShooterIO shooter,
+      RotationalMechanism hood,
       Drive drive,
       IndexerIO indexer,
       PhaseshiftIO phaseshift,
@@ -60,6 +64,9 @@ public class Shooter extends SubsystemBase {
     this.rumble3Seconds = new RumbleController(controller, 3, 0.1);
     this.rumble10Seconds = new RumbleController(controller, 0.5, 0.1);
     this.rumbleEndShift = new RumbleController(controller, 1, 1);
+    this.hood = hood;
+
+
 
     // Distance (meters) -> RPM calibration points for quadratic interpolation
     // TODO: tune these values with real testing
@@ -87,6 +94,7 @@ public class Shooter extends SubsystemBase {
     Logger.processInputs("Shooter", shooterInputs);
     Logger.processInputs("Indexer", indexerInputs);
     Logger.recordOutput("Shooter/DistanceToTargetMeters", getDistanceToTarget());
+    Logger.recordOutput("Shooter/HoodAngle", hood.getAngle());
   }
 
   /** Returns the distance in meters from the robot to the current shoot target. */
@@ -143,7 +151,11 @@ public class Shooter extends SubsystemBase {
   }
 
   public void setHoodAngle(double hoodAngle) {
-    shooter.setHoodAngle(hoodAngle);
+   this.hood.jogCCW(hoodAngle);
+  }
+
+  public RotationalMechanism getHood() {
+    return this.hood;
   }
 
   public void setIndexerSpeed(double indexerSpeedInRPS) {

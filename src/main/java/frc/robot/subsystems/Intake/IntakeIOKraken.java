@@ -2,19 +2,23 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems.Intake;
+package frc.robot.subsystems.intake;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.ParentDevice;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
+
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import frc.lib.Constants.BuildConstants;
 import frc.lib.Constants.IntakeConstants;
 import frc.lib.util.LoggedTunableNumber;
@@ -25,12 +29,14 @@ public class IntakeIOKraken implements IntakeIO {
   private final TalonFX m_rotationMotor;
   private final TalonFX m_rotationMotorFollow;
   private final TalonFX m_intakingMotor;
+  private final TalonFX m_intakingMotorFollow;
 
   private Slot0Configs m_rotationPIDConfigs;
   private Slot0Configs m_intakingPIDConfigs;
   private final TalonFXConfiguration m_rotationMotorConfig;
   private final TalonFXConfiguration m_intakingMotorConfig;
   private final VelocityTorqueCurrentFOC m_requestedVelocity;
+  private final Follower followercontrol;
   private final PositionVoltage m_requestedPosition;
   private double m_requestedAngleDegrees = 0.0;
   private final StatusSignal<Angle> m_rotationPosition;
@@ -55,6 +61,7 @@ public class IntakeIOKraken implements IntakeIO {
 
   public IntakeIOKraken() {
     m_intakingMotor = new TalonFX(IntakeConstants.intakingMotorID, IntakeConstants.canbus);
+    m_intakingMotorFollow = new TalonFX(IntakeConstants.intakingFollowMotorID, IntakeConstants.canbus);
     m_rotationMotor = new TalonFX(IntakeConstants.rotationMotorID, IntakeConstants.canbus);
     m_rotationMotorFollow =
         new TalonFX(IntakeConstants.rotationMotorFollowID, IntakeConstants.canbus);
@@ -86,8 +93,11 @@ public class IntakeIOKraken implements IntakeIO {
     m_rotationMotor.getConfigurator().apply(m_rotationMotorConfig);
     m_rotationMotorFollow.getConfigurator().apply(m_rotationMotorConfig);
     m_intakingMotor.getConfigurator().apply(m_intakingMotorConfig);
+    m_intakingMotorFollow.getConfigurator().apply(m_intakingMotorConfig);
     m_requestedPosition = new PositionVoltage(0).withSlot(0);
     m_requestedVelocity = new VelocityTorqueCurrentFOC(0).withSlot(0);
+    followercontrol = new Follower(IntakeConstants.intakingMotorID, MotorAlignmentValue.Opposed);
+    m_intakingMotorFollow.setControl(followercontrol);
 
     m_rotationPosition = m_rotationMotor.getPosition();
     m_rotationVelocity = m_rotationMotor.getVelocity();

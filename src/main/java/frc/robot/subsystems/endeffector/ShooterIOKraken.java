@@ -28,17 +28,12 @@ public class ShooterIOKraken implements ShooterIO {
   private TalonFX topShooterMotorLeft;
   private TalonFX bottomShooterMotorRight;
   private TalonFX bottomShooterMotorLeft;
-  private TalonFX hoodMotor;
-  private TalonFX hoodMotorFollower;
 
   private CANcoder hoodEncoder;
 
   private Slot0Configs shooterConfig;
   private MotionMagicConfigs shooterMotionMagicConfig;
-  private Slot0Configs hoodConfig;
-  private MotionMagicConfigs hoodMotionMagicConfig;
   private TalonFXConfiguration shooterMotorConfig;
-  private TalonFXConfiguration hoodMotorConfig;
 
   private TargetEnum targetEnum;
   private Pose2d robotPose;
@@ -69,27 +64,6 @@ public class ShooterIOKraken implements ShooterIO {
   private final LoggedTunableNumber shooterFF =
       new LoggedTunableNumber("Shooter/shooterFF", ShooterConstants.shooterFF);
 
-  private final LoggedTunableNumber hoodkp =
-      new LoggedTunableNumber("Hood/kp", ShooterConstants.hoodkp);
-  private final LoggedTunableNumber hoodki =
-      new LoggedTunableNumber("Hood/ki", ShooterConstants.hoodki);
-  private final LoggedTunableNumber hoodkd =
-      new LoggedTunableNumber("Hood/kd", ShooterConstants.hoodkd);
-  private final LoggedTunableNumber hoodka =
-      new LoggedTunableNumber("Hood/ka", ShooterConstants.hoodka);
-  private final LoggedTunableNumber hoodks =
-      new LoggedTunableNumber("Hood/ks", ShooterConstants.hoodks);
-  private final LoggedTunableNumber hoodkv =
-      new LoggedTunableNumber("Hood/kv", ShooterConstants.hoodkv);
-  private final LoggedTunableNumber hoodkg =
-      new LoggedTunableNumber("Hood/kg", ShooterConstants.hoodkg);
-  private final LoggedTunableNumber hoodMaxAccel =
-      new LoggedTunableNumber("Hood/maxAccel", ShooterConstants.hoodMaxAccel);
-  private final LoggedTunableNumber hoodMaxSpeed =
-      new LoggedTunableNumber("Hood/maxSpeed", ShooterConstants.hoodMaxSpeed);
-  private final LoggedTunableNumber hoodJerk =
-      new LoggedTunableNumber("Hood/jerk", ShooterConstants.hoodJerk);
-
 
   public ShooterIOKraken() {
 
@@ -107,9 +81,6 @@ public class ShooterIOKraken implements ShooterIO {
         new TalonFX(ShooterConstants.bottomShooterMotorLeftID, ShooterConstants.shooterCanbus);
     bottomShooterMotorLeft.setControl(
         new Follower(ShooterConstants.topShooterMotorRightID, MotorAlignmentValue.Opposed));
-    hoodMotor = new TalonFX(ShooterConstants.hoodMotorID, ShooterConstants.shooterCanbus);
-    hoodMotorFollower =
-        new TalonFX(ShooterConstants.hoodMotorFollowerID, ShooterConstants.shooterCanbus);
     hoodEncoder = new CANcoder(ShooterConstants.hoodEncoderID, ShooterConstants.shooterCanbus);
 
     shooterConfig =
@@ -127,36 +98,13 @@ public class ShooterIOKraken implements ShooterIO {
             .withMotionMagicCruiseVelocity(shooterMaxSpeed.get())
             .withMotionMagicJerk(shooterJerk.get());
 
-    hoodConfig =
-        new Slot0Configs()
-            .withKP(hoodkp.get())
-            .withKI(hoodki.get())
-            .withKD(hoodkd.get())
-            .withKA(hoodka.get())
-            .withKS(hoodks.get())
-            .withKV(hoodkv.get())
-            .withKG(hoodkg.get());
-
-    hoodMotionMagicConfig =
-        new MotionMagicConfigs()
-            .withMotionMagicAcceleration(hoodMaxAccel.get())
-            .withMotionMagicCruiseVelocity(hoodMaxSpeed.get())
-            .withMotionMagicJerk(hoodJerk.get());
 
     shooterVelocityVoltage = new VelocityTorqueCurrentFOC(0).withSlot(0);
     shooterMotorConfig = new TalonFXConfiguration();
     shooterMotorConfig.Slot0 = shooterConfig;
     // shooterMotorConfig.MotionMagic = shooterMotionMagicConfig;
 
-    hoodMotorConfig = new TalonFXConfiguration();
-    hoodMotorConfig.Slot0 = hoodConfig;
-    hoodMotorConfig.MotionMagic = hoodMotionMagicConfig;
-    hoodMotorConfig.Feedback.FeedbackRemoteSensorID = ShooterConstants.hoodEncoderID;
-    hoodMotorConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
-    hoodMotorConfig.Feedback.SensorToMechanismRatio = ShooterConstants.hoodToMotorRatio;
-
     topShooterMotorRight.getConfigurator().apply(shooterMotorConfig);
-    hoodMotor.getConfigurator().apply(hoodMotorConfig);
   }
 
   @Override
@@ -195,41 +143,7 @@ public class ShooterIOKraken implements ShooterIO {
         shooterMaxSpeed,
         shooterJerk);
 
-    LoggedTunableNumber.ifChanged(
-        hashCode(),
-        () -> {
-          hoodConfig =
-              new Slot0Configs()
-                  .withKP(hoodkp.get())
-                  .withKI(hoodki.get())
-                  .withKD(hoodkd.get())
-                  .withKA(hoodka.get())
-                  .withKS(hoodks.get())
-                  .withKV(hoodkv.get())
-                  .withKG(hoodkg.get());
-          hoodMotor.getConfigurator().apply(hoodConfig);
-        },
-        hoodkp,
-        hoodki,
-        hoodkd,
-        hoodka,
-        hoodks,
-        hoodkv,
-        hoodkg);
 
-    LoggedTunableNumber.ifChanged(
-        hashCode(),
-        () -> {
-          hoodMotionMagicConfig =
-              new MotionMagicConfigs()
-                  .withMotionMagicAcceleration(hoodMaxAccel.get())
-                  .withMotionMagicCruiseVelocity(hoodMaxSpeed.get())
-                  .withMotionMagicJerk(hoodJerk.get());
-          hoodMotor.getConfigurator().apply(hoodMotionMagicConfig);
-        },
-        hoodMaxAccel,
-        hoodMaxSpeed,
-        hoodJerk);
   }
 
   @Override
@@ -255,15 +169,6 @@ public class ShooterIOKraken implements ShooterIO {
         this.targetPose = GenericConstants.RIGHTALLIANCE;
         break;
     }
-  }
-
-  @Override
-  public void setHoodAngle(double angleDegrees) {
-    // still need to find the angle before this will work;
-
-    double motorRotations = (angleDegrees) * ShooterConstants.hoodGearRatio / 360;
-
-    hoodMotor.setControl(hoodPositionVoltage.withPosition(motorRotations));
   }
 
   public double getVelocity() {

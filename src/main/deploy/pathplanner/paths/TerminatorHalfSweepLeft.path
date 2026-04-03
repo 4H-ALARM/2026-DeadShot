@@ -3,53 +3,48 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 4.303240963855422,
-        "y": 7.392582025677603
+        "x": 8.464079885877318,
+        "y": 6.900912981455065
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.303240963855423,
-        "y": 7.392582025677603
+        "x": 8.464079885877318,
+        "y": 5.999688389506761
       },
       "isLocked": false,
-      "linkedName": "TopTrench"
+      "linkedName": "TerminatorTopOfMid"
     },
     {
       "anchor": {
-        "x": 5.59169757489301,
-        "y": 7.392582025677603
+        "x": 8.464079885877318,
+        "y": 4.947175463623396
       },
       "prevControl": {
-        "x": 5.070123553658574,
-        "y": 7.392582025677603
+        "x": 8.549190156778531,
+        "y": 5.182241926112462
       },
       "nextControl": {
-        "x": 6.08788028203584,
-        "y": 7.392582025677603
+        "x": 8.192368045649072,
+        "y": 4.196733238231099
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.153552068473608,
-        "y": 6.849158345221112
+        "x": 6.536219686162624,
+        "y": 4.947175463623396
       },
       "prevControl": {
-        "x": 7.636005706134093,
-        "y": 7.547845934379457
+        "x": 6.80793152639087,
+        "y": 4.144978601997147
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "TopOfMid"
+      "linkedName": "NeutralZoneTopBump"
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 1,
-      "rotationDegrees": 180.0
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
@@ -63,13 +58,13 @@
   },
   "goalEndState": {
     "velocity": 3.0,
-    "rotation": -95.0
+    "rotation": 135.0
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": -95.0
   },
   "useDefaultConstraints": true
 }

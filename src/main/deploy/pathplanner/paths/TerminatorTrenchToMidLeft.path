@@ -32,16 +32,16 @@
     },
     {
       "anchor": {
-        "x": 8.153552068473608,
-        "y": 6.849158345221112
+        "x": 8.464079885877318,
+        "y": 6.900912981455065
       },
       "prevControl": {
-        "x": 7.636005706134093,
-        "y": 7.547845934379457
+        "x": 7.946533523537803,
+        "y": 7.5996005706134095
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "TopOfMid"
+      "linkedName": "TerminatorTopOfMid"
     }
   ],
   "rotationTargets": [

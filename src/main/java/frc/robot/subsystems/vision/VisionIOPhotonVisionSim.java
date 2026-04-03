@@ -19,6 +19,7 @@ import org.photonvision.simulation.VisionSystemSim;
 /** IO implementation for physics sim using PhotonVision simulator. */
 public class VisionIOPhotonVisionSim extends VisionIOPhotonVision {
   private static VisionSystemSim visionSim;
+  private static VisionIOPhotonVisionSim primaryUpdater;
 
   private final Supplier<Pose2d> poseSupplier;
   private final PhotonCameraSim cameraSim;
@@ -44,11 +45,17 @@ public class VisionIOPhotonVisionSim extends VisionIOPhotonVision {
     var cameraProperties = new SimCameraProperties();
     cameraSim = new PhotonCameraSim(camera, cameraProperties, aprilTagLayout);
     visionSim.addCamera(cameraSim, robotToCamera);
+    if (primaryUpdater == null) {
+      primaryUpdater = this;
+    }
   }
 
   @Override
   public void updateInputs(VisionIOInputs inputs) {
-    visionSim.update(poseSupplier.get());
+    // Update the shared vision system once per robot loop, not once per camera.
+    if (this == primaryUpdater) {
+      visionSim.update(poseSupplier.get());
+    }
     super.updateInputs(inputs);
   }
 }

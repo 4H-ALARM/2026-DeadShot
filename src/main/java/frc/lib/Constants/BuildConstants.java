@@ -12,7 +12,7 @@ public final class BuildConstants {
   public static final String BUILD_DATE = "2026-01-13 20:34:11 EST";
   public static final long BUILD_UNIX_TIME = 1768354451577L;
   public static final int DIRTY = 0;
-  public static final boolean TUNING = false;
+  public static final boolean TUNING = true;
 
   private BuildConstants() {}
 }

@@ -16,10 +16,14 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.lib.Constants.GenericConstants;
+import frc.lib.Constants.ShooterConstants;
 import frc.lib.Constants.SwerveConstants;
+import frc.lib.catalyst.hardware.MotorType;
+import frc.lib.catalyst.mechanisms.RotationalMechanism;
 import frc.robot.commands.DeployIntake;
 import frc.robot.commands.AutoShoot;
 import frc.robot.commands.DriveCommands;
@@ -41,6 +45,7 @@ import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
+import frc.robot.util.ThrottledRotationalMechanism;
 import java.util.function.DoubleSupplier;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -69,7 +74,7 @@ public class RobotContainer {
   private final CommandXboxController OperatorController = new CommandXboxController(1);
 
   private final DeployIntake deployIntake;
-  private final DeployIntake deployIntakeAuto;
+//   private final DeployIntake deployIntakeAuto;
   private final Command driveDefaultCommand;
   private final Command indexerReverseCommand;
   private final Command autoShootCommand;
@@ -109,8 +114,11 @@ public class RobotContainer {
         vision =
             new Vision(
                 drive::addVisionMeasurement,
-                new VisionIOPhotonVision(camera0Name, robotToCameraL),
-                new VisionIOPhotonVision(camera1Name, robotToCameraR));
+                new VisionIOPhotonVision(camera0Name, backLeft),
+                new VisionIOPhotonVision(camera1Name, backRight),
+                new VisionIOPhotonVision(camera2Name, sideLeft),
+                new VisionIOPhotonVision(camera3Name, sideRight)
+                );
 
         shooter =
             new Shooter(
@@ -138,8 +146,10 @@ public class RobotContainer {
         vision =
             new Vision(
                 drive::addVisionMeasurement,
-                new VisionIOPhotonVisionSim(camera0Name, robotToCameraL, drive::getPose),
-                new VisionIOPhotonVisionSim(camera1Name, robotToCameraR, drive::getPose));
+                new VisionIOPhotonVisionSim(camera0Name, backLeft, drive::getPose),
+                new VisionIOPhotonVisionSim(camera1Name, backRight, drive::getPose),
+                new VisionIOPhotonVisionSim(camera2Name, sideLeft, drive::getPose),
+                new VisionIOPhotonVisionSim(camera3Name, sideRight, drive::getPose));
         shooter =
             new Shooter(
                 new ShooterIOKraken(),
@@ -176,25 +186,26 @@ public class RobotContainer {
 
         intake = new Intake(new IntakeIOKraken());
 
-        vision = new Vision(drive::addVisionMeasurement,
-            new VisionIO() {},
-            new VisionIO() {});
+        vision = new Vision(drive::addVisionMeasurement//,
+            // new VisionIO() {},
+            // new VisionIO() {}
+            );
         break;
     }
 
     deployIntake = new DeployIntake(intake);
-    deployIntakeAuto = new DeployIntake(intake);
+    // deployIntakeAuto = new DeployIntake(intake);
     driveDefaultCommand =
         DriveCommands.joystickDrive(
             drive, pilotForwardInput, pilotStrafeInput, pilotRotateInput);
     indexerReverseCommand =
-        Commands.runEnd(() -> shooter.setIndexerSpeed(-5900 / 60), () -> shooter.setIndexerSpeed(0));
-    autoShootCommand = AutoShoot.autoShoot(shooter, drive, pilotForwardInput, pilotStrafeInput).withTimeout(4);
-    ShootCommand = AutoShoot.autoShoot(shooter, drive, pilotForwardInput, pilotStrafeInput);
+        Commands.runEnd(() -> shooter.setIndexerSpeed(-6300 / 60), () -> shooter.setIndexerSpeed(0));
+    autoShootCommand = AutoShoot.autoShoot(shooter, drive, intake, pilotForwardInput, pilotStrafeInput).withTimeout(3);
+    ShootCommand = AutoShoot.autoShoot(shooter, drive, intake, pilotForwardInput, pilotStrafeInput);
     intakeCommand =
         Commands.runEnd(() -> intake.setIntakeSpeed(-5900 / 60), () -> intake.setIntakeSpeed(0), intake);
     ejectCommand =
-        Commands.runEnd(() -> intake.setIntakeSpeed(3000 / 60), () -> intake.setIntakeSpeed(0), intake);
+        Commands.runEnd(() -> intake.setIntakeSpeed(5900 / 60), () -> intake.setIntakeSpeed(0), intake);
     intakeCommandAuto =
         Commands.runEnd(() -> intake.setIntakeSpeed(-5900 / 60), () -> intake.setIntakeSpeed(0), intake);
     resetGyroCommand =
@@ -205,7 +216,7 @@ public class RobotContainer {
     ShootFromTowerCommand =
         Commands.runEnd(() -> shooter.spinShooter(1825 / 60), () -> shooter.stopShooter(), shooter);
     NamedCommands.registerCommand("Shoot", autoShootCommand);
-    NamedCommands.registerCommand("Deploy intake", deployIntakeAuto);
+    NamedCommands.registerCommand("Deploy intake", new DeployIntake(intake));
     NamedCommands.registerCommand("Intake", intakeCommandAuto);
 
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -223,6 +234,11 @@ public class RobotContainer {
   private void configureButtonBindings() {
     // Default command, normal field-relative drive
     drive.setDefaultCommand(driveDefaultCommand);
+
+    // PilotController.rightBumper().onTrue(shooter.getHood().goTo(-10));
+    // PilotController.leftBumper().onTrue(shooter.getHood().goTo(0));
+    // PilotController.a().onTrue(shooter.getHood().goTo(-25));
+    // PilotController.leftBumper().whileTrue(new InstantCommand(() -> shooter.setHoodAngle(-10)));
 
     // intake.setDefaultCommand(
     //     new InstantCommand(() -> intake.changeAngleTest(controller.getLeftY()), intake));
@@ -244,16 +260,16 @@ public class RobotContainer {
     //     .whileTrue(
     //         Commands.runEnd(() -> shooter.spinShooter(1750 / 60), () -> shooter.stopShooter()));
 
-    PilotController.rightBumper()
+    pilotRightBumper
         .whileTrue(
             Commands.runEnd(() -> shooter.setIndexerSpeed(-5900 / 60), () -> shooter.setIndexerSpeed(0)));
-    PilotController.rightTrigger()
+    pilotRightTrigger
         .whileTrue(
-            ShootCommand);
-    PilotController.leftTrigger()
+            ShootCommand).onFalse(new InstantCommand(() -> shooter.stopShooter()) );
+    pilotLeftTrigger
         .toggleOnTrue(
             intakeCommand);
-    PilotController.leftBumper()
+    pilotLeftBumper
         .onTrue(deployIntake);
 
     // TODO: this requires the shooter, but would not allow indexer to run from the pilot command.
@@ -262,24 +278,31 @@ public class RobotContainer {
             Commands.runEnd(
                 () -> shooter.spinShooter(2500/60), () -> shooter.stopShooter())
         );
-    OperatorController.rightTrigger()
-        .whileTrue(
-            ShootFromTowerCommand
-        );
-    OperatorController.leftBumper()
-        .whileTrue(
-            ejectCommand
-        );
+    OperatorController.b()
+        .onTrue( new InstantCommand(() -> shooter.setTarget(GenericConstants.RIGHTPASSING)))
+        .onFalse(new InstantCommand(() -> shooter.resetTarget()));
+
+    OperatorController.x()
+        .onTrue(new InstantCommand( () -> shooter.setTarget(GenericConstants.LEFTPASSING)))
+        .onFalse(new InstantCommand(() -> shooter.resetTarget()));
+    // OperatorController.rightTrigger()
+    //     .whileTrue(
+    //         ShootFromTowerCommand
+    //     );
+    // OperatorController.leftBumper()
+    //     .whileTrue(
+    //         ejectCommand
+    //     );
 
     // Reset gyro to 0° when B button is pressed
-    PilotController.b()
-        .onTrue(
-            Commands.runOnce(
-                    () ->
-                        drive.setPose(
-                            new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
-                    drive)
-                .ignoringDisable(true));
+    // pilotB
+    //     .onTrue(
+    //         Commands.runOnce(
+    //                 () ->
+    //                     drive.setPose(
+    //                         new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
+    //                 drive)
+    //             .ignoringDisable(true));
 
     //     OperatorController.b().onTrue(Commands.runOnce(() -> shootTarget.resetTarget(),
     // shootTarget));

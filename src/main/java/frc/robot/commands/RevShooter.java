@@ -5,14 +5,11 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.lib.Constants.ShooterConstants;
 import frc.robot.subsystems.endeffector.Shooter;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class RevShooter extends Command {
   /** Creates a new ShootBall. */
-  private double m_speed;
-
   private Shooter m_shooter;
 
   public RevShooter(Shooter shooter) {
@@ -46,8 +43,6 @@ public class RevShooter extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    this.m_speed = m_shooter.getLookupRpm();
-    return (m_shooter.getShooterVelocity() > m_speed - ShooterConstants.shooterRevTolerance
-        && m_shooter.getShooterVelocity() < m_speed + ShooterConstants.shooterRevTolerance);
+    return m_shooter.isShooterAtTargetVelocity();
   }
 }

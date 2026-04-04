@@ -8,6 +8,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.Constants.IntakeConstants;
 import frc.lib.util.LoggedTunableNumber;
+import frc.robot.subsystems.intake.IntakeIOInputsAutoLogged;
+
 import org.littletonrobotics.junction.Logger;
 
 public class Intake extends SubsystemBase {

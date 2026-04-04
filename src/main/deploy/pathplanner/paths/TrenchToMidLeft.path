@@ -32,12 +32,12 @@
     },
     {
       "anchor": {
-        "x": 8.01866265060241,
-        "y": 6.898060240963855
+        "x": 8.153552068473608,
+        "y": 6.849158345221112
       },
       "prevControl": {
-        "x": 7.501116288262895,
-        "y": 7.5967478301222
+        "x": 7.636005706134093,
+        "y": 7.547845934379457
       },
       "nextControl": null,
       "isLocked": false,
@@ -62,7 +62,7 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 1.5,
+    "velocity": 3.0,
     "rotation": -95.0
   },
   "reversed": false,

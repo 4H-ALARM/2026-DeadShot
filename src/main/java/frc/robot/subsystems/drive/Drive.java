@@ -157,12 +157,19 @@ public class Drive extends SubsystemBase {
   @Override
   public void periodic() {
     odometryLock.lock(); // Prevents odometry updates while reading data
-    gyroIO.updateInputs(gyroInputs);
+    try {
+      gyroIO.updateInputs(gyroInputs);
+      for (var module : modules) {
+        module.updateInputs();
+      }
+    } finally {
+      odometryLock.unlock();
+    }
+
     Logger.processInputs("Drive/Gyro", gyroInputs);
     for (var module : modules) {
-      module.periodic();
+      module.postPeriodic();
     }
-    odometryLock.unlock();
 
     // Stop moving when disabled
     if (DriverStation.isDisabled() && !wasDisabled) {
@@ -177,10 +184,17 @@ public class Drive extends SubsystemBase {
     // Update odometry
     double[] sampleTimestamps =
         modules[0].getOdometryTimestamps(); // All signals are sampled together
-    int sampleCount = sampleTimestamps.length;
+    int rawSampleCount = sampleTimestamps.length;
+    SwerveModulePosition[][] moduleOdometryPositions = new SwerveModulePosition[4][];
+    int sampleCount = rawSampleCount;
+    for (int moduleIndex = 0; moduleIndex < 4; moduleIndex++) {
+      moduleOdometryPositions[moduleIndex] = modules[moduleIndex].getOdometryPositions();
+      sampleCount = Math.min(sampleCount, moduleOdometryPositions[moduleIndex].length);
+    }
     int startIndex = Math.max(0, sampleCount - MAX_ODOMETRY_SAMPLES_PER_LOOP);
     int yawSampleCount = gyroInputs.odometryYawPositions.length;
-    Logger.recordOutput("Drive/OdometrySampleCount", sampleCount);
+    Logger.recordOutput("Drive/OdometrySampleCount", rawSampleCount);
+    Logger.recordOutput("Drive/OdometrySampleCountClamped", sampleCount);
     Logger.recordOutput("Drive/OdometrySamplesProcessed", sampleCount - startIndex);
     Logger.recordOutput("Drive/OdometrySamplesSkipped", startIndex);
     for (int i = startIndex; i < sampleCount; i++) {
@@ -188,7 +202,7 @@ public class Drive extends SubsystemBase {
       SwerveModulePosition[] modulePositions = new SwerveModulePosition[4];
       SwerveModulePosition[] moduleDeltas = new SwerveModulePosition[4];
       for (int moduleIndex = 0; moduleIndex < 4; moduleIndex++) {
-        modulePositions[moduleIndex] = modules[moduleIndex].getOdometryPositions()[i];
+        modulePositions[moduleIndex] = moduleOdometryPositions[moduleIndex][i];
         moduleDeltas[moduleIndex] =
             new SwerveModulePosition(
                 modulePositions[moduleIndex].distanceMeters

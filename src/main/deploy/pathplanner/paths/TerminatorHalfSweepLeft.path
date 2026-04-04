@@ -3,53 +3,48 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.162952924393723,
-        "y": 5.4647218259629105
+        "x": 8.464079885877318,
+        "y": 6.900912981455065
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.5182179846346875,
-        "y": 6.317083271746043
+        "x": 8.464079885877318,
+        "y": 5.999688389506761
       },
       "isLocked": false,
-      "linkedName": "AllianceTopBump"
+      "linkedName": "TerminatorTopOfMid"
     },
     {
       "anchor": {
-        "x": 3.5820120481927713,
-        "y": 7.324240963855422
+        "x": 8.464079885877318,
+        "y": 4.947175463623396
       },
       "prevControl": {
-        "x": 3.0363683670737815,
-        "y": 7.166610567087715
+        "x": 8.549190156778531,
+        "y": 5.182241926112462
       },
       "nextControl": {
-        "x": 4.073759036144579,
-        "y": 7.466301204819276
+        "x": 8.192368045649072,
+        "y": 4.196733238231099
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 5.385084337349396,
-        "y": 7.44444578313253
+        "x": 6.536219686162624,
+        "y": 4.947175463623396
       },
       "prevControl": {
-        "x": 4.543650602409637,
-        "y": 7.488156626506024
+        "x": 6.80793152639087,
+        "y": 4.144978601997147
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "NeutralZoneTopTrench"
+      "linkedName": "NeutralZoneTopBump"
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 1,
-      "rotationDegrees": 180.0
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
@@ -63,13 +58,13 @@
   },
   "goalEndState": {
     "velocity": 3.0,
-    "rotation": 180.0
+    "rotation": 135.0
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 135.0
+    "rotation": -95.0
   },
   "useDefaultConstraints": true
 }

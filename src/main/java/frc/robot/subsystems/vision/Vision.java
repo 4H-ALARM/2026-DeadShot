@@ -27,11 +27,15 @@ import org.littletonrobotics.junction.Logger;
 
 public class Vision extends SubsystemBase {
   private static final Pose3d[] EMPTY_POSE_ARRAY = new Pose3d[0];
+  private static final int DISABLED_INPUT_LOG_DIVISOR = 5;
+  private static final int DETAILED_LOG_DIVISOR = 2;
 
   private final VisionConsumer consumer;
   private final VisionIO[] io;
   private final VisionIOInputsAutoLogged[] inputs;
   private final Alert[] disconnectedAlerts;
+  private int disabledInputLogCounter = 0;
+  private int detailedLogCounter = 0;
 
   public Vision(VisionConsumer consumer, VisionIO... io) {
     this.consumer = consumer;
@@ -63,12 +67,19 @@ public class Vision extends SubsystemBase {
 
   @Override
   public void periodic() {
+    boolean isDisabled = DriverStation.isDisabled();
+    boolean shouldLogInputs =
+        !isDisabled || (disabledInputLogCounter++ % DISABLED_INPUT_LOG_DIVISOR) == 0;
+    boolean shouldLogDetailedPoses = (detailedLogCounter++ % DETAILED_LOG_DIVISOR) == 0;
+
     for (int i = 0; i < io.length; i++) {
       io[i].updateInputs(inputs[i]);
-      Logger.processInputs("Vision/Camera" + Integer.toString(i), inputs[i]);
+      if (shouldLogInputs) {
+        Logger.processInputs("Vision/Camera" + Integer.toString(i), inputs[i]);
+      }
     }
 
-    if (DriverStation.isDisabled()) {
+    if (isDisabled) {
       int totalUnreadResults = 0;
       for (int cameraIndex = 0; cameraIndex < io.length; cameraIndex++) {
         disconnectedAlerts[cameraIndex].set(!inputs[cameraIndex].connected);
@@ -166,11 +177,12 @@ public class Vision extends SubsystemBase {
       Logger.recordOutput(cameraKey + "/ObservationCount", inputs[cameraIndex].poseObservations.length);
       Logger.recordOutput(cameraKey + "/TagCount", inputs[cameraIndex].tagIds.length);
 
-      // Log camera metadata
-      Logger.recordOutput(cameraKey + "/TagPoses", toPoseArray(tagPoses));
-      Logger.recordOutput(cameraKey + "/RobotPoses", toPoseArray(robotPoses));
-      Logger.recordOutput(cameraKey + "/RobotPosesAccepted", toPoseArray(robotPosesAccepted));
-      Logger.recordOutput(cameraKey + "/RobotPosesRejected", toPoseArray(robotPosesRejected));
+      if (shouldLogDetailedPoses) {
+        Logger.recordOutput(cameraKey + "/TagPoses", toPoseArray(tagPoses));
+        Logger.recordOutput(cameraKey + "/RobotPoses", toPoseArray(robotPoses));
+        Logger.recordOutput(cameraKey + "/RobotPosesAccepted", toPoseArray(robotPosesAccepted));
+        Logger.recordOutput(cameraKey + "/RobotPosesRejected", toPoseArray(robotPosesRejected));
+      }
       allTagPoses.addAll(tagPoses);
       allRobotPoses.addAll(robotPoses);
       allRobotPosesAccepted.addAll(robotPosesAccepted);
@@ -179,10 +191,12 @@ public class Vision extends SubsystemBase {
 
     // Log summary data
     Logger.recordOutput("Vision/Summary/ObservationCount", totalObservations);
-    Logger.recordOutput("Vision/Summary/TagPoses", toPoseArray(allTagPoses));
-    Logger.recordOutput("Vision/Summary/RobotPoses", toPoseArray(allRobotPoses));
-    Logger.recordOutput("Vision/Summary/RobotPosesAccepted", toPoseArray(allRobotPosesAccepted));
-    Logger.recordOutput("Vision/Summary/RobotPosesRejected", toPoseArray(allRobotPosesRejected));
+    if (shouldLogDetailedPoses) {
+      Logger.recordOutput("Vision/Summary/TagPoses", toPoseArray(allTagPoses));
+      Logger.recordOutput("Vision/Summary/RobotPoses", toPoseArray(allRobotPoses));
+      Logger.recordOutput("Vision/Summary/RobotPosesAccepted", toPoseArray(allRobotPosesAccepted));
+      Logger.recordOutput("Vision/Summary/RobotPosesRejected", toPoseArray(allRobotPosesRejected));
+    }
   }
 
   private static Pose3d[] toPoseArray(List<Pose3d> poses) {

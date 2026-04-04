@@ -15,7 +15,7 @@ public class IntakeConstants {
   public static final int rotationMotorID = 30;
   public static final int rotationMotorFollowID = 17;
   public static final int intakingMotorID = 2;
-  // public static final int intakingMotorFollowID = 2;
+  public static final int intakingFollowMotorID = 3;
   public static final String canbus = "endEffector";
   // PID tuning for the intake
   public static final double angleMotorkp = 22.5;

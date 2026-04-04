@@ -53,8 +53,13 @@ public class Module {
   }
 
   public void periodic() {
+    updateInputs();
+    postPeriodic();
+  }
+
+  /** Reads hardware inputs and prepares odometry samples for this loop. */
+  public void updateInputs() {
     io.updateInputs(inputs);
-    Logger.processInputs("Drive/Module" + Integer.toString(index), inputs);
 
     // Calculate positions for odometry
     int sampleCount = inputs.odometryTimestamps.length; // All signals are sampled together
@@ -64,6 +69,11 @@ public class Module {
       Rotation2d angle = inputs.odometryTurnPositions[i];
       odometryPositions[i] = new SwerveModulePosition(positionMeters, angle);
     }
+  }
+
+  /** Logs module inputs and updates health alerts. */
+  public void postPeriodic() {
+    Logger.processInputs("Drive/Module" + Integer.toString(index), inputs);
 
     // Update alerts
     driveDisconnectedAlert.set(!inputs.driveConnected);

@@ -11,7 +11,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "TrenchToMidLeft"
+                  "pathName": "TerminatorTrenchToMidLeft"
                 }
               },
               {
@@ -30,7 +30,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "HalfSweepLeft"
+                  "pathName": "TerminatorHalfSweepLeft"
                 }
               },
               {
@@ -55,13 +55,19 @@
           }
         },
         {
+          "type": "path",
+          "data": {
+            "pathName": "AllianceBumpToTrenchLeft"
+          }
+        },
+        {
           "type": "deadline",
           "data": {
             "commands": [
               {
                 "type": "path",
                 "data": {
-                  "pathName": "AllianceBumpToDepotLeft"
+                  "pathName": "ScrapeLeft"
                 }
               },
               {
@@ -76,25 +82,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "DepotToAllianceBumpLeft"
+            "pathName": "CrossBumpLeft"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "Shoot"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "AllianceBumpToTrenchLeft"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "ScrapeLeft"
           }
         }
       ]

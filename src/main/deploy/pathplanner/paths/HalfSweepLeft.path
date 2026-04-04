@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.01866265060241,
-        "y": 6.898060240963855
+        "x": 8.153552068473608,
+        "y": 6.849158345221112
       },
       "prevControl": null,
       "nextControl": {
-        "x": 8.01866265060241,
-        "y": 5.996835649015551
+        "x": 8.153552068473608,
+        "y": 5.9479337532728085
       },
       "isLocked": false,
       "linkedName": "TopOfMid"
     },
     {
       "anchor": {
-        "x": 8.01866265060241,
-        "y": 4.996638554216868
+        "x": 8.295877318116975,
+        "y": 4.947175463623396
       },
       "prevControl": {
-        "x": 7.946181980189124,
-        "y": 5.235901072001081
+        "x": 8.380987589018188,
+        "y": 5.182241926112462
       },
       "nextControl": {
-        "x": 8.25706134094151,
-        "y": 4.209671897289586
+        "x": 8.02416547788873,
+        "y": 4.196733238231099
       },
       "isLocked": false,
       "linkedName": "MidOfMid"
@@ -45,21 +45,7 @@
     }
   ],
   "rotationTargets": [],
-  "constraintZones": [
-    {
-      "name": "Constraints Zone",
-      "minWaypointRelativePos": 0,
-      "maxWaypointRelativePos": 2.0,
-      "constraints": {
-        "maxVelocity": 0.75,
-        "maxAcceleration": 3.0,
-        "maxAngularVelocity": 540.0,
-        "maxAngularAcceleration": 720.0,
-        "nominalVoltage": 12.0,
-        "unlimited": false
-      }
-    }
-  ],
+  "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
@@ -71,7 +57,7 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 1.0,
+    "velocity": 3.0,
     "rotation": 135.0
   },
   "reversed": false,

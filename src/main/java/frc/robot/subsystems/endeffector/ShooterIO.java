@@ -13,19 +13,19 @@ public interface ShooterIO {
   @AutoLog
   public class ShooterIOInputs {
 
-    public Rotation2d hoodAngleDegrees;
+    // public Rotation2d hoodAngleDegrees;
     public double shooterVelocityRPM;
     public boolean topLeftMotorIsConnected;
     public boolean topRightMotorIsConnected;
     public boolean bottomLeftMotorIsConnected;
     public boolean bottomRightMotorIsConnected;
-    public boolean hoodMotorIsConnected;
+    // public boolean hoodMotorIsConnected;
   }
 
-  public default Rotation2d getHoodAngle() {
-    return new Rotation2d();
-  }
-  ;
+  // public default Rotation2d getHoodAngle() {
+  //   return new Rotation2d();
+  // }
+  // ;
 
   public default void changeTarget(TargetEnum target) {}
 
@@ -39,7 +39,7 @@ public interface ShooterIO {
     return 0;
   }
 
-  public default void setHoodAngle(double angleDegrees) {}
+  // public default void setHoodAngle(double angleDegrees) {}
 
   public default void stopShooter(){}
 }

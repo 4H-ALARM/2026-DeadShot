@@ -43,9 +43,22 @@
           }
         },
         {
-          "type": "path",
+          "type": "deadline",
           "data": {
-            "pathName": "CrossBumpLeft"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "CrossBumpLeft"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Intake"
+                }
+              }
+            ]
           }
         },
         {

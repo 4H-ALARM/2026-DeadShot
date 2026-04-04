@@ -4,27 +4,50 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.lib.Constants.IntakeConstants;
 import frc.robot.subsystems.endeffector.Shooter;
 import frc.robot.subsystems.intake.Intake;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class RunEndEffector extends Command {
-  double m_indexerSpeed;
-  Shooter m_shooter;
-  Intake m_intake;
+  private static final double INTAKE_HALF_RETRACT_DEGREES =
+      MathUtil.interpolate(
+          IntakeConstants.rotationDownDegrees, IntakeConstants.rotationUpDegrees, 0.5);
+  private static final double INTAKE_QUARTER_RETRACT_DEGREES =
+      MathUtil.interpolate(
+          IntakeConstants.rotationDownDegrees, IntakeConstants.rotationUpDegrees, 0.25);
+  private static final double INTAKE_DWELL_SECONDS = 0.2;
+
+  private final double m_indexerSpeed;
+  private final Shooter m_shooter;
+  private final Intake m_intake;
+  private final Timer m_phaseTimer = new Timer();
+  private IntakeMotionState m_intakeMotionState = IntakeMotionState.MOVING_TO_HALF;
+
+  private enum IntakeMotionState {
+    MOVING_TO_HALF,
+    HOLDING_AT_HALF,
+    MOVING_TO_QUARTER,
+    HOLDING_AT_QUARTER
+  }
+
   /** Creates a new RunEndEffector. */
   public RunEndEffector(Shooter shooter, Intake intake, double indexerSpeed) {
     this.m_shooter = shooter;
     this.m_intake = intake;
     this.m_indexerSpeed = indexerSpeed;
-    addRequirements(shooter);
-    // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(shooter, intake);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    m_phaseTimer.restart();
+    m_intakeMotionState = IntakeMotionState.MOVING_TO_HALF;
+    commandIntakeAngle(INTAKE_HALF_RETRACT_DEGREES);
     m_shooter.spinShooterFromLookup();
     m_shooter.stopIndexer();
     m_intake.setIntakeSpeed(-5900 / 60);
@@ -34,6 +57,7 @@ public class RunEndEffector extends Command {
   @Override
   public void execute() {
     m_shooter.spinShooterFromLookup();
+    updateIntakeMotion();
 
     if (m_shooter.isShooterAtTargetVelocity()) {
       m_shooter.setIndexerSpeed(m_indexerSpeed);
@@ -45,14 +69,51 @@ public class RunEndEffector extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    m_phaseTimer.stop();
     m_shooter.stopShooter();
     m_shooter.stopIndexer();
     m_intake.stopIntake();
+    m_intake.setRotationDown();
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
     return false;
+  }
+
+  private void updateIntakeMotion() {
+    switch (m_intakeMotionState) {
+      case MOVING_TO_HALF:
+        if (m_intake.isAtAngle(
+            INTAKE_HALF_RETRACT_DEGREES, IntakeConstants.anglePositionToleranceDegrees)) {
+          m_intakeMotionState = IntakeMotionState.HOLDING_AT_HALF;
+          m_phaseTimer.restart();
+        }
+        break;
+      case HOLDING_AT_HALF:
+        if (m_phaseTimer.hasElapsed(INTAKE_DWELL_SECONDS)) {
+          m_intakeMotionState = IntakeMotionState.MOVING_TO_QUARTER;
+          commandIntakeAngle(INTAKE_QUARTER_RETRACT_DEGREES);
+        }
+        break;
+      case MOVING_TO_QUARTER:
+        if (m_intake.isAtAngle(
+            INTAKE_QUARTER_RETRACT_DEGREES, IntakeConstants.anglePositionToleranceDegrees)) {
+          m_intakeMotionState = IntakeMotionState.HOLDING_AT_QUARTER;
+          m_phaseTimer.restart();
+        }
+        break;
+      case HOLDING_AT_QUARTER:
+        if (m_phaseTimer.hasElapsed(INTAKE_DWELL_SECONDS)) {
+          m_intakeMotionState = IntakeMotionState.MOVING_TO_HALF;
+          commandIntakeAngle(INTAKE_HALF_RETRACT_DEGREES);
+        }
+        break;
+    }
+  }
+
+  private void commandIntakeAngle(double targetAngleDegrees) {
+    m_intake.setAngle(targetAngleDegrees);
   }
 }

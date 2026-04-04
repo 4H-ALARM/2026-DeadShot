@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.intake;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.Constants.IntakeConstants;
@@ -78,5 +79,9 @@ public class Intake extends SubsystemBase {
 
   public double getRotationDegrees() {
     return m_inputs.rotationDegrees;
+  }
+
+  public boolean isAtAngle(double angleDegrees, double toleranceDegrees) {
+    return MathUtil.isNear(angleDegrees, getAngle(), toleranceDegrees);
   }
 }

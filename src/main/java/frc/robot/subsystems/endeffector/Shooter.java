@@ -35,10 +35,10 @@ public class Shooter extends SubsystemBase {
   private static final double HOOD_MAX_ANGLE_DEGREES = 0.0;
   private static final LookupPoint[] LOOKUP_POINTS = {
     new LookupPoint(3.55, 2075, 0.0),
-    new LookupPoint(3.07, 1875, 0.0),
+    new LookupPoint(3.07, 1850, 0.0),
     new LookupPoint(2.75, 1825, 0.0),
     new LookupPoint(4.0,2250, 0.0),
-    new LookupPoint(4.26, 2150, 25.0),
+    new LookupPoint(4.26, 2025,0),
     new LookupPoint(3.46, 2000, 0.0),
     new LookupPoint(3.67, 2100, 0.0),
     new LookupPoint(3.84, 2000, 20.0),

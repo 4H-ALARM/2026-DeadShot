@@ -15,10 +15,10 @@ import frc.robot.subsystems.intake.Intake;
 public class RunEndEffector extends Command {
   private static final double INTAKE_HALF_RETRACT_DEGREES =
       MathUtil.interpolate(
-          IntakeConstants.rotationDownDegrees, IntakeConstants.rotationUpDegrees, 0.5);
+          IntakeConstants.rotationDownDegrees, IntakeConstants.rotationUpDegrees, 0.4);
   private static final double INTAKE_QUARTER_RETRACT_DEGREES =
       MathUtil.interpolate(
-          IntakeConstants.rotationDownDegrees, IntakeConstants.rotationUpDegrees, 0.25);
+          IntakeConstants.rotationDownDegrees, IntakeConstants.rotationUpDegrees, 0.2);
   private static final double INTAKE_DWELL_SECONDS = 0.2;
 
   private final double m_indexerSpeed;

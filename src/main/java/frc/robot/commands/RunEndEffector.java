@@ -31,7 +31,8 @@ public class RunEndEffector extends Command {
     MOVING_TO_HALF,
     HOLDING_AT_HALF,
     MOVING_TO_QUARTER,
-    HOLDING_AT_QUARTER
+    HOLDING_AT_QUARTER,
+    STAY_DOWN
   }
 
   /** Creates a new RunEndEffector. */
@@ -45,9 +46,14 @@ public class RunEndEffector extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    if(m_intake.shouldJostleOnShoot()) {
+      m_intakeMotionState = IntakeMotionState.MOVING_TO_HALF;
+      commandIntakeAngle(INTAKE_HALF_RETRACT_DEGREES);
+    } else {
+      m_intakeMotionState = IntakeMotionState.STAY_DOWN;
+      m_intake.setRotationDown();
+    }
     m_phaseTimer.restart();
-    m_intakeMotionState = IntakeMotionState.MOVING_TO_HALF;
-    commandIntakeAngle(INTAKE_HALF_RETRACT_DEGREES);
     m_shooter.spinShooterFromLookup();
     m_shooter.stopIndexer();
     m_intake.setIntakeSpeed(-5900 / 60);
@@ -62,7 +68,7 @@ public class RunEndEffector extends Command {
     if (m_shooter.isShooterAtTargetVelocity()) {
       m_shooter.setIndexerSpeed(m_indexerSpeed);
     } else {
-      m_shooter.stopIndexer();
+      m_shooter.setIndexerSpeed(m_indexerSpeed / 6);
     }
   }
 
@@ -109,6 +115,8 @@ public class RunEndEffector extends Command {
           m_intakeMotionState = IntakeMotionState.MOVING_TO_HALF;
           commandIntakeAngle(INTAKE_HALF_RETRACT_DEGREES);
         }
+        break;
+      case STAY_DOWN:
         break;
     }
   }

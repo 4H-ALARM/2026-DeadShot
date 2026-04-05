@@ -79,8 +79,8 @@ public class AutoShoot {
   }
 
   private static Command getXLockCommand(Drive drive) {
-        // command to xlock the drive, this is a startRun instead of an instant command,
-        // because we don't want the command to complete until cancelled.
+    // command to xlock the drive, this is a startRun instead of an instant command,
+    // because we don't want the command to complete until cancelled.
     return Commands.startRun(drive::stopWithX, () -> {}, drive);
   }
 

@@ -26,6 +26,7 @@ public class RunEndEffector extends Command {
   private final Intake m_intake;
   private final Timer m_phaseTimer = new Timer();
   private IntakeMotionState m_intakeMotionState = IntakeMotionState.MOVING_TO_HALF;
+  private boolean m_shouldJostle = true;
 
   private enum IntakeMotionState {
     MOVING_TO_HALF,
@@ -46,22 +47,32 @@ public class RunEndEffector extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    if(m_intake.shouldJostleOnShoot()) {
-      m_intakeMotionState = IntakeMotionState.MOVING_TO_HALF;
-      commandIntakeAngle(INTAKE_HALF_RETRACT_DEGREES);
-    } else {
-      m_intakeMotionState = IntakeMotionState.STAY_DOWN;
-      m_intake.setRotationDown();
-    }
-    m_phaseTimer.restart();
+    initializeJostle();
+
     m_shooter.spinShooterFromLookup();
     m_shooter.stopIndexer();
     m_intake.setIntakeSpeed(-5900 / 60);
   }
 
+  private void initializeJostle(){
+    m_shouldJostle = m_intake.shouldJostleOnShoot();
+    if(m_shouldJostle) {
+      m_intakeMotionState = IntakeMotionState.MOVING_TO_HALF;
+      commandIntakeAngle(INTAKE_HALF_RETRACT_DEGREES);
+      m_phaseTimer.restart();
+    } else {
+      m_intakeMotionState = IntakeMotionState.STAY_DOWN;
+      m_intake.setRotationDown();
+    }
+  }
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+
+    if(m_intake.shouldJostleOnShoot() != m_shouldJostle) {
+      initializeJostle();
+    }
+
     m_shooter.spinShooterFromLookup();
     updateIntakeMotion();
 
@@ -70,6 +81,8 @@ public class RunEndEffector extends Command {
     } else {
       m_shooter.setIndexerSpeed(m_indexerSpeed / 6);
     }
+    
+
   }
 
   // Called once the command ends or is interrupted.

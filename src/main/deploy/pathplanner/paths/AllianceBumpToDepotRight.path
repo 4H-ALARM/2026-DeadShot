@@ -8,46 +8,30 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.5182179846346875,
-        "y": 1.7529167282539575
+        "x": 1.5418972895863048,
+        "y": 2.3594436519258206
       },
       "isLocked": false,
       "linkedName": "AllianceTopBumpRight"
     },
     {
       "anchor": {
-        "x": 3.5820120481927713,
-        "y": 0.7457590361445785
+        "x": 0.8690870185449355,
+        "y": 2.2559343794579174
       },
       "prevControl": {
-        "x": 3.0363683670737815,
-        "y": 0.9033894329122854
-      },
-      "nextControl": {
-        "x": 4.073759036144579,
-        "y": 0.6036987951807244
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 5.385084337349396,
-        "y": 0.6255542168674699
-      },
-      "prevControl": {
-        "x": 4.543650602409637,
-        "y": 0.5818433734939763
+        "x": 1.3097618668729025,
+        "y": 2.2559343794579174
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "NeutralZoneTopTrenchRight"
+      "linkedName": "DepotRight"
     }
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 1,
-      "rotationDegrees": 180
+      "waypointRelativePos": 0.5202558635394499,
+      "rotationDegrees": -170
     }
   ],
   "constraintZones": [],
@@ -62,8 +46,8 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 5.0,
-    "rotation": 180
+    "velocity": 0,
+    "rotation": -170
   },
   "reversed": false,
   "folder": null,

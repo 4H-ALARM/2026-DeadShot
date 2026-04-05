@@ -3,45 +3,45 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.162952924393723,
-        "y": 2.60527817403709
+        "x": 4.303240963855422,
+        "y": 0.6774179743223971
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.5182179846346875,
-        "y": 1.7529167282539575
+        "x": 5.303240963855423,
+        "y": 0.6774179743223971
       },
       "isLocked": false,
-      "linkedName": "AllianceTopBumpRight"
+      "linkedName": "TopTrenchRight"
     },
     {
       "anchor": {
-        "x": 3.5820120481927713,
-        "y": 0.7457590361445785
+        "x": 5.59169757489301,
+        "y": 0.6774179743223971
       },
       "prevControl": {
-        "x": 3.0363683670737815,
-        "y": 0.9033894329122854
+        "x": 5.070123553658574,
+        "y": 0.6774179743223971
       },
       "nextControl": {
-        "x": 4.073759036144579,
-        "y": 0.6036987951807244
+        "x": 6.08788028203584,
+        "y": 0.6774179743223971
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 5.385084337349396,
-        "y": 0.6255542168674699
+        "x": 8.464079885877318,
+        "y": 1.1690870185449356
       },
       "prevControl": {
-        "x": 4.543650602409637,
-        "y": 0.5818433734939763
+        "x": 7.946533523537803,
+        "y": 0.47039942938659074
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "NeutralZoneTopTrenchRight"
+      "linkedName": "TerminatorTopOfMidRight"
     }
   ],
   "rotationTargets": [
@@ -62,14 +62,14 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 5.0,
-    "rotation": 180
+    "velocity": 3.0,
+    "rotation": 95
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -135
+    "rotation": 180
   },
   "useDefaultConstraints": true
 }

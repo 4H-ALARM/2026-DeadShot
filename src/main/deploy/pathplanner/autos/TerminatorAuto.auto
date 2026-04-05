@@ -28,9 +28,22 @@
           "data": {
             "commands": [
               {
-                "type": "path",
+                "type": "sequential",
                 "data": {
-                  "pathName": "TerminatorHalfSweepLeft"
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "TerminatorHalfSweepLeft"
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "CrossBumpLeft"
+                      }
+                    }
+                  ]
                 }
               },
               {
@@ -43,21 +56,9 @@
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "CrossBumpLeft"
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "Shoot"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "AllianceBumpToTrenchLeft"
           }
         },
         {
@@ -65,9 +66,28 @@
           "data": {
             "commands": [
               {
-                "type": "path",
+                "type": "sequential",
                 "data": {
-                  "pathName": "ScrapeLeft"
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "AllianceBumpToTrenchLeft"
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "ScrapeLeft"
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "CrossBumpLeft"
+                      }
+                    }
+                  ]
                 }
               },
               {
@@ -80,27 +100,41 @@
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "CrossBumpLeft"
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "Shoot"
           }
         },
         {
-          "type": "path",
+          "type": "deadline",
           "data": {
-            "pathName": "AllianceBumpToTrenchLeft"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "ScrapeLeft"
+            "commands": [
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "AllianceBumpToTrenchLeft"
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "ScrapeLeft"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Intake"
+                }
+              }
+            ]
           }
         }
       ]

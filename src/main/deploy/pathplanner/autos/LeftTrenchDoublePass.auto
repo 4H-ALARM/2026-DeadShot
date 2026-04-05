@@ -103,6 +103,18 @@
           "data": {
             "name": "Shoot"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "AllianceBumpToTrenchLeft"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ScrapeLeft"
+          }
         }
       ]
     }

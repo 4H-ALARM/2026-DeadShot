@@ -9,10 +9,11 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
-import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.ParentDevice;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 
 import edu.wpi.first.math.filter.Debouncer;
@@ -37,7 +38,8 @@ public class IntakeIOKraken implements IntakeIO {
   private final TalonFXConfiguration m_intakingMotorConfig;
   private final VelocityTorqueCurrentFOC m_requestedVelocity;
   private final Follower followercontrol;
-  private final PositionVoltage m_requestedPosition;
+  private final Follower rotationFollowerControl;
+  private final MotionMagicVoltage m_requestedPosition;
   private double m_requestedAngleDegrees = 0.0;
   private final StatusSignal<Angle> m_rotationPosition;
   private final StatusSignal<AngularVelocity> m_rotationVelocity;
@@ -65,8 +67,6 @@ public class IntakeIOKraken implements IntakeIO {
     m_rotationMotor = new TalonFX(IntakeConstants.rotationMotorID, IntakeConstants.canbus);
     m_rotationMotorFollow =
         new TalonFX(IntakeConstants.rotationMotorFollowID, IntakeConstants.canbus);
-    // m_rotationMotorFollow.setControl(
-    //     new Follower(IntakeConstants.rotationMotorID, MotorAlignmentValue.Opposed));
     m_rotationPIDConfigs =
         new Slot0Configs()
             .withKP(rotationkp.get())
@@ -74,7 +74,7 @@ public class IntakeIOKraken implements IntakeIO {
             .withKD(rotationkd.get())
             .withKV(IntakeConstants.angleMotorkv)
             .withKA(IntakeConstants.angleMotorka)
-            .withKG(IntakeConstants.angleMotorkg);
+            .withKG(IntakeConstants.angleMotorkg).withGravityType(GravityTypeValue.Arm_Cosine);
      m_intakingPIDConfigs =
         new Slot0Configs()
             .withKP(IntakeConstants.intakingMotorkp)
@@ -88,16 +88,25 @@ public class IntakeIOKraken implements IntakeIO {
     m_rotationMotorConfig = new TalonFXConfiguration();
     m_intakingMotorConfig = new TalonFXConfiguration();
     m_rotationMotorConfig.Slot0 = m_rotationPIDConfigs;
+    m_rotationMotorConfig.MotionMagic.MotionMagicCruiseVelocity =
+        IntakeConstants.angleMotionMagicCruiseVelocityDegreesPerSecond / 360.0;
+    m_rotationMotorConfig.MotionMagic.MotionMagicAcceleration =
+        IntakeConstants.angleMotionMagicAccelerationDegreesPerSecondSquared / 360.0;
+    m_rotationMotorConfig.MotionMagic.MotionMagicJerk =
+        IntakeConstants.angleMotionMagicJerkDegreesPerSecondCubed / 360.0;
     m_intakingMotorConfig.Slot0 = m_intakingPIDConfigs;
     m_rotationMotorConfig.Feedback.SensorToMechanismRatio = rotationGearRatio.get();
     m_rotationMotor.getConfigurator().apply(m_rotationMotorConfig);
     m_rotationMotorFollow.getConfigurator().apply(m_rotationMotorConfig);
     m_intakingMotor.getConfigurator().apply(m_intakingMotorConfig);
     m_intakingMotorFollow.getConfigurator().apply(m_intakingMotorConfig);
-    m_requestedPosition = new PositionVoltage(0).withSlot(0);
+    m_requestedPosition = new MotionMagicVoltage(0).withSlot(0);
     m_requestedVelocity = new VelocityTorqueCurrentFOC(0).withSlot(0);
     followercontrol = new Follower(IntakeConstants.intakingMotorID, MotorAlignmentValue.Opposed);
+    rotationFollowerControl =
+        new Follower(IntakeConstants.rotationMotorID, MotorAlignmentValue.Opposed);
     m_intakingMotorFollow.setControl(followercontrol);
+    m_rotationMotorFollow.setControl(rotationFollowerControl);
 
     m_rotationPosition = m_rotationMotor.getPosition();
     m_rotationVelocity = m_rotationMotor.getVelocity();
@@ -132,8 +141,6 @@ public class IntakeIOKraken implements IntakeIO {
     m_requestedAngleDegrees = angleDegrees;
     m_rotationMotor.setControl(
         m_requestedPosition.withPosition(angleDegrees / 360).withEnableFOC(true));
-    m_rotationMotorFollow.setControl(
-        m_requestedPosition.withPosition(-angleDegrees / 360).withEnableFOC(true));
   }
 
   public double getAngle() {
@@ -191,6 +198,8 @@ public class IntakeIOKraken implements IntakeIO {
     inputs.rotationMotorFollowerConnected =
         m_rotationFollowerConnectedDebounce.calculate(status.isOK());
     inputs.rotationDegrees = m_rotationPosition.getValueAsDouble() * 360.0;
+    inputs.rotationPrimaryDegrees = m_rotationPosition.getValueAsDouble() * 360.0;
+    inputs.rotationFollowerDegrees = m_rotationFollowerPosition.getValueAsDouble() * 360.0;
     inputs.rotationSpeedDegreesPerSecond = m_rotationVelocity.getValueAsDouble() * 360.0;
     inputs.rotationSetpointDegrees = m_requestedAngleDegrees;
   }

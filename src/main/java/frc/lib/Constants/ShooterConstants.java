@@ -31,7 +31,7 @@ public class ShooterConstants {
   public static final double shooterMaxSpeed = 3600/60;
   public static final double shooterJerk = 0.0;
   public static final double hoodToMotorRatio = 1.0;
-  public static final double shooterRevTolerance = 90;
+  public static final double shooterRevTolerance = 100;
   public static final double shooterFF = 5;
 
   public static final double indexerkp = 6;

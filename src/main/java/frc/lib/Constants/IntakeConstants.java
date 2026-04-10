@@ -8,8 +8,8 @@ package frc.lib.Constants;
 public class IntakeConstants {
 
   public static final double rotationGearRatio = 3 * 5;
-  public static final double rotationUpDegrees = 2;
-  public static final double rotationDownDegrees = 96;
+  public static final double rotationUpDegrees = 0;
+  public static final double rotationDownDegrees = 90;
 
   // Motor IDs
   public static final int rotationMotorID = 30;
@@ -18,13 +18,17 @@ public class IntakeConstants {
   public static final int intakingFollowMotorID = 3;
   public static final String canbus = "endEffector";
   // PID tuning for the intake
-  public static final double angleMotorkp = 22.5;
+  public static final double angleMotorkp = 150;
   public static final double angleMotorki = 0.01;
-  public static final double angleMotorkd = 0.25;
-  public static final double angleMotorks = 0;
-  public static final double angleMotorkv = 1.47;
-  public static final double angleMotorkg = 0.72;
-  public static final double angleMotorka = 0.18;
+  public static final double angleMotorkd = 0.1;
+  public static final double angleMotorks = 0.2;
+  public static final double angleMotorkv = 1.87;
+  public static final double angleMotorkg = 0.5;
+  public static final double angleMotorka = 0.25;
+  public static final double angleMotionMagicCruiseVelocityDegreesPerSecond = 1000;
+  public static final double angleMotionMagicAccelerationDegreesPerSecondSquared = 1000*5;
+  public static final double angleMotionMagicJerkDegreesPerSecondCubed = 0.0;
+  public static final double anglePositionToleranceDegrees = 3.0;
 
   public static final double intakingMotorkp = 1.5;
   public static final double intakingMotorki = 0.0;

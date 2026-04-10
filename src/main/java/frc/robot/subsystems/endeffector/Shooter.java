@@ -43,7 +43,9 @@ public class Shooter extends SubsystemBase {
     new LookupPoint(3.67, 2100, 0.0),
     new LookupPoint(3.84, 2000, 20.0),
     new LookupPoint(3.66, 1950, 15.0),
-    new LookupPoint(2.6, 1775, 0.0)
+    new LookupPoint(2.6, 1775, 0.0),
+    new LookupPoint(5.52, 2300, 30.0),
+    new LookupPoint(5.07, 2150, 27.5)
   };
   private static final LookupPoint[] SORTED_LOOKUP_POINTS =
       Arrays.stream(LOOKUP_POINTS)

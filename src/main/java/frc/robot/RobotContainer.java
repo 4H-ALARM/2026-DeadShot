@@ -200,7 +200,7 @@ public class RobotContainer {
             drive, pilotForwardInput, pilotStrafeInput, pilotRotateInput);
     indexerReverseCommand =
         Commands.runEnd(() -> shooter.setIndexerSpeed(-6300 / 60), () -> shooter.setIndexerSpeed(0));
-    autoShootCommand = AutoShoot.autoShoot(shooter, drive, intake, pilotForwardInput, pilotStrafeInput).withTimeout(3);
+    autoShootCommand = AutoShoot.autoShoot(shooter, drive, intake, pilotForwardInput, pilotStrafeInput).withTimeout(4);
     ShootCommand = AutoShoot.autoShoot(shooter, drive, intake, pilotForwardInput, pilotStrafeInput);
     intakeCommand =
         Commands.runEnd(() -> intake.setIntakeSpeed(-5900 / 60), () -> intake.setIntakeSpeed(0), intake);
@@ -285,6 +285,9 @@ public class RobotContainer {
     OperatorController.x()
         .onTrue(new InstantCommand( () -> shooter.setTarget(GenericConstants.LEFTPASSING)))
         .onFalse(new InstantCommand(() -> shooter.resetTarget()));
+
+    OperatorController.povLeft()
+        .onTrue(new InstantCommand( () -> intake.toggleIntakeJostling()));
     // OperatorController.rightTrigger()
     //     .whileTrue(
     //         ShootFromTowerCommand

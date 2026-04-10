@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.intake;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.Constants.IntakeConstants;
@@ -15,6 +16,7 @@ import org.littletonrobotics.junction.Logger;
 public class Intake extends SubsystemBase {
   /** Creates a new Intake. */
   private final IntakeIO m_intakeIO;
+  private boolean m_shouldJostleIntakeOnShoot = true;
 
   private final IntakeIOInputsAutoLogged m_inputs = new IntakeIOInputsAutoLogged();
   private final LoggedTunableNumber m_upRotationDegrees =
@@ -78,5 +80,17 @@ public class Intake extends SubsystemBase {
 
   public double getRotationDegrees() {
     return m_inputs.rotationDegrees;
+  }
+
+  public boolean isAtAngle(double angleDegrees, double toleranceDegrees) {
+    return MathUtil.isNear(angleDegrees, getAngle(), toleranceDegrees);
+  }
+
+  public void toggleIntakeJostling() {
+    m_shouldJostleIntakeOnShoot = !m_shouldJostleIntakeOnShoot;
+  }
+
+  public boolean shouldJostleOnShoot() {
+    return m_shouldJostleIntakeOnShoot;
   }
 }

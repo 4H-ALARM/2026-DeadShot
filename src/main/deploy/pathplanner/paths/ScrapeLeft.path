@@ -8,59 +8,43 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.575035663338087,
-        "y": 7.625477888730385
+        "x": 6.62679029957204,
+        "y": 7.405520684736091
       },
       "isLocked": false,
       "linkedName": "NeutralZoneTopTrench"
     },
     {
       "anchor": {
-        "x": 5.953325301204819,
-        "y": 6.6904337349397585
+        "x": 7.700699001426534,
+        "y": 6.189286733238232
       },
       "prevControl": {
-        "x": 6.022615464030364,
-        "y": 6.930639632734982
+        "x": 7.428987161198288,
+        "y": 7.211440798858773
       },
       "nextControl": {
-        "x": 5.625493975903614,
-        "y": 5.553951807228916
+        "x": 8.02807074791057,
+        "y": 4.957745401226855
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 5.953325301204819,
-        "y": 4.384686746987952
+        "x": 7.700699001426534,
+        "y": 4.546077032810271
       },
       "prevControl": {
-        "x": 5.786084118299206,
-        "y": 4.570510283549743
+        "x": 7.8653251533936634,
+        "y": 4.73422120648699
       },
       "nextControl": {
-        "x": 6.248373493975904,
-        "y": 4.056855421686747
+        "x": 7.3384165477888725,
+        "y": 4.132039942938659
       },
       "isLocked": false,
       "linkedName": "AllianceTopHub"
-    },
-    {
-      "anchor": {
-        "x": 6.785197289156626,
-        "y": 4.110128012048193
-      },
-      "prevControl": {
-        "x": 6.568631730461732,
-        "y": 3.784644935370789
-      },
-      "nextControl": {
-        "x": 7.040827389443652,
-        "y": 4.49432239657632
-      },
-      "isLocked": false,
-      "linkedName": null
     },
     {
       "anchor": {
@@ -78,16 +62,8 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 1.0,
+      "waypointRelativePos": 0.7228144989339118,
       "rotationDegrees": -100.0
-    },
-    {
-      "waypointRelativePos": 2,
-      "rotationDegrees": -100.0
-    },
-    {
-      "waypointRelativePos": 3.0,
-      "rotationDegrees": 45.0
     }
   ],
   "constraintZones": [],

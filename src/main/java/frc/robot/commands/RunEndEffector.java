@@ -81,7 +81,7 @@ public class RunEndEffector extends Command {
     } else {
       m_shooter.setIndexerSpeed(m_indexerSpeed / 6);
     }
-    
+
 
   }
 

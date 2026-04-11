@@ -9,6 +9,7 @@ package frc.robot;
 
 import static frc.robot.subsystems.vision.VisionConstants.*;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -28,6 +29,7 @@ import frc.robot.commands.DeployIntake;
 import frc.robot.commands.AutoShoot;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.SelectTarget;
+import frc.robot.lib.BLine.FollowPath;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.intake.IntakeIOKraken;
 import frc.robot.subsystems.drive.Drive;
@@ -192,6 +194,17 @@ public class RobotContainer {
             );
         break;
     }
+
+    FollowPath.Builder pathBuilder = new FollowPath.Builder(
+            drive,                      // The drive subsystem to require
+            drive::getPose,             // Supplier for current robot pose
+            drive::getChassisSpeeds,    // Supplier for current speeds
+            drive::runVelocity,               // Consumer to drive the robot
+            new PIDController(5.0, 0.0, 0.0),    // Translation PID
+            new PIDController(3.0, 0.0, 0.0),    // Rotation PID
+            new PIDController(2.0, 0.0, 0.0)     // Cross-track PID
+            ).withDefaultShouldFlip()                // Auto-flip for red alliance 
+            .withPoseReset(drive::setPose);  // Reset odometry at path start
 
     deployIntake = new DeployIntake(intake);
     // deployIntakeAuto = new DeployIntake(intake);

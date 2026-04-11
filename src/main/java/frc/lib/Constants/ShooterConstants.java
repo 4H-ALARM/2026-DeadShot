@@ -55,4 +55,6 @@ public class ShooterConstants {
   public static final double hoodMaxSpeed = 50.0;
   public static final double hoodJerk = 50.0;
   public static final double hoodGearRatio = 1;
+  public static final double maxHoodAngle = 67;
+  public static final double minHoodAngle = 38;
 }

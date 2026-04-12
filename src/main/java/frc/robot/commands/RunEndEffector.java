@@ -51,7 +51,8 @@ public class RunEndEffector extends Command {
 
     m_shooter.spinShooterFromLookup();
     m_shooter.stopIndexer();
-    m_intake.setIntakeSpeed(-5900 / 60);
+    //m_shooter.setIndexerSpeed(m_indexerSpeed);
+    // m_intake.setIntakeSpeed(-5900 / 60);
   }
 
   private void initializeJostle(){
@@ -76,10 +77,11 @@ public class RunEndEffector extends Command {
     m_shooter.spinShooterFromLookup();
     updateIntakeMotion();
 
+
     if (m_shooter.isShooterAtTargetVelocity()) {
       m_shooter.setIndexerSpeed(m_indexerSpeed);
     } else {
-      m_shooter.setIndexerSpeed(m_indexerSpeed / 6);
+      m_shooter.setIndexerSpeed(0*m_indexerSpeed);
     }
 
 

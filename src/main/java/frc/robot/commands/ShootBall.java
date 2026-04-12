@@ -18,7 +18,7 @@ public class ShootBall extends SequentialCommandGroup {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-        new RevShooter(shooter),
+        new RevShooter(shooter).withTimeout(1),
         new RunEndEffector(shooter, intake, indexerSpeed));
   }
 }

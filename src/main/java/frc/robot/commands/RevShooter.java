@@ -29,6 +29,7 @@ public class RevShooter extends Command {
   @Override
   public void execute() {
     m_shooter.spinShooterFromLookup();
+    // m_shooter.setIndexerSpeed(500);
   }
 
   // Called once the command ends or is interrupted.
@@ -43,6 +44,6 @@ public class RevShooter extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return m_shooter.isShooterAtTargetVelocity();
+    return false;
   }
 }

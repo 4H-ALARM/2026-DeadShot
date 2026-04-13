@@ -8,6 +8,8 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.units.AngleUnit;
+import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -27,6 +29,7 @@ import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
 
 public class Shooter extends SubsystemBase {
 
@@ -66,7 +69,7 @@ public class Shooter extends SubsystemBase {
   private Command rumble3Seconds;
   private Command rumbleEndShift;
   private double lastCommandedHoodAngleDegrees = Double.NaN;
-  private final CANcoder hoodEncoder = new CANcoder(ShooterConstants.hoodEncoderID);
+  private final CANcoder hoodEncoder = new CANcoder(ShooterConstants.hoodEncoderID, ShooterConstants.shooterCanbus);
   private final LoggedTunableNumber useDashboardShotTuning =
       new LoggedTunableNumber("Shooter/ShotTuning/UseDashboardSetpoints", 0.0);
   private final LoggedTunableNumber dashboardShooterRpm =
@@ -95,11 +98,8 @@ public class Shooter extends SubsystemBase {
     this.rumble3Seconds = new RumbleController(controller, 3, 0.1);
     this.rumble10Seconds = new RumbleController(controller, 0.5, 0.1);
     this.rumbleEndShift = new RumbleController(controller, 1, 1);
-    MagnetSensorConfigs magnetSensorConfigs = new MagnetSensorConfigs().withMagnetOffset(0.06884765625);
-
+    MagnetSensorConfigs magnetSensorConfigs = new MagnetSensorConfigs().withMagnetOffset(-0.071533203125).withSensorDirection(SensorDirectionValue.Clockwise_Positive);
     hoodEncoder.getConfigurator().apply(magnetSensorConfigs);
-
-
     this.hood = new RotationalMechanism(RotationalMechanism.Config.builder()
                                                     .name("hood")
                                                     .canBus("endEffector")
@@ -112,7 +112,7 @@ public class Shooter extends SubsystemBase {
                                                     .feedforward(0, 20.85)
                                                     .range(HOOD_MIN_ANGLE_DEGREES, HOOD_MAX_ANGLE_DEGREES)
                                                     .statorCurrentLimit(30)
-                                                    .startingAngle(hoodEncoder.getAbsolutePosition().getValueAsDouble())
+                                                    .startingAngle(hoodEncoder.getAbsolutePosition().getValue().in(Units.Degrees))
                                                     .motionMagic(999, 9999, 0).build());
 
 
@@ -145,8 +145,7 @@ public class Shooter extends SubsystemBase {
     Logger.processInputs("Indexer", indexerInputs);
     Logger.recordOutput("Shooter/DistanceToTargetMeters", getDistanceToTarget());
     Logger.recordOutput("Shooter/HoodAngle", hood.getAngle());
-    Logger.recordOutput(
-        "Shooter/ShotTuning/UseDashboardSetpoints", shouldUseDashboardShotTuning());
+    Logger.recordOutput("Shooter/ShotTuning/UseDashboardSetpoints", shouldUseDashboardShotTuning());
     Logger.recordOutput("Shooter/ShotTuning/HoodPercent", dashboardHoodPercent.get());
     Logger.recordOutput("Shooter/ShotTuning/TargetRPM", getActiveTargetRpm());
     Logger.recordOutput("Shooter/ShotTuning/TargetHoodAngle", getActiveTargetHoodAngle());

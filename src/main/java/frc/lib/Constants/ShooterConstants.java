@@ -21,18 +21,18 @@ public class ShooterConstants {
   public static final int encoderResetButtonPort = 1;
   public static final String shooterCanbus = "endEffector";
 
-  public static final double shooterkp = 8;
+  public static final double shooterkp = 10;
   public static final double shooterki = 0;
   public static final double shooterkd = 0;
-  public static final double shooterks = 0.625;
-  public static final double shooterkv = 0.3;
-  public static final double shooterka = 0.5;
-  public static final double shooterMaxAccel = 3600/60*12;
+  public static final double shooterks = 5;
+  public static final double shooterkv = 0.053;
+  public static final double shooterka = 0;
+  public static final double shooterMaxAccel = 3600/60*40;
   public static final double shooterMaxSpeed = 3600/60;
   public static final double shooterJerk = 0.0;
   public static final double hoodToMotorRatio = 1.0;
   public static final double shooterRevTolerance = 100;
-  public static final double shooterFF = 5;
+  public static final double shooterFF = 0;
 
   public static final double indexerkp = 6;
   public static final double indexerki = 0.0;

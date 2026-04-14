@@ -35,17 +35,17 @@ public class Shooter extends SubsystemBase {
   private static final double HOOD_MIN_ANGLE_DEGREES = -30.0;
   private static final double HOOD_MAX_ANGLE_DEGREES = 0.0;
   private static final LookupPoint[] LOOKUP_POINTS = {
-    new LookupPoint(3.55, 2075*.95, 0.0),
-    new LookupPoint(3.07, 1875*.95, 0.0),
-    new LookupPoint(2.75, 1825*.95, 0.0),
-    new LookupPoint(4.26, 2150*.95, 25.0),
-    new LookupPoint(3.46, 2000*.95, 0.0),
-    new LookupPoint(3.67, 2100*.95, 0.0),
-    new LookupPoint(3.84, 2000*.95, 20.0),
-    new LookupPoint(3.66, 1950*.95, 15.0),
-    new LookupPoint(2.6, 1775*.95, 0.0),
-    new LookupPoint(5.52, 2300*.95, 30.0),
-    new LookupPoint(5.07, 2150*.95, 27.5)
+    new LookupPoint(3.55, 2075*1.1, 0.0),
+    new LookupPoint(3.07, 1875*1.1, 0.0),
+    new LookupPoint(2.75, 1825*1.1, 0.0),
+    new LookupPoint(4.26, 2150*1.1, 25.0),
+    new LookupPoint(3.46, 2000*1.1, 0.0),
+    new LookupPoint(3.67, 2100*1.1, 0.0),
+    new LookupPoint(3.84, 2000*1.1, 20.0),
+    new LookupPoint(3.66, 1950*1.1, 15.0),
+    new LookupPoint(2.6, 1775*1.1, 0.0),
+    new LookupPoint(5.52, 2300*1.1, 30.0),
+    new LookupPoint(5.07, 2150*1.1, 27.5)
   };
   private static final LookupPoint[] SORTED_LOOKUP_POINTS =
       Arrays.stream(LOOKUP_POINTS)

@@ -262,7 +262,7 @@ public class RobotContainer {
 
     pilotRightBumper
         .whileTrue(
-            Commands.runEnd(() -> shooter.setIndexerSpeed(-3500 / 60), () -> shooter.setIndexerSpeed(0)));
+            Commands.runEnd(() -> shooter.setIndexerSpeed(-5900 / 60), () -> shooter.setIndexerSpeed(0)));
     pilotRightTrigger
         .whileTrue(
             ShootCommand).onFalse(new InstantCommand(() -> shooter.stopShooter()) );

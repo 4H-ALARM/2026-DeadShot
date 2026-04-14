@@ -4,9 +4,11 @@
 
 package frc.robot.subsystems.endeffector;
 
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.TorqueCurrentConfigs;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
@@ -98,10 +100,21 @@ public class ShooterIOKraken implements ShooterIO {
             .withMotionMagicCruiseVelocity(shooterMaxSpeed.get())
             .withMotionMagicJerk(shooterJerk.get());
 
+    CurrentLimitsConfigs shooterCurrentLimitsConfigs = new CurrentLimitsConfigs()
+      .withStatorCurrentLimit(45)
+      .withStatorCurrentLimitEnable(true)
+      .withSupplyCurrentLimit(50)
+      .withSupplyCurrentLimitEnable(true);
+
+    TorqueCurrentConfigs shooterTorqueCurrentConfigs = new TorqueCurrentConfigs().withPeakForwardTorqueCurrent(45).withPeakReverseTorqueCurrent(-45);
+
 
     shooterVelocityVoltage = new VelocityTorqueCurrentFOC(0).withSlot(0);
     shooterMotorConfig = new TalonFXConfiguration();
     shooterMotorConfig.Slot0 = shooterConfig;
+    shooterMotorConfig.CurrentLimits = shooterCurrentLimitsConfigs;
+    shooterMotorConfig.TorqueCurrent = shooterTorqueCurrentConfigs;
+
     // shooterMotorConfig.MotionMagic = shooterMotionMagicConfig;
 
     topShooterMotorRight.getConfigurator().apply(shooterMotorConfig);

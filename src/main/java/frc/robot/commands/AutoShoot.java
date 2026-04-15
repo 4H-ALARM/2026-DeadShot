@@ -14,8 +14,6 @@ import frc.robot.subsystems.intake.Intake;
 
 import java.util.function.DoubleSupplier;
 
-import org.opencv.core.Mat.Atable;
-
 public class AutoShoot {
   private AutoShoot() {}
 
@@ -29,44 +27,7 @@ public class AutoShoot {
       Intake intake,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier) {
-      boolean[] atAngle = new boolean[1];
-    // return Commands.parallel(
-    //     // Spin shooter at lookup RPM
-    //     new ShootBall(shooter, intake, -5900.0),
-    //     Commands.run(() -> shooter.setHoodAngle(shooter.getActiveTargetHoodAngle())),
-    //     // Aim drive at target
-    //     DriveCommands.joystickDriveAtAngle(
-    //         drive,
-    //         xSupplier,
-    //         ySupplier,
-    //         () -> {
-    //           Translation2d robotXY = drive.getPose().getTranslation();
-    //           Translation2d targetXY =
-    //               new Translation2d(
-    //                   shooter.getShootTarget().getTarget().getX(),
-    //                   shooter.getShootTarget().getTarget().getY());
-    //           Translation2d toTarget = targetXY.minus(robotXY);
-    //           return new Rotation2d(toTarget.getX(), toTarget.getY()).rotateBy(new Rotation2d(Math.PI));
-    //         }))
-        return Commands.sequence(
-          Commands.parallel(
-            DriveCommands.joystickDriveAtAngle(
-            drive,
-            xSupplier,
-            ySupplier,
-            () -> {
-              Translation2d robotXY = drive.getPose().getTranslation();
-              Translation2d targetXY =
-                  new Translation2d(
-                      shooter.getShootTarget().getTarget().getX(),
-                      shooter.getShootTarget().getTarget().getY());
-              Translation2d toTarget = targetXY.minus(robotXY);
-              return new Rotation2d(toTarget.getX(), toTarget.getY()).rotateBy(new Rotation2d(Math.PI));
-            },
-            atAngle),
-            new RevShooter(shooter)
-          ),
-          Commands.parallel(
+    return Commands.parallel(
         // Spin shooter at lookup RPM
         new ShootBall(shooter, intake, -5900.0),
         Commands.run(() -> shooter.setHoodAngle(shooter.getActiveTargetHoodAngle())),
@@ -83,10 +44,7 @@ public class AutoShoot {
                       shooter.getShootTarget().getTarget().getY());
               Translation2d toTarget = targetXY.minus(robotXY);
               return new Rotation2d(toTarget.getX(), toTarget.getY()).rotateBy(new Rotation2d(Math.PI));
-            },
-            atAngle))
-
-        )
+            }))
         .finallyDo(() -> shooter.stopShooter());
   }
 }

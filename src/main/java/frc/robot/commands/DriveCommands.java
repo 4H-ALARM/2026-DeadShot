@@ -105,8 +105,7 @@ public class DriveCommands {
       Drive drive,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
-      Supplier<Rotation2d> rotationSupplier,
-      boolean[] atAngle) {
+      Supplier<Rotation2d> rotationSupplier) {
 
     // Create PID controller
     ProfiledPIDController angleController =
@@ -115,9 +114,8 @@ public class DriveCommands {
             0.0,
             ANGLE_KD,
             new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
-          
     angleController.enableContinuousInput(-Math.PI, Math.PI);
-    
+
     // Construct command
     return Commands.run(
             () -> {
@@ -145,7 +143,6 @@ public class DriveCommands {
                       isFlipped
                           ? drive.getRotation().plus(new Rotation2d(Math.PI))
                           : drive.getRotation()));
-              atAngle[0] = angleController.atGoal();
             },
             drive)
 

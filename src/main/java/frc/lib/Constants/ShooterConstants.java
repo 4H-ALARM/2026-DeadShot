@@ -31,7 +31,8 @@ public class ShooterConstants {
   public static final double shooterMaxSpeed = 3600/60;
   public static final double shooterJerk = 0.0;
   public static final double hoodToMotorRatio = 1.0;
-  public static final double shooterRevTolerance = 100;
+  public static final double shooterRevUpTolerance = 5;
+  public static final double shooterIndexerStartTolerance = 500;
   public static final double shooterFF = 0;
 
   public static final double indexerkp = 6;
@@ -41,7 +42,7 @@ public class ShooterConstants {
   public static final double indexerkv = 0.39;
   public static final double indexerka = 0.01;
   public static final double indexerCruiseVelocity = 6400/60;
-  public static final double indexerAcceleration = 6400/60*25*0.75;
+  public static final double indexerAcceleration = 25*6400/60;
   public static final double indexerJerk = 0;
 
   public static final double hoodkp = 1.0;

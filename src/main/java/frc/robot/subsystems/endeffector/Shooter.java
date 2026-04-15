@@ -35,17 +35,16 @@ public class Shooter extends SubsystemBase {
   private static final double HOOD_MIN_ANGLE_DEGREES = -30.0;
   private static final double HOOD_MAX_ANGLE_DEGREES = 0.0;
   private static final LookupPoint[] LOOKUP_POINTS = {
-    new LookupPoint(3.55, 2075*1.1, 0.0),
-    new LookupPoint(3.07, 1875*1.1, 0.0),
-    new LookupPoint(2.75, 1825*1.1, 0.0),
-    new LookupPoint(4.26, 2150*1.1, 25.0),
-    new LookupPoint(3.46, 2000*1.1, 0.0),
-    new LookupPoint(3.67, 2100*1.1, 0.0),
-    new LookupPoint(3.84, 2000*1.1, 20.0),
-    new LookupPoint(3.66, 1950*1.1, 15.0),
-    new LookupPoint(2.6, 1775*1.1, 0.0),
-    new LookupPoint(5.52, 2300*1.1, 30.0),
-    new LookupPoint(5.07, 2150*1.1, 27.5)
+    new LookupPoint(3.55, 2050, 0.0),
+    new LookupPoint(3.09, 1965, 0.0),
+    new LookupPoint(2.76, 1900, 0.0),
+    new LookupPoint(3.5, 1990, 10),
+    new LookupPoint(3.29, 1985, 0.0),
+    new LookupPoint(3.7, 2125, 0.0),
+    new LookupPoint(4.0, 2100, 15.0),
+    new LookupPoint(2.5, 1805, 0.0),
+    new LookupPoint(2.0, 1700, 0.0),
+    new LookupPoint(4.5, 2175, 30.0)
   };
   private static final LookupPoint[] SORTED_LOOKUP_POINTS =
       Arrays.stream(LOOKUP_POINTS)
@@ -199,8 +198,18 @@ public class Shooter extends SubsystemBase {
   }
 
   public boolean isShooterAtTargetVelocity() {
+    return isShooterAtRevUpTolerance();
+  }
+
+  public boolean isShooterAtRevUpTolerance() {
     double targetRpm = getActiveTargetRpm();
-    return Math.abs(getShooterVelocity() - targetRpm) <= ShooterConstants.shooterRevTolerance;
+    return Math.abs(getShooterVelocity() - targetRpm) <= ShooterConstants.shooterRevUpTolerance;
+  }
+
+  public boolean isShooterReadyToStartIndexer() {
+    double targetRpm = getActiveTargetRpm();
+    return Math.abs(getShooterVelocity() - targetRpm)
+        <= ShooterConstants.shooterIndexerStartTolerance;
   }
 
   public double getActiveTargetHoodAngle() {

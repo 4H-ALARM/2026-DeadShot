@@ -78,10 +78,10 @@ public class RunEndEffector extends Command {
     updateIntakeMotion();
 
 
-    if (m_shooter.isShooterAtTargetVelocity()) {
+    if (m_shooter.isShooterReadyToStartIndexer()) {
       m_shooter.setIndexerSpeed(m_indexerSpeed);
     } else {
-      m_shooter.setIndexerSpeed(0*m_indexerSpeed);
+      m_shooter.stopIndexer();
     }
 
 

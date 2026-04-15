@@ -13,12 +13,6 @@
                 "data": {
                   "pathName": "TrenchToMidLeft"
                 }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Deploy intake"
-                }
               }
             ]
           }

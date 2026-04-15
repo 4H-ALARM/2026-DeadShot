@@ -8,6 +8,8 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.units.AngleUnit;
+import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -25,7 +27,9 @@ import java.util.Arrays;
 import java.util.Comparator;
 import org.littletonrobotics.junction.Logger;
 
+import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
 
 public class Shooter extends SubsystemBase {
 
@@ -34,18 +38,16 @@ public class Shooter extends SubsystemBase {
   private static final double HOOD_MIN_ANGLE_DEGREES = -30.0;
   private static final double HOOD_MAX_ANGLE_DEGREES = 0.0;
   private static final LookupPoint[] LOOKUP_POINTS = {
-    new LookupPoint(3.55, 2075, 0.0),
-    new LookupPoint(3.07, 1875, 0.0),
-    new LookupPoint(2.75, 1825, 0.0),
-    new LookupPoint(4.0,2250, 0.0),
-    new LookupPoint(4.26, 2150, 25.0),
-    new LookupPoint(3.46, 2000, 0.0),
-    new LookupPoint(3.67, 2100, 0.0),
-    new LookupPoint(3.84, 2000, 20.0),
-    new LookupPoint(3.66, 1950, 15.0),
-    new LookupPoint(2.6, 1775, 0.0),
-    new LookupPoint(5.52, 2300, 30.0),
-    new LookupPoint(5.07, 2150, 27.5)
+    new LookupPoint(3.55, 2050, 0.0),
+    new LookupPoint(3.09, 1965, 0.0),
+    new LookupPoint(2.76, 1900, 0.0),
+    new LookupPoint(3.5, 1990, 10),
+    new LookupPoint(3.29, 1985, 0.0),
+    new LookupPoint(3.7, 2125, 0.0),
+    new LookupPoint(4.0, 2100, 15.0),
+    new LookupPoint(2.5, 1805, 0.0),
+    new LookupPoint(2.0, 1700, 0.0),
+    new LookupPoint(4.5, 2175, 30.0)
   };
   private static final LookupPoint[] SORTED_LOOKUP_POINTS =
       Arrays.stream(LOOKUP_POINTS)
@@ -66,7 +68,7 @@ public class Shooter extends SubsystemBase {
   private Command rumble3Seconds;
   private Command rumbleEndShift;
   private double lastCommandedHoodAngleDegrees = Double.NaN;
-  private final CANcoder hoodEncoder = new CANcoder(ShooterConstants.hoodEncoderID);
+  private final CANcoder hoodEncoder = new CANcoder(ShooterConstants.hoodEncoderID, ShooterConstants.shooterCanbus);
   private final LoggedTunableNumber useDashboardShotTuning =
       new LoggedTunableNumber("Shooter/ShotTuning/UseDashboardSetpoints", 0.0);
   private final LoggedTunableNumber dashboardShooterRpm =
@@ -95,6 +97,8 @@ public class Shooter extends SubsystemBase {
     this.rumble3Seconds = new RumbleController(controller, 3, 0.1);
     this.rumble10Seconds = new RumbleController(controller, 0.5, 0.1);
     this.rumbleEndShift = new RumbleController(controller, 1, 1);
+    MagnetSensorConfigs magnetSensorConfigs = new MagnetSensorConfigs().withMagnetOffset(-0.071533203125).withSensorDirection(SensorDirectionValue.Clockwise_Positive);
+    hoodEncoder.getConfigurator().apply(magnetSensorConfigs);
     this.hood = new RotationalMechanism(RotationalMechanism.Config.builder()
                                                     .name("hood")
                                                     .canBus("endEffector")
@@ -107,7 +111,7 @@ public class Shooter extends SubsystemBase {
                                                     .feedforward(0, 20.85)
                                                     .range(HOOD_MIN_ANGLE_DEGREES, HOOD_MAX_ANGLE_DEGREES)
                                                     .statorCurrentLimit(30)
-                                                    .startingAngle(hoodEncoder.getAbsolutePosition().getValueAsDouble())
+                                                    .startingAngle(hoodEncoder.getAbsolutePosition().getValue().in(Units.Degrees))
                                                     .motionMagic(999, 9999, 0).build());
 
 
@@ -132,6 +136,7 @@ public class Shooter extends SubsystemBase {
         CommandScheduler.getInstance().schedule(rumbleEndShift);
      }
      lastPhaseTime = phaseshiftInputs.phaseTimeRemaining;
+     shooter.updateTuningValues();
      shooter.updateInputs(shooterInputs);
      indexer.updateInputs(indexerInputs);
     Logger.processInputs("PhaseShift", phaseshiftInputs);
@@ -139,8 +144,7 @@ public class Shooter extends SubsystemBase {
     Logger.processInputs("Indexer", indexerInputs);
     Logger.recordOutput("Shooter/DistanceToTargetMeters", getDistanceToTarget());
     Logger.recordOutput("Shooter/HoodAngle", hood.getAngle());
-    Logger.recordOutput(
-        "Shooter/ShotTuning/UseDashboardSetpoints", shouldUseDashboardShotTuning());
+    Logger.recordOutput("Shooter/ShotTuning/UseDashboardSetpoints", shouldUseDashboardShotTuning());
     Logger.recordOutput("Shooter/ShotTuning/HoodPercent", dashboardHoodPercent.get());
     Logger.recordOutput("Shooter/ShotTuning/TargetRPM", getActiveTargetRpm());
     Logger.recordOutput("Shooter/ShotTuning/TargetHoodAngle", getActiveTargetHoodAngle());
@@ -193,8 +197,18 @@ public class Shooter extends SubsystemBase {
   }
 
   public boolean isShooterAtTargetVelocity() {
+    return isShooterAtRevUpTolerance();
+  }
+
+  public boolean isShooterAtRevUpTolerance() {
     double targetRpm = getActiveTargetRpm();
-    return Math.abs(getShooterVelocity() - targetRpm) <= ShooterConstants.shooterRevTolerance;
+    return Math.abs(getShooterVelocity() - targetRpm) <= ShooterConstants.shooterRevUpTolerance;
+  }
+
+  public boolean isShooterReadyToStartIndexer() {
+    double targetRpm = getActiveTargetRpm();
+    return Math.abs(getShooterVelocity() - targetRpm)
+        <= ShooterConstants.shooterIndexerStartTolerance;
   }
 
   public double getActiveTargetHoodAngle() {

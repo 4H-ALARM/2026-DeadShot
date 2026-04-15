@@ -4,9 +4,11 @@
 
 package frc.robot.subsystems.endeffector;
 
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.TorqueCurrentConfigs;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
@@ -44,25 +46,25 @@ public class ShooterIOKraken implements ShooterIO {
   private VelocityTorqueCurrentFOC shooterVelocityVoltage;
 
   private final LoggedTunableNumber shooterkp =
-      new LoggedTunableNumber("Shooter/kp", ShooterConstants.shooterkp);
+      new LoggedTunableNumber("Shooter/ShotTuning/kp", ShooterConstants.shooterkp);
   private final LoggedTunableNumber shooterki =
-      new LoggedTunableNumber("Shooter/ki", ShooterConstants.shooterki);
+      new LoggedTunableNumber("Shooter/ShotTuning/ki", ShooterConstants.shooterki);
   private final LoggedTunableNumber shooterkd =
-      new LoggedTunableNumber("Shooter/kd", ShooterConstants.shooterkd);
+      new LoggedTunableNumber("Shooter/ShotTuning/kd", ShooterConstants.shooterkd);
   private final LoggedTunableNumber shooterka =
-      new LoggedTunableNumber("Shooter/ka", ShooterConstants.shooterka);
+      new LoggedTunableNumber("Shooter/ShotTuning/ka", ShooterConstants.shooterka);
   private final LoggedTunableNumber shooterks =
-      new LoggedTunableNumber("Shooter/ks", ShooterConstants.shooterks);
+      new LoggedTunableNumber("Shooter/ShotTuning/ks", ShooterConstants.shooterks);
   private final LoggedTunableNumber shooterkv =
-      new LoggedTunableNumber("Shooter/kv", ShooterConstants.shooterkv);
+      new LoggedTunableNumber("Shooter/ShotTuning/kv", ShooterConstants.shooterkv);
   private final LoggedTunableNumber shooterMaxAccel =
-      new LoggedTunableNumber("Shooter/maxAccel", ShooterConstants.shooterMaxAccel);
+      new LoggedTunableNumber("Shooter/ShotTuning/maxAccel", ShooterConstants.shooterMaxAccel);
   private final LoggedTunableNumber shooterMaxSpeed =
-      new LoggedTunableNumber("Shooter/maxSpeed", ShooterConstants.shooterMaxSpeed);
+      new LoggedTunableNumber("Shooter/ShotTuning/maxSpeed", ShooterConstants.shooterMaxSpeed);
   private final LoggedTunableNumber shooterJerk =
-      new LoggedTunableNumber("Shooter/jerk", ShooterConstants.shooterJerk);
+      new LoggedTunableNumber("Shooter/ShotTuning/jerk", ShooterConstants.shooterJerk);
   private final LoggedTunableNumber shooterFF =
-      new LoggedTunableNumber("Shooter/shooterFF", ShooterConstants.shooterFF);
+      new LoggedTunableNumber("Shooter/ShotTuning/shooterFF", ShooterConstants.shooterFF);
 
 
   public ShooterIOKraken() {
@@ -98,10 +100,21 @@ public class ShooterIOKraken implements ShooterIO {
             .withMotionMagicCruiseVelocity(shooterMaxSpeed.get())
             .withMotionMagicJerk(shooterJerk.get());
 
+    CurrentLimitsConfigs shooterCurrentLimitsConfigs = new CurrentLimitsConfigs()
+      .withStatorCurrentLimit(45)
+      .withStatorCurrentLimitEnable(true)
+      .withSupplyCurrentLimit(50)
+      .withSupplyCurrentLimitEnable(true);
+
+    TorqueCurrentConfigs shooterTorqueCurrentConfigs = new TorqueCurrentConfigs().withPeakForwardTorqueCurrent(45).withPeakReverseTorqueCurrent(-45);
+
 
     shooterVelocityVoltage = new VelocityTorqueCurrentFOC(0).withSlot(0);
     shooterMotorConfig = new TalonFXConfiguration();
     shooterMotorConfig.Slot0 = shooterConfig;
+    shooterMotorConfig.CurrentLimits = shooterCurrentLimitsConfigs;
+    shooterMotorConfig.TorqueCurrent = shooterTorqueCurrentConfigs;
+
     // shooterMotorConfig.MotionMagic = shooterMotionMagicConfig;
 
     topShooterMotorRight.getConfigurator().apply(shooterMotorConfig);
@@ -149,7 +162,8 @@ public class ShooterIOKraken implements ShooterIO {
   @Override
   public void setShooterSpeed(double speed) {
     // topShooterMotorRight.set(speed);
-    topShooterMotorRight.setControl(shooterVelocityVoltage.withVelocity(speed).withFeedForward(ShooterConstants.shooterFF));
+    topShooterMotorRight.setControl(
+        shooterVelocityVoltage.withVelocity(speed).withFeedForward(shooterFF.get()).withUpdateFreqHz(1000));
   }
 
   @Override

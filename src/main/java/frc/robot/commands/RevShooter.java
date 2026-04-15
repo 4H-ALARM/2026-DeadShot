@@ -11,6 +11,7 @@ import frc.robot.subsystems.endeffector.Shooter;
 public class RevShooter extends Command {
   /** Creates a new ShootBall. */
   private Shooter m_shooter;
+  private double indexerSpeed;
 
   public RevShooter(Shooter shooter) {
 
@@ -22,13 +23,16 @@ public class RevShooter extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-
+    indexerSpeed = 1000;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
     m_shooter.spinShooterFromLookup();
+    indexerSpeed = indexerSpeed -0.001;
+    if (indexerSpeed<400){indexerSpeed = 400;}
+    m_shooter.setIndexerSpeed(indexerSpeed);
   }
 
   // Called once the command ends or is interrupted.
@@ -37,12 +41,13 @@ public class RevShooter extends Command {
     // Note: RevShooter should only be used to rev up the shooter for shooting, so only stop the shooter if the command was interrupted.
     if(interrupted) {
       m_shooter.stopShooter();
+      m_shooter.setIndexerSpeed(0);
     }
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return m_shooter.isShooterAtTargetVelocity();
+    return false;
   }
 }

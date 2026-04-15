@@ -116,8 +116,8 @@ public class RobotContainer {
                 drive::addVisionMeasurement,
                 new VisionIOPhotonVision(camera0Name, backLeft),
                 new VisionIOPhotonVision(camera1Name, backRight),
-                new VisionIOPhotonVision(camera2Name, sideLeft),
-                new VisionIOPhotonVision(camera3Name, sideRight)
+                new VisionIOPhotonVision(camera2Name, sideLeft)//,
+                // new VisionIOPhotonVision(camera3Name, sideRight)
                 );
 
         shooter =

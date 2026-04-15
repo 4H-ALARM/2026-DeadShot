@@ -11,26 +11,13 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "TrenchToMidLeft"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "deadline",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "HalfSweepLeft"
+                  "pathName": "TerminatorTrenchToMidRight"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "Intake"
+                  "name": "Deploy intake"
                 }
               }
             ]
@@ -41,59 +28,22 @@
           "data": {
             "commands": [
               {
-                "type": "path",
+                "type": "sequential",
                 "data": {
-                  "pathName": "CrossBumpLeft"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Intake"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Shoot"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "AllianceBumpToTrenchLeft"
-          }
-        },
-        {
-          "type": "deadline",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "ScrapeLeft"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Intake"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "deadline",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "CrossBumpLeft"
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "TerminatorHalfSweepRight"
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "CrossBumpRight"
+                      }
+                    }
+                  ]
                 }
               },
               {
@@ -122,13 +72,57 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "AllianceBumpToTrenchLeft"
+                        "pathName": "AllianceBumpToTrenchRight"
                       }
                     },
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "ScrapeLeft"
+                        "pathName": "ScrapeRight"
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "CrossBumpRight"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Intake"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
+          "type": "deadline",
+          "data": {
+            "commands": [
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "AllianceBumpToTrenchRight"
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "ScrapeRight"
                       }
                     }
                   ]

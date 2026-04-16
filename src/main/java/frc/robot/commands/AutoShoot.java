@@ -4,14 +4,11 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.endeffector.Shooter;
 import frc.robot.subsystems.intake.Intake;
-
 import java.util.function.DoubleSupplier;
 
 public class AutoShoot {
@@ -29,22 +26,10 @@ public class AutoShoot {
       DoubleSupplier ySupplier) {
     return Commands.parallel(
         // Spin shooter at lookup RPM
-        new ShootBall(shooter, intake, -5900.0),
+        new ShootBall(shooter, intake, -3000.0),
         Commands.run(() -> shooter.setHoodAngle(shooter.getActiveTargetHoodAngle())),
         // Aim drive at target
-        DriveCommands.joystickDriveAtAngle(
-            drive,
-            xSupplier,
-            ySupplier,
-            () -> {
-              Translation2d robotXY = drive.getPose().getTranslation();
-              Translation2d targetXY =
-                  new Translation2d(
-                      shooter.getShootTarget().getTarget().getX(),
-                      shooter.getShootTarget().getTarget().getY());
-              Translation2d toTarget = targetXY.minus(robotXY);
-              return new Rotation2d(toTarget.getX(), toTarget.getY()).rotateBy(new Rotation2d(Math.PI));
-            }))
+        DriveCommands.joystickDriveAtAngle(drive, xSupplier, ySupplier, shooter::getActiveTargetDriveAngle))
         .finallyDo(() -> shooter.stopShooter());
   }
 }

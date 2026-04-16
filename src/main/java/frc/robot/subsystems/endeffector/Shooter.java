@@ -4,86 +4,100 @@
 
 package frc.robot.subsystems.endeffector;
 
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.MagnetSensorConfigs;
+import com.ctre.phoenix6.hardware.CANcoder;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.lib.Constants.GenericConstants;
 import frc.lib.Constants.ShooterConstants;
 import frc.lib.catalyst.hardware.MotorType;
 import frc.lib.catalyst.mechanisms.RotationalMechanism;
+import frc.lib.firecontrol.ProjectileSimulator;
+import frc.lib.firecontrol.ShotCalculator;
+import frc.lib.firecontrol.ShotLUT;
 import frc.lib.util.LoggedTunableNumber;
 import frc.robot.commands.RumbleController;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.targeting.ShootTargetIO;
-import java.util.Arrays;
-import java.util.Comparator;
 import org.littletonrobotics.junction.Logger;
-
-import com.ctre.phoenix6.hardware.CANcoder;
 
 public class Shooter extends SubsystemBase {
 
   private static final double MAX_RPM = 3600.0;
+  private static final double MIN_SOLUTION_CONFIDENCE = 50.0;
+  private static final Rotation2d SHOOTER_FORWARD_OFFSET = new Rotation2d(Math.PI);
+
+  // Projectile LUT model defaults. Tune to your mechanism as needed.
+  private static final double LOOKUP_MIN_DISTANCE_METERS = 2.00;
+  private static final double LOOKUP_MAX_DISTANCE_METERS = 6.00;
+  private static final double LOOKUP_STEP_METERS = 0.1;
+  private static final double BALL_MASS_KG = 0.2268;
+  private static final double BALL_DIAMETER_M = 0.1778;
+  private static final double DRAG_COEFFICIENT = 0.47;
+  private static final double MAGNUS_COEFFICIENT = 0.4;
+  private static final double AIR_DENSITY_KG_M3 = 1.225;
+  private static final double EXIT_HEIGHT_METERS = 0.387;
+  private static final double FLYWHEEL_DIAMETER_METERS = 0.1016;
+  private static final double SLIP_FACTOR = 0.85;
+  private static final double FIXED_LAUNCH_ANGLE_DEGREES = 67.0;
+  private static final double SIMULATION_TIMESTEP_SECONDS = 0.001;
+  private static final double MIN_SIM_RPM = 1500.0;
+  private static final double MAX_SIM_RPM = MAX_RPM;
+  private static final int RPM_SEARCH_ITERATIONS = 25;
+  private static final double MAX_SIMULATION_TIME_SECONDS = 5.0;
+  private static final double HOOD_SWEEP_MIN_ANGLE_DEGREES = 28;
+  private static final double HOOD_SWEEP_MAX_ANGLE_DEGREES = 85.0;
+  private static final double HOOD_SWEEP_STEP_DEGREES = 1.0;
+
   private static final double HOOD_COMMAND_EPSILON_DEGREES = 0.1;
   private static final double HOOD_MIN_ANGLE_DEGREES = -30.0;
   private static final double HOOD_MAX_ANGLE_DEGREES = 0.0;
-  private static final LookupPoint[] LOOKUP_POINTS = {
-    new LookupPoint(3.55, 2075, 0.0),
-    new LookupPoint(3.07, 1875, 0.0),
-    new LookupPoint(2.75, 1825, 0.0),
-    new LookupPoint(4.0,2250, 0.0),
-    new LookupPoint(4.26, 2150, 25.0),
-    new LookupPoint(3.46, 2000, 0.0),
-    new LookupPoint(3.67, 2100, 0.0),
-    new LookupPoint(3.84, 2000, 20.0),
-    new LookupPoint(3.66, 1950, 15.0),
-    new LookupPoint(2.6, 1775, 0.0),
-    new LookupPoint(5.52, 2300, 30.0),
-    new LookupPoint(5.07, 2150, 27.5)
-  };
-  private static final LookupPoint[] SORTED_LOOKUP_POINTS =
-      Arrays.stream(LOOKUP_POINTS)
-          .sorted(Comparator.comparingDouble(LookupPoint::distanceMeters))
-          .toArray(LookupPoint[]::new);
-  private static final double[] MONOTONIC_HOOD_PERCENTS = buildMonotonicHoodPercents();
 
-  private ShooterIO shooter;
-  private ShooterIOInputsAutoLogged shooterInputs;
-  private Drive drive;
-  private IndexerIO indexer;
-  private IndexerIOInputsAutoLogged indexerInputs;
-  private PhaseshiftIO phaseshift;
-  private PhaseshiftIOInputsAutoLogged phaseshiftInputs;
-  private ShootTargetIO shootTarget;
-  private double lastPhaseTime = 0;
-  private Command rumble10Seconds;
-  private Command rumble3Seconds;
-  private Command rumbleEndShift;
-  private double lastCommandedHoodAngleDegrees = Double.NaN;
+  private final ShooterIO shooter;
+  private final ShooterIOInputsAutoLogged shooterInputs;
+  private final Drive drive;
+  private final IndexerIO indexer;
+  private final IndexerIOInputsAutoLogged indexerInputs;
+  private final PhaseshiftIO phaseshift;
+  private final PhaseshiftIOInputsAutoLogged phaseshiftInputs;
+  private final ShootTargetIO shootTarget;
+  private final Command rumble10Seconds;
+  private final Command rumble3Seconds;
+  private final Command rumbleEndShift;
   private final CANcoder hoodEncoder = new CANcoder(ShooterConstants.hoodEncoderID);
+  private final ShotCalculator shotCalculator;
   private final LoggedTunableNumber useDashboardShotTuning =
       new LoggedTunableNumber("Shooter/ShotTuning/UseDashboardSetpoints", 0.0);
   private final LoggedTunableNumber dashboardShooterRpm =
       new LoggedTunableNumber("Shooter/ShotTuning/ShooterRPM", 1825.0);
   private final LoggedTunableNumber dashboardHoodPercent =
       new LoggedTunableNumber("Shooter/ShotTuning/HoodPercent", 50.0);
-  private RotationalMechanism hood;
+  private final LoggedTunableNumber shooterRevToleranceRpm =
+      new LoggedTunableNumber(
+          "Shooter/ShotTuning/ShooterRevToleranceRPM", ShooterConstants.shooterRevTolerance);
 
-  /** FIX DO NOT WANT TO IMPORT A WHOLE DRIVE */
+  private RotationalMechanism hood;
+  private ShotCalculator.LaunchParameters latestLaunchParameters =
+      ShotCalculator.LaunchParameters.INVALID;
+  private double lastPhaseTime = 0;
+  private double lastCommandedHoodAngleDegrees = Double.NaN;
+  private int fireControlLutEntries = 0;
+
   public Shooter(
       ShooterIO shooter,
       Drive drive,
       IndexerIO indexer,
       PhaseshiftIO phaseshift,
       ShootTargetIO shootTarget,
-      CommandXboxController controller
-      ) {
+      CommandXboxController controller) {
     this.shooter = shooter;
     this.drive = drive;
     this.indexer = indexer;
@@ -95,45 +109,58 @@ public class Shooter extends SubsystemBase {
     this.rumble3Seconds = new RumbleController(controller, 3, 0.1);
     this.rumble10Seconds = new RumbleController(controller, 0.5, 0.1);
     this.rumbleEndShift = new RumbleController(controller, 1, 1);
-    this.hood = new RotationalMechanism(RotationalMechanism.Config.builder()
-                                                    .name("hood")
-                                                    .canBus("endEffector")
-                                                    .currentLimit(30)
-                                                    .motor(ShooterConstants.hoodMotorID)
-                                                    .follower(ShooterConstants.hoodMotorFollowerID, true)
-                                                    .motorType(MotorType.KRAKEN_X60_FOC)
-                                                    .gearRatio(213.3333)
-                                                    .pid(900,0,8)
-                                                    .feedforward(0, 20.85)
-                                                    .range(HOOD_MIN_ANGLE_DEGREES, HOOD_MAX_ANGLE_DEGREES)
-                                                    .statorCurrentLimit(30)
-                                                    .startingAngle(hoodEncoder.getAbsolutePosition().getValueAsDouble())
-                                                    .motionMagic(999, 9999, 0).build());
 
+    MagnetSensorConfigs magnetSensorConfigs = new MagnetSensorConfigs().withMagnetOffset(0.06884765625);
 
+    hoodEncoder.getConfigurator().apply(magnetSensorConfigs);
+    this.hood =
+        new RotationalMechanism(
+            RotationalMechanism.Config.builder()
+                .name("hood")
+                .canBus("endEffector")
+                .currentLimit(30)
+                .motor(ShooterConstants.hoodMotorID)
+                .follower(ShooterConstants.hoodMotorFollowerID, true)
+                .motorType(MotorType.KRAKEN_X60_FOC)
+                .gearRatio(213.3333)
+                .pid(900, 0, 8)
+                .feedforward(0, 20.85)
+                .range(HOOD_MIN_ANGLE_DEGREES, HOOD_MAX_ANGLE_DEGREES)
+                .statorCurrentLimit(30)
+                .startingAngle(0)
+                .motionMagic(999, 9999, 0)
+                .build());
 
-    // Distance (meters) -> RPM calibration points for quadratic interpolation
-    // TODO: tune these values with real testing
-    // shootTarget.setTarget(GenericConstants.HUB_POSE3D, true);
+    this.shotCalculator = createShotCalculator();
+    generateFireControlLUT();
   }
 
   @Override
   public void periodic() {
-     phaseshift.updateInputs(phaseshiftInputs);
+    phaseshift.updateInputs(phaseshiftInputs);
 
-     if(phaseshiftInputs.phaseTimeRemaining <= 10 && lastPhaseTime > 10 && phaseshiftInputs.myHubActive == false){
+    if (phaseshiftInputs.phaseTimeRemaining <= 10
+        && lastPhaseTime > 10
+        && phaseshiftInputs.myHubActive == false) {
       CommandScheduler.getInstance().schedule(rumble10Seconds);
+    }
+    if (phaseshiftInputs.phaseTimeRemaining <= 3
+        && lastPhaseTime > 3
+        && phaseshiftInputs.myHubActive == false) {
+      CommandScheduler.getInstance().schedule(rumble3Seconds);
+    }
+    if (phaseshiftInputs.phaseTimeRemaining <= 3
+        && lastPhaseTime > 3
+        && phaseshiftInputs.myHubActive == true) {
+      CommandScheduler.getInstance().schedule(rumbleEndShift);
+    }
 
-     }
-     if(phaseshiftInputs.phaseTimeRemaining <= 3 && lastPhaseTime > 3 && phaseshiftInputs.myHubActive == false){
-        CommandScheduler.getInstance().schedule(rumble3Seconds);
-     }
-      if(phaseshiftInputs.phaseTimeRemaining <= 3 && lastPhaseTime > 3 && phaseshiftInputs.myHubActive == true){
-        CommandScheduler.getInstance().schedule(rumbleEndShift);
-     }
-     lastPhaseTime = phaseshiftInputs.phaseTimeRemaining;
-     shooter.updateInputs(shooterInputs);
-     indexer.updateInputs(indexerInputs);
+    lastPhaseTime = phaseshiftInputs.phaseTimeRemaining;
+    shooter.updateInputs(shooterInputs);
+    shooter.updateTuningValues();
+    indexer.updateInputs(indexerInputs);
+    latestLaunchParameters = calculateLaunchParameters();
+
     Logger.processInputs("PhaseShift", phaseshiftInputs);
     Logger.processInputs("Shooter", shooterInputs);
     Logger.processInputs("Indexer", indexerInputs);
@@ -144,26 +171,48 @@ public class Shooter extends SubsystemBase {
     Logger.recordOutput("Shooter/ShotTuning/HoodPercent", dashboardHoodPercent.get());
     Logger.recordOutput("Shooter/ShotTuning/TargetRPM", getActiveTargetRpm());
     Logger.recordOutput("Shooter/ShotTuning/TargetHoodAngle", getActiveTargetHoodAngle());
+    Logger.recordOutput("Shooter/ShotTuning/ShooterRevToleranceRPM", shooterRevToleranceRpm.get());
+    Logger.recordOutput("Shooter/FireControl/HasValidLaunch", hasReliableLaunchSolution());
+    Logger.recordOutput(
+        "Shooter/FireControl/LaunchConfidence", latestLaunchParameters.confidence());
+    Logger.recordOutput(
+        "Shooter/FireControl/SolvedDistanceMeters", latestLaunchParameters.solvedDistanceM());
+    Logger.recordOutput(
+        "Shooter/FireControl/AimAngleRadians", getActiveTargetDriveAngle().getRadians());
+    Logger.recordOutput("Shooter/FireControl/CalculatedRPM", latestLaunchParameters.rpm());
+    Logger.recordOutput("Shooter/FireControl/ShotLUTSize", fireControlLutEntries);
   }
 
-  /** Returns the distance in meters from the robot to the current shoot target. */
   public double getDistanceToTarget() {
     Pose2d robotPose = drive.getPose();
-    Translation2d targetXY = new Translation2d(shootTarget.getTarget().getX(), shootTarget.getTarget().getY());
-
+    Translation2d targetXY =
+        new Translation2d(shootTarget.getTarget().getX(), shootTarget.getTarget().getY());
     Logger.recordOutput("Shooter/targetpost", shootTarget.getTarget());
     return robotPose.getTranslation().getDistance(targetXY);
   }
 
-  /** Returns the linearly interpolated RPM for the current distance to target, capped at MAX_RPM. */
   public double getLookupRpm() {
-    double rpm = interpolateLookupValue(getDistanceToTarget(), LookupPoint::rpm);
-    return Math.min(rpm, MAX_RPM);
+    if (hasReliableLaunchSolution()) {
+      return MathUtil.clamp(latestLaunchParameters.rpm(), 0.0, MAX_RPM);
+    }
+    if (fireControlLutEntries <= 0) {
+      return 0.0;
+    }
+    return MathUtil.clamp(shotCalculator.getBaseRPM(getDistanceToTarget()), 0.0, MAX_RPM);
   }
 
-  /** Returns the interpolated hood angle in degrees for the current distance to target. */
   public double getLookupHoodAngle() {
-    return hoodPercentToAngleDegrees(MathUtil.clamp(getLookupHoodPercent() / 100.0, 0.0, 1.0));
+    if (fireControlLutEntries <= 0) {
+      return HOOD_MAX_ANGLE_DEGREES;
+    }
+    double lookupDistance =
+        hasReliableLaunchSolution()
+            ? latestLaunchParameters.solvedDistanceM()
+            : getDistanceToTarget();
+    double launchAngleDeg = shotCalculator.getHoodAngle(lookupDistance);
+    Logger.recordOutput("Shooter/FireControl/LaunchAngleDeg", launchAngleDeg);
+    double hoodEncoderAngleDeg = launchAngleToHoodEncoderAngle(launchAngleDeg);
+    return MathUtil.clamp(hoodEncoderAngleDeg, HOOD_MIN_ANGLE_DEGREES, HOOD_MAX_ANGLE_DEGREES);
   }
 
   public boolean shouldUseDashboardShotTuning() {
@@ -180,7 +229,10 @@ public class Shooter extends SubsystemBase {
   }
 
   public double getLookupHoodPercent() {
-    return interpolateLookupValue(getDistanceToTarget(), MONOTONIC_HOOD_PERCENTS);
+    double normalizedPercent =
+        (HOOD_MAX_ANGLE_DEGREES - getLookupHoodAngle())
+            / (HOOD_MAX_ANGLE_DEGREES - HOOD_MIN_ANGLE_DEGREES);
+    return MathUtil.clamp(normalizedPercent, 0.0, 1.0) * 100.0;
   }
 
   private double hoodPercentToAngleDegrees(double normalizedPercent) {
@@ -188,84 +240,134 @@ public class Shooter extends SubsystemBase {
         - normalizedPercent * (HOOD_MAX_ANGLE_DEGREES - HOOD_MIN_ANGLE_DEGREES);
   }
 
+  // Map launch-angle space (e.g. 37..67 deg) to hood encoder command space (-30..0 deg).
+  private double launchAngleToHoodEncoderAngle(double launchAngleDeg) {
+    double clampedLaunch =
+        MathUtil.clamp(launchAngleDeg, HOOD_SWEEP_MIN_ANGLE_DEGREES, HOOD_SWEEP_MAX_ANGLE_DEGREES);
+    double normalized =
+        (clampedLaunch - HOOD_SWEEP_MIN_ANGLE_DEGREES)
+            / (HOOD_SWEEP_MAX_ANGLE_DEGREES - HOOD_SWEEP_MIN_ANGLE_DEGREES);
+    return MathUtil.interpolate(HOOD_MIN_ANGLE_DEGREES, HOOD_MAX_ANGLE_DEGREES, normalized);
+  }
+
   public double getActiveTargetRpm() {
-    return shouldUseDashboardShotTuning() ? getDashboardShooterRpm() : getLookupRpm();
+    return shouldUseDashboardShotTuning()
+        ? getDashboardShooterRpm()
+        : MathUtil.clamp(getLookupRpm(), 0.0, MAX_RPM);
   }
 
   public boolean isShooterAtTargetVelocity() {
     double targetRpm = getActiveTargetRpm();
-    return Math.abs(getShooterVelocity() - targetRpm) <= ShooterConstants.shooterRevTolerance;
+    return Math.abs(getShooterVelocity() - targetRpm) <= shooterRevToleranceRpm.get();
   }
 
   public double getActiveTargetHoodAngle() {
     return shouldUseDashboardShotTuning() ? getDashboardHoodAngle() : getLookupHoodAngle();
   }
 
-  private double interpolateLookupValue(double distance, LookupValueExtractor valueExtractor) {
-    if (distance <= SORTED_LOOKUP_POINTS[0].distanceMeters()) {
-      return valueExtractor.extract(SORTED_LOOKUP_POINTS[0]);
+  public Rotation2d getActiveTargetDriveAngle() {
+    if (hasReliableLaunchSolution()) {
+      return latestLaunchParameters.driveAngle();
     }
 
-    for (int i = 1; i < SORTED_LOOKUP_POINTS.length; i++) {
-      LookupPoint lowerPoint = SORTED_LOOKUP_POINTS[i - 1];
-      LookupPoint upperPoint = SORTED_LOOKUP_POINTS[i];
-      if (distance <= upperPoint.distanceMeters()) {
-        double distanceSpan = upperPoint.distanceMeters() - lowerPoint.distanceMeters();
-        if (distanceSpan <= 0.0) {
-          return valueExtractor.extract(upperPoint);
-        }
-
-        double blend = (distance - lowerPoint.distanceMeters()) / distanceSpan;
-        return MathUtil.interpolate(
-            valueExtractor.extract(lowerPoint), valueExtractor.extract(upperPoint), blend);
-      }
-    }
-
-    return valueExtractor.extract(SORTED_LOOKUP_POINTS[SORTED_LOOKUP_POINTS.length - 1]);
+    Translation2d robotXY = drive.getPose().getTranslation();
+    Translation2d targetXY =
+        new Translation2d(shootTarget.getTarget().getX(), shootTarget.getTarget().getY());
+    Translation2d toTarget = targetXY.minus(robotXY);
+    return new Rotation2d(toTarget.getX(), toTarget.getY()).rotateBy(SHOOTER_FORWARD_OFFSET);
   }
 
-  private double interpolateLookupValue(double distance, double[] values) {
-    if (distance <= SORTED_LOOKUP_POINTS[0].distanceMeters()) {
-      return values[0];
-    }
-
-    for (int i = 1; i < SORTED_LOOKUP_POINTS.length; i++) {
-      LookupPoint lowerPoint = SORTED_LOOKUP_POINTS[i - 1];
-      LookupPoint upperPoint = SORTED_LOOKUP_POINTS[i];
-      if (distance <= upperPoint.distanceMeters()) {
-        double distanceSpan = upperPoint.distanceMeters() - lowerPoint.distanceMeters();
-        if (distanceSpan <= 0.0) {
-          return values[i];
-        }
-
-        double blend = (distance - lowerPoint.distanceMeters()) / distanceSpan;
-        return MathUtil.interpolate(values[i - 1], values[i], blend);
-      }
-    }
-
-    return values[values.length - 1];
+  private ShotCalculator createShotCalculator() {
+    ShotCalculator.Config config = new ShotCalculator.Config();
+    config.launcherOffsetX = -0.241; // rear-facing shooter is behind robot center
+    config.launcherOffsetY = 0.0;
+    config.minScoringDistance = LOOKUP_MIN_DISTANCE_METERS;
+    config.maxScoringDistance = LOOKUP_MAX_DISTANCE_METERS;
+    config.shooterAngleOffsetRad = Math.PI;
+    return new ShotCalculator(config);
   }
 
-  private static double[] buildMonotonicHoodPercents() {
-    double[] monotonicPercents = new double[SORTED_LOOKUP_POINTS.length];
-    double runningPercent = 0.0;
-    for (int i = 0; i < SORTED_LOOKUP_POINTS.length; i++) {
-      // Once hood starts coming in, keep it from dropping back to zero at farther distances.
-      runningPercent =
-          Math.max(runningPercent, MathUtil.clamp(SORTED_LOOKUP_POINTS[i].hoodPercent(), 0.0, 100.0));
-      monotonicPercents[i] = runningPercent;
-    }
-    return monotonicPercents;
+  private void generateFireControlLUT() {
+    Translation3d target = shootTarget.getTarget();
+    ProjectileSimulator.SimParameters params =
+        new ProjectileSimulator.SimParameters(
+            BALL_MASS_KG,
+            BALL_DIAMETER_M,
+            DRAG_COEFFICIENT,
+            MAGNUS_COEFFICIENT,
+            AIR_DENSITY_KG_M3,
+            EXIT_HEIGHT_METERS,
+            FLYWHEEL_DIAMETER_METERS,
+            target.getZ(),
+            SLIP_FACTOR,
+            FIXED_LAUNCH_ANGLE_DEGREES,
+            SIMULATION_TIMESTEP_SECONDS,
+            MIN_SIM_RPM,
+            MAX_SIM_RPM,
+            RPM_SEARCH_ITERATIONS,
+            MAX_SIMULATION_TIME_SECONDS);
+
+    // Backspin requested: Magnus sign -1.
+    ProjectileSimulator simulator = new ProjectileSimulator(params, -1.0);
+
+    // Adjustable-hood workflow from README.
+    ShotLUT shotLut =
+        simulator.generateVariableAngleShotLUT(
+            HOOD_SWEEP_MIN_ANGLE_DEGREES,
+            HOOD_SWEEP_MAX_ANGLE_DEGREES,
+            HOOD_SWEEP_STEP_DEGREES);
+    shotCalculator.loadShotLUT(shotLut);
+    fireControlLutEntries = shotLut.size();
+
+    // Also generate fixed-angle LUT stats on your requested 0.5m->6.0m range for visibility.
+    ProjectileSimulator.GeneratedLUT generatedLUT =
+        simulator.generateLUT(
+            LOOKUP_MIN_DISTANCE_METERS, LOOKUP_MAX_DISTANCE_METERS, LOOKUP_STEP_METERS);
+    Logger.recordOutput(
+        "Shooter/FireControl/LUTReachablePoints", (double) generatedLUT.reachableCount());
+    Logger.recordOutput(
+        "Shooter/FireControl/LUTUnreachablePoints", (double) generatedLUT.unreachableCount());
+    Logger.recordOutput("Shooter/FireControl/LUTMaxRangeMeters", generatedLUT.maxRangeM());
+    Logger.recordOutput(
+        "Shooter/FireControl/LUTGenerationTimeMs", (double) generatedLUT.generationTimeMs());
   }
 
-  /** Applies the lookup-table setpoints based on distance to the current target. */
+  private ShotCalculator.LaunchParameters calculateLaunchParameters() {
+    if (fireControlLutEntries <= 0) {
+      return ShotCalculator.LaunchParameters.INVALID;
+    }
+
+    Pose2d pose = drive.getPose();
+    ChassisSpeeds robotRelativeVelocity = drive.getChassisSpeeds();
+    ChassisSpeeds fieldRelativeVelocity =
+        ChassisSpeeds.fromRobotRelativeSpeeds(robotRelativeVelocity, drive.getRotation());
+    Translation2d targetXY =
+        new Translation2d(shootTarget.getTarget().getX(), shootTarget.getTarget().getY());
+
+    ShotCalculator.ShotInputs shotInputs =
+        new ShotCalculator.ShotInputs(
+            pose,
+            fieldRelativeVelocity,
+            robotRelativeVelocity,
+            targetXY,
+            new Translation2d(1.0, 0.0),
+            1.0,
+            0.0,
+            0.0);
+    return shotCalculator.calculate(shotInputs);
+  }
+
+  private boolean hasReliableLaunchSolution() {
+    return latestLaunchParameters.isValid()
+        && latestLaunchParameters.confidence() >= MIN_SOLUTION_CONFIDENCE;
+  }
+
   public void applyLookupSetpoints() {
     double rpm = getActiveTargetRpm();
     setHoodAngle(getActiveTargetHoodAngle());
-    shooter.setShooterSpeed(rpm / 60.0); // convert RPM to RPS
+    shooter.setShooterSpeed(rpm / 60.0); // RPM -> RPS
   }
 
-  /** Spins the shooter at the lookup-table RPM based on distance to the current target. */
   public void spinShooterFromLookup() {
     applyLookupSetpoints();
   }
@@ -305,6 +407,7 @@ public class Shooter extends SubsystemBase {
   public ShootTargetIO getShootTarget() {
     return shootTarget;
   }
+
   public double getShooterVelocity() {
     return shooter.getVelocity();
   }
@@ -315,12 +418,5 @@ public class Shooter extends SubsystemBase {
 
   public void resetTarget() {
     shootTarget.resetTarget();
-  }
-
-  private static record LookupPoint(double distanceMeters, double rpm, double hoodPercent) {}
-
-  @FunctionalInterface
-  private static interface LookupValueExtractor {
-    double extract(LookupPoint point);
   }
 }

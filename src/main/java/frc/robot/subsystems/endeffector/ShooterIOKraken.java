@@ -24,6 +24,8 @@ import org.littletonrobotics.junction.Logger;
 
 /** Add your docs here. */
 public class ShooterIOKraken implements ShooterIO {
+  private static final String SHOT_TUNING_KEY = "Shooter/ShotTuning/";
+
   private TalonFX topShooterMotorRight;
   private TalonFX topShooterMotorLeft;
   private TalonFX bottomShooterMotorRight;
@@ -44,25 +46,25 @@ public class ShooterIOKraken implements ShooterIO {
   private VelocityTorqueCurrentFOC shooterVelocityVoltage;
 
   private final LoggedTunableNumber shooterkp =
-      new LoggedTunableNumber("Shooter/kp", ShooterConstants.shooterkp);
+      new LoggedTunableNumber(SHOT_TUNING_KEY + "ShooterKp", ShooterConstants.shooterkp);
   private final LoggedTunableNumber shooterki =
-      new LoggedTunableNumber("Shooter/ki", ShooterConstants.shooterki);
+      new LoggedTunableNumber(SHOT_TUNING_KEY + "ShooterKi", ShooterConstants.shooterki);
   private final LoggedTunableNumber shooterkd =
-      new LoggedTunableNumber("Shooter/kd", ShooterConstants.shooterkd);
+      new LoggedTunableNumber(SHOT_TUNING_KEY + "ShooterKd", ShooterConstants.shooterkd);
   private final LoggedTunableNumber shooterka =
-      new LoggedTunableNumber("Shooter/ka", ShooterConstants.shooterka);
+      new LoggedTunableNumber(SHOT_TUNING_KEY + "ShooterKa", ShooterConstants.shooterka);
   private final LoggedTunableNumber shooterks =
-      new LoggedTunableNumber("Shooter/ks", ShooterConstants.shooterks);
+      new LoggedTunableNumber(SHOT_TUNING_KEY + "ShooterKs", ShooterConstants.shooterks);
   private final LoggedTunableNumber shooterkv =
-      new LoggedTunableNumber("Shooter/kv", ShooterConstants.shooterkv);
+      new LoggedTunableNumber(SHOT_TUNING_KEY + "ShooterKv", ShooterConstants.shooterkv);
   private final LoggedTunableNumber shooterMaxAccel =
-      new LoggedTunableNumber("Shooter/maxAccel", ShooterConstants.shooterMaxAccel);
+      new LoggedTunableNumber(SHOT_TUNING_KEY + "ShooterMaxAccel", ShooterConstants.shooterMaxAccel);
   private final LoggedTunableNumber shooterMaxSpeed =
-      new LoggedTunableNumber("Shooter/maxSpeed", ShooterConstants.shooterMaxSpeed);
+      new LoggedTunableNumber(SHOT_TUNING_KEY + "ShooterMaxSpeed", ShooterConstants.shooterMaxSpeed);
   private final LoggedTunableNumber shooterJerk =
-      new LoggedTunableNumber("Shooter/jerk", ShooterConstants.shooterJerk);
+      new LoggedTunableNumber(SHOT_TUNING_KEY + "ShooterJerk", ShooterConstants.shooterJerk);
   private final LoggedTunableNumber shooterFF =
-      new LoggedTunableNumber("Shooter/shooterFF", ShooterConstants.shooterFF);
+      new LoggedTunableNumber(SHOT_TUNING_KEY + "ShooterFF", ShooterConstants.shooterFF);
 
 
   public ShooterIOKraken() {
@@ -149,7 +151,8 @@ public class ShooterIOKraken implements ShooterIO {
   @Override
   public void setShooterSpeed(double speed) {
     // topShooterMotorRight.set(speed);
-    topShooterMotorRight.setControl(shooterVelocityVoltage.withVelocity(speed).withFeedForward(ShooterConstants.shooterFF));
+    topShooterMotorRight.setControl(
+        shooterVelocityVoltage.withVelocity(speed).withFeedForward(shooterFF.get()));
   }
 
   @Override

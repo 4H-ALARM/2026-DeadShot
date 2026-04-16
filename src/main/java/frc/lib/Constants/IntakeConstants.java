@@ -9,7 +9,7 @@ public class IntakeConstants {
 
   public static final double rotationGearRatio = 3 * 5;
   public static final double rotationUpDegrees = 0;
-  public static final double rotationDownDegrees = 90;
+  public static final double rotationDownDegrees = 88;
 
   // Motor IDs
   public static final int rotationMotorID = 30;
@@ -25,10 +25,11 @@ public class IntakeConstants {
   public static final double angleMotorkv = 1.87;
   public static final double angleMotorkg = 0.5;
   public static final double angleMotorka = 0.25;
-  public static final double angleMotionMagicCruiseVelocityDegreesPerSecond = 1000;
+  public static final double angleMotionMagicCruiseVelocityRotationsPerSecond = 0.75;
   public static final double angleMotionMagicAccelerationDegreesPerSecondSquared = 1000*5;
   public static final double angleMotionMagicJerkDegreesPerSecondCubed = 0.0;
   public static final double anglePositionToleranceDegrees = 3.0;
+  public static final double jostleIntakeVelocity = 0.05;
 
   public static final double intakingMotorkp = 1.5;
   public static final double intakingMotorki = 0.0;

@@ -93,4 +93,10 @@ public class Intake extends SubsystemBase {
   public boolean shouldJostleOnShoot() {
     return m_shouldJostleIntakeOnShoot;
   }
+  public void jostleIntake() {
+    m_intakeIO.jostleIntake();
+  }
+  public void resetMotionMagic() {
+    m_intakeIO.resetMotionMagic();
+  }
 }

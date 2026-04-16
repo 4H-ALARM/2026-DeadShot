@@ -20,7 +20,7 @@ public class DeployIntake extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-
+    m_intake.resetMotionMagic();
     if (m_intake.isIntakeUp()) {
       m_intake.setRotationDown();
     }

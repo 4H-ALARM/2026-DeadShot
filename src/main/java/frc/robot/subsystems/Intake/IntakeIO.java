@@ -42,5 +42,9 @@ public interface IntakeIO {
 
   public default void updateTuningValues() {}
 
+  public default void resetMotionMagic() {}
+
+  public default void jostleIntake() {}
+
   public default void updateInputs(IntakeIOInputs inputs) {}
 }

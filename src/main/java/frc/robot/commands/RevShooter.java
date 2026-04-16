@@ -23,7 +23,7 @@ public class RevShooter extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    indexerSpeed = 1000;
+    indexerSpeed = 400;
   }
 
   // Called every time the scheduler runs while the command is scheduled.

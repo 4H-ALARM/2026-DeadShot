@@ -40,6 +40,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.lib.Constants.SwerveConstants;
+import frc.lib.util.AllianceFlipUtil;
 import frc.lib.util.LocalADStarAK;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
@@ -103,6 +104,16 @@ public class Drive extends SubsystemBase {
   private SwerveDrivePoseEstimator poseEstimator =
       new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, Pose2d.kZero);
 
+  private boolean shouldMirrorAuto = true;
+
+  public void setAutoMirroring(boolean useRightSide) {
+    shouldMirrorAuto = true;
+  }
+
+  public boolean isAutoMirroredToRight() {
+    return shouldMirrorAuto;
+  }
+
   public Drive(
       GyroIO gyroIO,
       ModuleIO flModuleIO,
@@ -123,10 +134,10 @@ public class Drive extends SubsystemBase {
 
     // Configure AutoBuilder for PathPlanner
     AutoBuilder.configure(
-        this::getPose,
-        this::setPose,
-        this::getChassisSpeeds,
-        this::runVelocity,
+        this::getPoseWithMirror,
+        this::setPoseWithMirror,
+        this::getChassisSpeedsWithMirror,
+        this::runVelocityWithMirror,
         new PPHolonomicDriveController(
             new PIDConstants(8.75, 0.0, 0.0), new PIDConstants(8.75, 0.0, 0.0)),
         PP_CONFIG,
@@ -253,6 +264,13 @@ public class Drive extends SubsystemBase {
     Logger.recordOutput("SwerveStates/SetpointsOptimized", setpointStates);
   }
 
+  public void runVelocityWithMirror(ChassisSpeeds speeds) {
+    if (shouldMirrorAuto) {
+      speeds = mirrorChassisSpeeds(speeds);
+    }
+    runVelocity(speeds);
+  }
+
   /** Runs the drive in a straight line with the specified drive output. */
   public void runCharacterization(double output) {
     for (int i = 0; i < 4; i++) {
@@ -315,6 +333,22 @@ public class Drive extends SubsystemBase {
     return kinematics.toChassisSpeeds(getModuleStates());
   }
 
+  private static ChassisSpeeds mirrorChassisSpeeds(ChassisSpeeds speeds) {
+    // Mirror along the x axis (and rotational velocity)
+    return new ChassisSpeeds(speeds.vxMetersPerSecond, -speeds.vyMetersPerSecond, -speeds.omegaRadiansPerSecond);
+  }
+
+  private static Pose2d mirrorPose(Pose2d pose) {
+    return new Pose2d(pose.getX(), AllianceFlipUtil.fieldWidth - pose.getY(), Rotation2d.kPi.minus(pose.getRotation()));
+  }
+
+  public ChassisSpeeds getChassisSpeedsWithMirror() {
+    var speeds = getChassisSpeeds();
+    if(shouldMirrorAuto) {
+      return mirrorChassisSpeeds(speeds);
+    }
+    return speeds;
+  }
   /** Returns the position of each module in radians. */
   public double[] getWheelRadiusCharacterizationPositions() {
     double[] values = new double[4];
@@ -339,6 +373,14 @@ public class Drive extends SubsystemBase {
     return poseEstimator.getEstimatedPosition();
   }
 
+  public Pose2d getPoseWithMirror() {
+    var pose = getPose();
+    if (shouldMirrorAuto) {
+      return mirrorPose(pose);
+    }
+    return pose;
+  }
+
   /** Returns the current odometry rotation. */
   public Rotation2d getRotation() {
     return getPose().getRotation();
@@ -347,6 +389,13 @@ public class Drive extends SubsystemBase {
   /** Resets the current odometry pose. */
   public void setPose(Pose2d pose) {
     poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
+  }
+
+  public void setPoseWithMirror(Pose2d pose) {
+    if (shouldMirrorAuto) {
+      pose = mirrorPose(pose);
+    }
+    setPose(pose);
   }
 
   /** Adds a new timestamped vision measurement. */

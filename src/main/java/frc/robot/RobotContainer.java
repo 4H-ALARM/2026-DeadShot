@@ -286,6 +286,12 @@ public class RobotContainer {
         .onTrue(new InstantCommand( () -> shooter.setTarget(GenericConstants.LEFTPASSING)))
         .onFalse(new InstantCommand(() -> shooter.resetTarget()));
 
+    OperatorController.povUp()
+        .onTrue(new InstantCommand(() -> shooter.increaseLookupShooterPercentAdjustment()));
+
+    OperatorController.povDown()
+        .onTrue(new InstantCommand(() -> shooter.decreaseLookupShooterPercentAdjustment()));
+
     OperatorController.povLeft()
         .onTrue(new InstantCommand( () -> intake.toggleIntakeJostling()));
     // OperatorController.rightTrigger()

@@ -34,6 +34,7 @@ import com.ctre.phoenix6.signals.SensorDirectionValue;
 public class Shooter extends SubsystemBase {
 
   private static final double MAX_RPM = 3600.0;
+  private static final double LOOKUP_SHOOTER_PERCENT_INCREMENT = 1.0;
   private static final double HOOD_COMMAND_EPSILON_DEGREES = 0.1;
   private static final double HOOD_MIN_ANGLE_DEGREES = -30.0;
   private static final double HOOD_MAX_ANGLE_DEGREES = 0.0;
@@ -75,6 +76,7 @@ public class Shooter extends SubsystemBase {
       new LoggedTunableNumber("Shooter/ShotTuning/ShooterRPM", 1825.0);
   private final LoggedTunableNumber dashboardHoodPercent =
       new LoggedTunableNumber("Shooter/ShotTuning/HoodPercent", 50.0);
+  private double lookupShooterPercentAdjustment = 0.0;
   private RotationalMechanism hood;
 
   /** FIX DO NOT WANT TO IMPORT A WHOLE DRIVE */
@@ -146,6 +148,16 @@ public class Shooter extends SubsystemBase {
     Logger.recordOutput("Shooter/HoodAngle", hood.getAngle());
     Logger.recordOutput("Shooter/ShotTuning/UseDashboardSetpoints", shouldUseDashboardShotTuning());
     Logger.recordOutput("Shooter/ShotTuning/HoodPercent", dashboardHoodPercent.get());
+    Logger.recordOutput("Shooter/ShotTuning/LookupBaseRPM", getBaseLookupRpm());
+    Logger.recordOutput(
+        "Shooter/ShotTuning/LookupShooterPercentAdjustment", lookupShooterPercentAdjustment);
+    Logger.recordOutput(
+        "Shooter/ShotTuning/LookupAdjustmentPercent", getLookupShooterPercentAdjustment());
+    Logger.recordOutput(
+        "Shooter/ShotTuning/LookupShooterScaleMultiplier",
+        getLookupShooterScaleMultiplier());
+    Logger.recordOutput("Shooter/ShotTuning/LookupAdjustmentRPM", getLookupShooterRpmAdjustment());
+    Logger.recordOutput("Shooter/ShotTuning/LookupAdjustedRPM", getLookupRpm());
     Logger.recordOutput("Shooter/ShotTuning/TargetRPM", getActiveTargetRpm());
     Logger.recordOutput("Shooter/ShotTuning/TargetHoodAngle", getActiveTargetHoodAngle());
   }
@@ -161,8 +173,11 @@ public class Shooter extends SubsystemBase {
 
   /** Returns the linearly interpolated RPM for the current distance to target, capped at MAX_RPM. */
   public double getLookupRpm() {
-    double rpm = interpolateLookupValue(getDistanceToTarget(), LookupPoint::rpm);
-    return Math.min(rpm, MAX_RPM);
+    return Math.min(getBaseLookupRpm() * getLookupShooterScaleMultiplier(), MAX_RPM);
+  }
+
+  public double getBaseLookupRpm() {
+    return interpolateLookupValue(getDistanceToTarget(), LookupPoint::rpm);
   }
 
   /** Returns the interpolated hood angle in degrees for the current distance to target. */
@@ -185,6 +200,31 @@ public class Shooter extends SubsystemBase {
 
   public double getLookupHoodPercent() {
     return interpolateLookupValue(getDistanceToTarget(), MONOTONIC_HOOD_PERCENTS);
+  }
+
+  public void increaseLookupShooterPercentAdjustment() {
+    adjustLookupShooterPercent(LOOKUP_SHOOTER_PERCENT_INCREMENT);
+  }
+
+  public void decreaseLookupShooterPercentAdjustment() {
+    adjustLookupShooterPercent(-LOOKUP_SHOOTER_PERCENT_INCREMENT);
+  }
+
+  public void adjustLookupShooterPercent(double percentDelta) {
+    lookupShooterPercentAdjustment =
+        Math.max(-100.0, lookupShooterPercentAdjustment + percentDelta);
+  }
+
+  public double getLookupShooterPercentAdjustment() {
+    return lookupShooterPercentAdjustment;
+  }
+
+  public double getLookupShooterScaleMultiplier() {
+    return Math.max(0.0, 1.0 + (lookupShooterPercentAdjustment / 100.0));
+  }
+
+  public double getLookupShooterRpmAdjustment() {
+    return getLookupRpm() - getBaseLookupRpm();
   }
 
   private double hoodPercentToAngleDegrees(double normalizedPercent) {

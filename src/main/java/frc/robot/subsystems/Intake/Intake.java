@@ -16,7 +16,7 @@ import org.littletonrobotics.junction.Logger;
 public class Intake extends SubsystemBase {
   /** Creates a new Intake. */
   private final IntakeIO m_intakeIO;
-  private boolean m_shouldJostleIntakeOnShoot = true;
+  private boolean m_shouldJostleIntakeOnShoot = false;
 
   private final IntakeIOInputsAutoLogged m_inputs = new IntakeIOInputsAutoLogged();
   private final LoggedTunableNumber m_upRotationDegrees =

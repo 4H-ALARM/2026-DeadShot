@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.162952924393723,
-        "y": 5.4647218259629105
+        "x": 2.7840085592011405,
+        "y": 5.387089871611984
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.5182179846346875,
-        "y": 6.317083271746043
+        "x": 2.139273619442105,
+        "y": 6.239451317395116
       },
       "isLocked": false,
       "linkedName": "AllianceTopBump"
@@ -20,12 +20,12 @@
         "y": 7.324240963855422
       },
       "prevControl": {
-        "x": 3.0363683670737815,
-        "y": 7.166610567087715
+        "x": 2.188830242510699,
+        "y": 7.1855634807417985
       },
       "nextControl": {
-        "x": 4.073759036144579,
-        "y": 7.466301204819276
+        "x": 4.091350600366355,
+        "y": 7.374940584091697
       },
       "isLocked": false,
       "linkedName": null
@@ -47,7 +47,7 @@
   "rotationTargets": [
     {
       "waypointRelativePos": 1,
-      "rotationDegrees": 180.0
+      "rotationDegrees": 0.0
     }
   ],
   "constraintZones": [],
@@ -63,7 +63,7 @@
   },
   "goalEndState": {
     "velocity": 5.0,
-    "rotation": 180.0
+    "rotation": 0.0
   },
   "reversed": false,
   "folder": null,

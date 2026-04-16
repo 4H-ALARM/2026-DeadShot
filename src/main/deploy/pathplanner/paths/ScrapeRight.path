@@ -21,7 +21,7 @@
       },
       "prevControl": {
         "x": 7.428987161198288,
-        "y": 0.8585592011412269
+        "y": 0.8585592011412266
       },
       "nextControl": {
         "x": 8.02807074791057,
@@ -33,15 +33,15 @@
     {
       "anchor": {
         "x": 7.700699001426534,
-        "y": 3.808573466476462
+        "y": 3.472168330955778
       },
       "prevControl": {
-        "x": 7.8423312071483,
-        "y": 3.602562985426621
+        "x": 7.842331207148301,
+        "y": 3.266157849905936
       },
       "nextControl": {
         "x": 7.416048502139798,
-        "y": 4.222610556348075
+        "y": 3.8862054208273906
       },
       "isLocked": false,
       "linkedName": "AllianceTopHubRight"
@@ -63,11 +63,11 @@
   "rotationTargets": [
     {
       "waypointRelativePos": 0.7228144989339118,
-      "rotationDegrees": 100
+      "rotationDegrees": 100.0
     },
     {
       "waypointRelativePos": 1.2857142857142783,
-      "rotationDegrees": 100
+      "rotationDegrees": 100.0
     }
   ],
   "constraintZones": [],
@@ -83,13 +83,13 @@
   },
   "goalEndState": {
     "velocity": 3.0,
-    "rotation": -135
+    "rotation": -135.0
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 180
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }

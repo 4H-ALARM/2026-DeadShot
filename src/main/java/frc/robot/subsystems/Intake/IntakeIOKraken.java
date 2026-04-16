@@ -90,7 +90,7 @@ public class IntakeIOKraken implements IntakeIO {
     m_intakingMotorConfig = new TalonFXConfiguration();
     m_rotationMotorConfig.Slot0 = m_rotationPIDConfigs;
     m_rotationMotorConfig.MotionMagic.MotionMagicCruiseVelocity =
-        IntakeConstants.angleMotionMagicCruiseVelocityDegreesPerSecond / 360.0;
+        IntakeConstants.angleMotionMagicCruiseVelocityRotationsPerSecond;
     m_rotationMotorConfig.MotionMagic.MotionMagicAcceleration =
         IntakeConstants.angleMotionMagicAccelerationDegreesPerSecondSquared / 360.0;
     m_rotationMotorConfig.MotionMagic.MotionMagicJerk =
@@ -101,7 +101,7 @@ public class IntakeIOKraken implements IntakeIO {
     m_rotationMotorFollow.getConfigurator().apply(m_rotationMotorConfig);
     m_intakingMotor.getConfigurator().apply(m_intakingMotorConfig);
     m_intakingMotorFollow.getConfigurator().apply(m_intakingMotorConfig);
-    m_requestedPosition = new DynamicMotionMagicVoltage(0, IntakeConstants.angleMotionMagicCruiseVelocityDegreesPerSecond, IntakeConstants.angleMotionMagicAccelerationDegreesPerSecondSquared);
+    m_requestedPosition = new DynamicMotionMagicVoltage(0, IntakeConstants.angleMotionMagicCruiseVelocityRotationsPerSecond, IntakeConstants.angleMotionMagicAccelerationDegreesPerSecondSquared);
     m_requestedVelocity = new VelocityTorqueCurrentFOC(0).withSlot(0);
     followercontrol = new Follower(IntakeConstants.intakingMotorID, MotorAlignmentValue.Opposed);
     rotationFollowerControl =
@@ -195,7 +195,7 @@ public class IntakeIOKraken implements IntakeIO {
   }
 
   public void resetMotionMagic() {
-    m_requestedPosition.Velocity = IntakeConstants.angleMotionMagicCruiseVelocityDegreesPerSecond;
+    m_requestedPosition.Velocity = IntakeConstants.angleMotionMagicCruiseVelocityRotationsPerSecond;
   }
 
   public void updateInputs(IntakeIOInputs inputs) {

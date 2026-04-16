@@ -25,7 +25,7 @@ public class IntakeConstants {
   public static final double angleMotorkv = 1.87;
   public static final double angleMotorkg = 0.5;
   public static final double angleMotorka = 0.25;
-  public static final double angleMotionMagicCruiseVelocityDegreesPerSecond = 0.75;
+  public static final double angleMotionMagicCruiseVelocityRotationsPerSecond = 0.75;
   public static final double angleMotionMagicAccelerationDegreesPerSecondSquared = 1000*5;
   public static final double angleMotionMagicJerkDegreesPerSecondCubed = 0.0;
   public static final double anglePositionToleranceDegrees = 3.0;

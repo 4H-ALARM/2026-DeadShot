@@ -214,7 +214,7 @@ public class RobotContainer {
                 drive)
             .ignoringDisable(true);
     ShootFromTowerCommand =
-        Commands.runEnd(() -> shooter.spinShooter(1825 / 60), () -> shooter.stopShooter(), shooter);
+        Commands.runEnd(() -> shooter.spinShooter(1955 / 60), () -> shooter.stopShooter(), shooter);
     NamedCommands.registerCommand("Shoot", autoShootCommand);
     NamedCommands.registerCommand("Deploy intake", new DeployIntake(intake));
     NamedCommands.registerCommand("Intake", intakeCommandAuto);
@@ -275,8 +275,7 @@ public class RobotContainer {
     // TODO: this requires the shooter, but would not allow indexer to run from the pilot command.
     OperatorController.rightBumper()
         .whileTrue(
-            Commands.runEnd(
-                () -> shooter.spinShooter(2500/60), () -> shooter.stopShooter())
+           ShootFromTowerCommand
         );
     OperatorController.b()
         .onTrue( new InstantCommand(() -> shooter.setTarget(GenericConstants.RIGHTPASSING)))

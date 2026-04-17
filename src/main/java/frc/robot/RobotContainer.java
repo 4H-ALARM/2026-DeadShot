@@ -24,6 +24,7 @@ import frc.lib.Constants.ShooterConstants;
 import frc.lib.Constants.SwerveConstants;
 import frc.lib.catalyst.hardware.MotorType;
 import frc.lib.catalyst.mechanisms.RotationalMechanism;
+import frc.lib.util.BetterAutoChooser;
 import frc.robot.commands.DeployIntake;
 import frc.robot.commands.AutoShoot;
 import frc.robot.commands.DriveCommands;
@@ -219,7 +220,7 @@ public class RobotContainer {
     NamedCommands.registerCommand("Deploy intake", new DeployIntake(intake));
     NamedCommands.registerCommand("Intake", intakeCommandAuto);
 
-    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+    autoChooser = new LoggedDashboardChooser<>("Auto Choices", BetterAutoChooser.buildAutoChooser());
 
     // Configure the button bindings
     configureButtonBindings();

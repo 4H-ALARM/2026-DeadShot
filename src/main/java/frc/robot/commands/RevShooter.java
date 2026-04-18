@@ -43,7 +43,7 @@ public class RevShooter extends Command {
       m_shooter.stopShooter();
       m_shooter.setIndexerSpeed(0);
     }
-    
+
   }
 
   // Returns true when the command should end.

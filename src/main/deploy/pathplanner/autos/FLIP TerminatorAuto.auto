@@ -9,15 +9,28 @@
           "data": {
             "commands": [
               {
-                "type": "path",
+                "type": "wait",
                 "data": {
-                  "pathName": "TerminatorTrenchToMidLeft"
+                  "waitTime": 7.5
                 }
               },
               {
                 "type": "named",
                 "data": {
                   "name": "Deploy intake"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "TerminatorTrenchToMidLeft"
                 }
               }
             ]

@@ -6,6 +6,7 @@ package frc.robot.subsystems.intake;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DynamicMotionMagicVoltage;
@@ -99,6 +100,9 @@ public class IntakeIOKraken implements IntakeIO {
     m_intakingMotorConfig.Slot0 = m_intakingPIDConfigs;
     m_rotationMotorConfig.Feedback.SensorToMechanismRatio = rotationGearRatio.get();
     m_rotationMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    m_intakingMotorConfig.CurrentLimits = new CurrentLimitsConfigs()
+      .withSupplyCurrentLimit(50)
+      .withSupplyCurrentLimitEnable(true);
     m_rotationMotor.getConfigurator().apply(m_rotationMotorConfig);
     m_rotationMotorFollow.getConfigurator().apply(m_rotationMotorConfig);
     m_intakingMotor.getConfigurator().apply(m_intakingMotorConfig);

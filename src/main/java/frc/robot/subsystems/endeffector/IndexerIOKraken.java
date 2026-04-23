@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.endeffector;
 
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
@@ -43,6 +44,11 @@ public class IndexerIOKraken implements IndexerIO {
 
     m_configurator = new TalonFXConfiguration();
     m_configurator.Slot0 = m_slot0Configs;
+    m_configurator.CurrentLimits = new CurrentLimitsConfigs()
+      .withStatorCurrentLimit(80)
+      .withStatorCurrentLimitEnable(true)
+      .withSupplyCurrentLimit(50)
+      .withSupplyCurrentLimitEnable(true);
 
     m_configurator.MotionMagic.MotionMagicCruiseVelocity =
         ShooterConstants.indexerCruiseVelocity;
@@ -52,6 +58,7 @@ public class IndexerIOKraken implements IndexerIO {
         ShooterConstants.indexerJerk;
 
     m_indexerMotor.getConfigurator().apply(m_configurator);
+   // m_indexerMotorFollower.getConfigurator().apply(m_configurator);
 
     m_motionMagicVelocity = new MotionMagicVelocityTorqueCurrentFOC(0);
   }

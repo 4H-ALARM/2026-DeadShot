@@ -32,7 +32,7 @@ public class RevShooter extends Command {
     m_shooter.spinShooterFromLookup();
     indexerSpeed = indexerSpeed -0.001;
     if (indexerSpeed<400){indexerSpeed = 400;}
-    m_shooter.setIndexerSpeed(indexerSpeed);
+    m_shooter.setIndexerSpeed(indexerSpeed/60);
   }
 
   // Called once the command ends or is interrupted.
@@ -43,6 +43,7 @@ public class RevShooter extends Command {
       m_shooter.stopShooter();
       m_shooter.setIndexerSpeed(0);
     }
+
   }
 
   // Returns true when the command should end.

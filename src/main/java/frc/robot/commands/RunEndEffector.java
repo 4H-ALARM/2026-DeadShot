@@ -41,7 +41,7 @@ public class RunEndEffector extends Command {
     this.m_shooter = shooter;
     this.m_intake = intake;
     this.m_indexerSpeed = indexerSpeed;
-    addRequirements(shooter, intake);
+    addRequirements(shooter);
   }
 
   // Called when the command is initially scheduled.

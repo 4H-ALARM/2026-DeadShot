@@ -14,6 +14,7 @@ public interface IntakeIO {
     public boolean rotationMotorConnected;
     public boolean rotationMotorFollowerConnected;
     public boolean intakingMotorConnected;
+    public boolean intakeActive;
 
     public double rotationDegrees;
     public double rotationPrimaryDegrees;

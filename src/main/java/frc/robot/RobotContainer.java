@@ -24,6 +24,7 @@ import frc.lib.Constants.ShooterConstants;
 import frc.lib.Constants.SwerveConstants;
 import frc.lib.catalyst.hardware.MotorType;
 import frc.lib.catalyst.mechanisms.RotationalMechanism;
+import frc.lib.util.BetterAutoChooser;
 import frc.robot.commands.DeployIntake;
 import frc.robot.commands.AutoShoot;
 import frc.robot.commands.DriveCommands;
@@ -116,8 +117,8 @@ public class RobotContainer {
                 drive::addVisionMeasurement,
                 new VisionIOPhotonVision(camera0Name, backLeft),
                 new VisionIOPhotonVision(camera1Name, backRight),
-                new VisionIOPhotonVision(camera2Name, sideLeft)//,
-                // new VisionIOPhotonVision(camera3Name, sideRight)
+                new VisionIOPhotonVision(camera2Name, sideLeft),
+                new VisionIOPhotonVision(camera3Name, sideRight)
                 );
 
         shooter =
@@ -214,12 +215,12 @@ public class RobotContainer {
                 drive)
             .ignoringDisable(true);
     ShootFromTowerCommand =
-        Commands.runEnd(() -> shooter.spinShooter(1825 / 60), () -> shooter.stopShooter(), shooter);
+        Commands.runEnd(() -> shooter.spinShooter(1955 / 60), () -> shooter.stopShooter(), shooter);
     NamedCommands.registerCommand("Shoot", autoShootCommand);
     NamedCommands.registerCommand("Deploy intake", new DeployIntake(intake));
     NamedCommands.registerCommand("Intake", intakeCommandAuto);
 
-    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+    autoChooser = new LoggedDashboardChooser<>("Auto Choices", BetterAutoChooser.buildAutoChooser());
 
     // Configure the button bindings
     configureButtonBindings();
@@ -275,8 +276,7 @@ public class RobotContainer {
     // TODO: this requires the shooter, but would not allow indexer to run from the pilot command.
     OperatorController.rightBumper()
         .whileTrue(
-            Commands.runEnd(
-                () -> shooter.spinShooter(2500/60), () -> shooter.stopShooter())
+           ShootFromTowerCommand
         );
     OperatorController.b()
         .onTrue( new InstantCommand(() -> shooter.setTarget(GenericConstants.RIGHTPASSING)))

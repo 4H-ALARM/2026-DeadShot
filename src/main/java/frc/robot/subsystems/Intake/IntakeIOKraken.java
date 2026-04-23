@@ -6,6 +6,7 @@ package frc.robot.subsystems.intake;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DynamicMotionMagicVoltage;
@@ -16,6 +17,7 @@ import com.ctre.phoenix6.hardware.ParentDevice;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.units.measure.Angle;
@@ -97,6 +99,10 @@ public class IntakeIOKraken implements IntakeIO {
         IntakeConstants.angleMotionMagicJerkDegreesPerSecondCubed / 360.0;
     m_intakingMotorConfig.Slot0 = m_intakingPIDConfigs;
     m_rotationMotorConfig.Feedback.SensorToMechanismRatio = rotationGearRatio.get();
+    m_rotationMotorConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    m_intakingMotorConfig.CurrentLimits = new CurrentLimitsConfigs()
+      .withSupplyCurrentLimit(50)
+      .withSupplyCurrentLimitEnable(true);
     m_rotationMotor.getConfigurator().apply(m_rotationMotorConfig);
     m_rotationMotorFollow.getConfigurator().apply(m_rotationMotorConfig);
     m_intakingMotor.getConfigurator().apply(m_intakingMotorConfig);
@@ -212,5 +218,6 @@ public class IntakeIOKraken implements IntakeIO {
     inputs.rotationFollowerDegrees = m_rotationFollowerPosition.getValueAsDouble() * 360.0;
     inputs.rotationSpeedDegreesPerSecond = m_rotationVelocity.getValueAsDouble() * 360.0;
     inputs.rotationSetpointDegrees = m_requestedAngleDegrees;
+    inputs.intakeActive = m_intakingMotor.getVelocity().getValueAsDouble() * 60>100;
   }
 }

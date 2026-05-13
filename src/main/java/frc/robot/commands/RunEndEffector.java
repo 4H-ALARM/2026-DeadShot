@@ -78,7 +78,7 @@ public class RunEndEffector extends Command {
     // m_shooter.spinShooterFromLookup();
 
 
-    if (m_shooter.isShooterReadyToStartIndexer()) {
+    if (true) {
       m_shooter.setIndexerSpeed(m_indexerSpeed);
     } else {
      // m_shooter.stopIndexer();

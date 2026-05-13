@@ -281,7 +281,7 @@ public class Shooter extends SubsystemBase {
 
   /** Spins the shooter at the lookup-table RPM based on distance to the current target. */
   public void spinShooterFromLookup() {
-    applyLookupSetpoints();
+    //applyLookupSetpoints();
   }
 
   public void spinShooter(double speed) {

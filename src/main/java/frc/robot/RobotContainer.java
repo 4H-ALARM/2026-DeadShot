@@ -105,13 +105,22 @@ public class RobotContainer {
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
+        // drive =
+        //     new Drive(
+        //         new GyroIOPigeon2(),
+        //         new ModuleIOTalonFX(SwerveConstants.FrontLeft),
+        //         new ModuleIOTalonFX(SwerveConstants.FrontRight),
+        //         new ModuleIOTalonFX(SwerveConstants.BackLeft),
+        //         new ModuleIOTalonFX(SwerveConstants.BackRight));
+
         drive =
             new Drive(
-                new GyroIOPigeon2(),
-                new ModuleIOTalonFX(SwerveConstants.FrontLeft),
-                new ModuleIOTalonFX(SwerveConstants.FrontRight),
-                new ModuleIOTalonFX(SwerveConstants.BackLeft),
-                new ModuleIOTalonFX(SwerveConstants.BackRight));
+                new GyroIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {},
+                new ModuleIO() {});
+
 
         vision =
             new Vision(
@@ -204,7 +213,7 @@ public class RobotContainer {
         Commands.runEnd(() -> shooter.setIndexerSpeed(-6300 / 60), () -> shooter.setIndexerSpeed(0));
     // autoShootCommand = AutoShoot.autoShoot(shooter, drive, intake, pilotForwardInput, pilotStrafeInput).withTimeout(3.85);
     // ShootCommand = AutoShoot.autoShoot(shooter, drive, intake, pilotForwardInput, pilotStrafeInput);
-    ShootCommand = new ShootBall(shooter, intake, -3000, 1000);
+    ShootCommand = new ShootBall(shooter, intake, -4000, 1500);
     intakeCommand =
         Commands.runEnd(() -> intake.setIntakeSpeed(-2000 / 60), () -> intake.setIntakeSpeed(0), intake);
     ejectCommand =

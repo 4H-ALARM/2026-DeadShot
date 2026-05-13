@@ -26,10 +26,11 @@ public class AutoShoot {
       Drive drive,
       Intake intake,
       DoubleSupplier xSupplier,
-      DoubleSupplier ySupplier) {
+      DoubleSupplier ySupplier,
+      double shooterSpeedInRPM) {
     return Commands.parallel(
         // Spin shooter at lookup RPM
-        new ShootBall(shooter, intake, -5900.0),
+        new ShootBall(shooter, intake, -5900.0, shooterSpeedInRPM),
         Commands.run(() -> shooter.setHoodAngle(shooter.getActiveTargetHoodAngle())),
         // Aim drive at target
         DriveCommands.joystickDriveAtAngle(

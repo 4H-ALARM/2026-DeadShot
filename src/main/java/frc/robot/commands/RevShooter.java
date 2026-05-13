@@ -11,10 +11,11 @@ import frc.robot.subsystems.endeffector.Shooter;
 public class RevShooter extends Command {
   /** Creates a new ShootBall. */
   private Shooter m_shooter;
+  private final double m_shooterSpeed;
   private double indexerSpeed;
 
-  public RevShooter(Shooter shooter) {
-
+  public RevShooter(Shooter shooter, double shooterSpeedInRPM) {
+    this.m_shooterSpeed = shooterSpeedInRPM;
     this.m_shooter = shooter;
     addRequirements(shooter);
     // Use addRequirements() here to declare subsystem dependencies.
@@ -29,7 +30,8 @@ public class RevShooter extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_shooter.spinShooterFromLookup();
+    // m_shooter.spinShooterFromLookup();
+    m_shooter.spinShooter(m_shooterSpeed/60);
     indexerSpeed = indexerSpeed -0.001;
     if (indexerSpeed<400){indexerSpeed = 400;}
     m_shooter.setIndexerSpeed(indexerSpeed/60);

@@ -22,6 +22,7 @@ public class RunEndEffector extends Command {
   private static final double INTAKE_DWELL_SECONDS = 0.2;
 
   private final double m_indexerSpeed;
+  private final double m_shooterSpeed;
   private final Shooter m_shooter;
   private final Intake m_intake;
   private final Timer m_phaseTimer = new Timer();
@@ -37,10 +38,11 @@ public class RunEndEffector extends Command {
   }
 
   /** Creates a new RunEndEffector. */
-  public RunEndEffector(Shooter shooter, Intake intake, double indexerSpeed) {
+  public RunEndEffector(Shooter shooter, Intake intake, double indexerSpeed, double shooterSpeedInRPM) {
     this.m_shooter = shooter;
     this.m_intake = intake;
     this.m_indexerSpeed = indexerSpeed;
+    this.m_shooterSpeed = shooterSpeedInRPM;
     addRequirements(shooter);
   }
 
@@ -49,7 +51,8 @@ public class RunEndEffector extends Command {
   public void initialize() {
     initializeJostle();
 
-    m_shooter.spinShooterFromLookup();
+    m_shooter.spinShooter(m_shooterSpeed/60);
+    // m_shooter.spinShooterFromLookup();
     m_shooter.stopIndexer();
     //m_shooter.setIndexerSpeed(m_indexerSpeed);
     // m_intake.setIntakeSpeed(-5900 / 60);
@@ -72,10 +75,10 @@ public class RunEndEffector extends Command {
       initializeJostle();
     }
 
-    m_shooter.spinShooterFromLookup();
+    // m_shooter.spinShooterFromLookup();
 
 
-    if (m_shooter.isShooterReadyToStartIndexer()) {
+    if (true) {
       m_shooter.setIndexerSpeed(m_indexerSpeed);
     } else {
      // m_shooter.stopIndexer();

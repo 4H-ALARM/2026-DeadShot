@@ -13,12 +13,12 @@ import frc.robot.subsystems.intake.Intake;
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class ShootBall extends SequentialCommandGroup {
   /** Creates a new ShootBall. */
-  public ShootBall(Shooter shooter, Intake intake, double indexerSpeed) {
+  public ShootBall(Shooter shooter, Intake intake, double indexerSpeed, double shooterSpeedInRPM) {
 
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-        new RevShooter(shooter).withTimeout(1),
-        new RunEndEffector(shooter, intake, indexerSpeed));
+        new RevShooter(shooter, shooterSpeedInRPM).withTimeout(1),
+        new RunEndEffector(shooter, intake, indexerSpeed, shooterSpeedInRPM));
   }
 }

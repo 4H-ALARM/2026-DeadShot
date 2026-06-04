@@ -277,7 +277,8 @@ public class RobotContainer {
     OperatorController.rightBumper()
         .whileTrue(
            ShootFromTowerCommand
-        );
+        )
+        .onTrue(Commands.runOnce(() ->shooter.setHoodAngle(0)));
     OperatorController.b()
         .onTrue( new InstantCommand(() -> shooter.setTarget(GenericConstants.RIGHTPASSING)))
         .onFalse(new InstantCommand(() -> shooter.resetTarget()));

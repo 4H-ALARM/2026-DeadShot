@@ -17,6 +17,7 @@ public class BetterAutoChooser {
   private static final boolean RIGHT_IS_FLIPPED = true;
   private static final String DEFAULT_NAME = "None";
   private static final String FLIP_PREFIX = "FLIP ";
+    private static final String MIRROR_PREFIX = "MIRROR ";
 
   private static Map<String, Pose2d> startingPoses = new HashMap<>();
 
@@ -36,6 +37,9 @@ public class BetterAutoChooser {
         String remainder = name.substring(FLIP_PREFIX.length());
         registerAuto("Right" + remainder + " (Generated)", new PathPlannerAuto(name, RIGHT_IS_FLIPPED));
         registerAuto("Left" + remainder + " (Generated)", new PathPlannerAuto(name, !RIGHT_IS_FLIPPED));
+      } else if(name.startsWith(MIRROR_PREFIX)) {
+        String remainder = name.substring(MIRROR_PREFIX.length());
+        registerAuto("RightMirrored" + remainder + " (Generated)", new PathPlannerAuto(name, RIGHT_IS_FLIPPED));
       } else {
         registerAuto(name, new PathPlannerAuto(name));
       }

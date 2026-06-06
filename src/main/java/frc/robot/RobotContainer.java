@@ -79,12 +79,16 @@ public class RobotContainer {
   private final Command driveDefaultCommand;
   private final Command indexerReverseCommand;
   private final Command autoShootCommand;
+  private final Command autoShootCommandPassing;
   private final Command intakeCommand;
   private final Command ejectCommand;
   private final Command intakeCommandAuto;
   private final Command resetGyroCommand;
   private final Command ShootCommand;
   private final Command ShootFromTowerCommand;
+  private final Command passingTargetLeftAuto;
+  private final Command passingTargetRightAuto;
+  private final Command xLockAuto;
 
 
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -202,6 +206,7 @@ public class RobotContainer {
     indexerReverseCommand =
         Commands.runEnd(() -> shooter.setIndexerSpeed(-6300 / 60), () -> shooter.setIndexerSpeed(0));
     autoShootCommand = AutoShoot.autoShoot(shooter, drive, intake, pilotForwardInput, pilotStrafeInput).withTimeout(3.85);
+    autoShootCommandPassing = AutoShoot.autoShoot(shooter, drive, intake, pilotForwardInput, pilotStrafeInput).withTimeout(3.25);
     ShootCommand = AutoShoot.autoShoot(shooter, drive, intake, pilotForwardInput, pilotStrafeInput);
     intakeCommand =
         Commands.runEnd(() -> intake.setIntakeSpeed(-5900 / 60), () -> intake.setIntakeSpeed(0), intake);
@@ -216,9 +221,20 @@ public class RobotContainer {
             .ignoringDisable(true);
     ShootFromTowerCommand =
         Commands.runEnd(() -> shooter.spinShooter(1955 / 60), () -> shooter.stopShooter(), shooter);
+    passingTargetLeftAuto =
+        Commands.runEnd(() -> shooter.setTarget(GenericConstants.LEFTPASSING), () -> shooter.setTarget(GenericConstants.HUB_POSE3D)).withTimeout(5);
+     passingTargetRightAuto =
+        Commands.runEnd(() -> shooter.setTarget(GenericConstants.RIGHTPASSING), () -> shooter.setTarget(GenericConstants.HUB_POSE3D)).withTimeout(5);
+    xLockAuto =
+        new InstantCommand(() -> drive.stopWithX(), drive);
+
     NamedCommands.registerCommand("Shoot", autoShootCommand);
+    NamedCommands.registerCommand("Passing shoot", autoShootCommandPassing);
     NamedCommands.registerCommand("Deploy intake", new DeployIntake(intake));
     NamedCommands.registerCommand("Intake", intakeCommandAuto);
+    NamedCommands.registerCommand("Pass Left", passingTargetLeftAuto);
+    NamedCommands.registerCommand("Pass Right", passingTargetRightAuto);
+    NamedCommands.registerCommand("xLock", xLockAuto);
 
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", BetterAutoChooser.buildAutoChooser());
 

@@ -3,24 +3,24 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.63796005706134,
-        "y": 3.9767760342368046
+        "x": 6.458587731811697,
+        "y": 5.490599144079885
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.6158059914407983,
-        "y": 3.9638373751783167
+        "x": 7.027888730385165,
+        "y": 4.714279600570612
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "BattleCryBump"
     },
     {
       "anchor": {
-        "x": 2.589,
-        "y": 3.9767760342368046
+        "x": 8.218245363766048,
+        "y": 4.015592011412268
       },
       "prevControl": {
-        "x": 3.391196861626248,
+        "x": 7.218245363766048,
         "y": 4.015592011412268
       },
       "nextControl": null,
@@ -41,14 +41,14 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
+    "velocity": 0.0,
     "rotation": 180.0
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": 135.0
   },
   "useDefaultConstraints": true
 }

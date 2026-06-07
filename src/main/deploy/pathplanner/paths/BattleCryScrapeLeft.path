@@ -20,12 +20,12 @@
         "y": 6.189286733238232
       },
       "prevControl": {
-        "x": 7.6801659536207545,
-        "y": 7.246738695235862
+        "x": 7.700699001426534,
+        "y": 7.2469380264274506
       },
       "nextControl": {
-        "x": 7.7265763195435095,
-        "y": 4.85660485021398
+        "x": 7.700699001426534,
+        "y": 4.895420827389444
       },
       "isLocked": false,
       "linkedName": null
@@ -48,32 +48,32 @@
     },
     {
       "anchor": {
-        "x": 6.186875891583452,
-        "y": 4.132039942938659
+        "x": 6.096305278174036,
+        "y": 4.261426533523538
       },
       "prevControl": {
-        "x": 5.998224511042576,
-        "y": 3.9679952642074623
+        "x": 5.90765389763316,
+        "y": 4.097381854792341
       },
       "nextControl": {
-        "x": 6.782054208273894,
-        "y": 4.6495863052781745
+        "x": 6.6914835948644775,
+        "y": 4.7789728958630535
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 6.303323823109842,
-        "y": 5.283580599144081
+        "x": 6.458587731811697,
+        "y": 5.490599144079885
       },
       "prevControl": {
-        "x": 6.924379457917261,
-        "y": 5.024807417974324
+        "x": 7.079643366619115,
+        "y": 5.231825962910128
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "NeutralZoneTopBump"
+      "linkedName": "BattleCryBump"
     }
   ],
   "rotationTargets": [
@@ -86,21 +86,7 @@
       "rotationDegrees": -100.0
     }
   ],
-  "constraintZones": [
-    {
-      "name": "Constraints Zone",
-      "minWaypointRelativePos": 0.8534773801485731,
-      "maxWaypointRelativePos": 3.3166779203240835,
-      "constraints": {
-        "maxVelocity": 2.5,
-        "maxAcceleration": 5.0,
-        "maxAngularVelocity": 540.0,
-        "maxAngularAcceleration": 720.0,
-        "nominalVoltage": 12.0,
-        "unlimited": false
-      }
-    }
-  ],
+  "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
@@ -112,7 +98,7 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 3.0,
+    "velocity": 0.0,
     "rotation": 135.0
   },
   "reversed": false,

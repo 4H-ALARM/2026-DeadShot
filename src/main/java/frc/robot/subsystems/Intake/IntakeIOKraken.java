@@ -218,6 +218,7 @@ public class IntakeIOKraken implements IntakeIO {
     inputs.rotationFollowerDegrees = m_rotationFollowerPosition.getValueAsDouble() * 360.0;
     inputs.rotationSpeedDegreesPerSecond = m_rotationVelocity.getValueAsDouble() * 360.0;
     inputs.rotationSetpointDegrees = m_requestedAngleDegrees;
-    inputs.intakeActive = m_intakingMotor.getVelocity().getValueAsDouble() * 60>100;
+    inputs.intakeActive = (m_intakingMotor.getVelocity().getValueAsDouble() * 60) > 100;
+    inputs.intakeMotorSpeedRPM = m_intakingMotor.getVelocity().getValueAsDouble() * 60;
   }
 }

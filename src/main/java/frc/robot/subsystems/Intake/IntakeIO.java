@@ -21,6 +21,7 @@ public interface IntakeIO {
     public double rotationFollowerDegrees;
     public double rotationSpeedDegreesPerSecond;
     public double rotationSetpointDegrees;
+    public double intakeMotorSpeedRPM;
   }
 
   public void resetEncoder();

@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 6.458587731811697,
+        "y": 5.490599144079885
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 7.027888730385165,
+        "y": 4.714279600570612
+      },
+      "isLocked": false,
+      "linkedName": "BattleCryBump"
+    },
+    {
+      "anchor": {
+        "x": 8.218245363766048,
+        "y": 4.015592011412268
+      },
+      "prevControl": {
+        "x": 7.218245363766048,
+        "y": 4.015592011412268
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 5.0,
+    "maxAcceleration": 5.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0.0,
+    "rotation": 180.0
+  },
+  "reversed": false,
+  "folder": null,
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 135.0
+  },
+  "useDefaultConstraints": true
+}

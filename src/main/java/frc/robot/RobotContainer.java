@@ -284,7 +284,7 @@ public class RobotContainer {
         .whileTrue(
             ShootCommand).onFalse(new InstantCommand(() -> shooter.stopShooter()) );
     pilotLeftTrigger
-        .toggleOnTrue(
+        .whileTrue(
             intakeCommand);
     pilotLeftBumper
         .onTrue(deployIntake);
